@@ -1,0 +1,1641 @@
+{
+  "updated_at": "2026-08-07T03:43:16.106632",
+  "target_date": "Aug 07, 2026",
+  "commodities": {
+    "Bawang Merah": {
+      "commodity_id": "5",
+      "national_avg": 39750.0,
+      "provinces_count": 32,
+      "prices": [
+        {
+          "prov_id": 6,
+          "province": "Jambi",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 30150.0,
+          "price_diff": "Rp650",
+          "national_avg": 39750.0,
+          "percentage_change": 2.2
+        },
+        {
+          "prov_id": 18,
+          "province": "Nusa Tenggara Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 30900.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 17,
+          "province": "Bali",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 31650.0,
+          "price_diff": "-Rp150",
+          "national_avg": 39750.0,
+          "percentage_change": -0.47
+        },
+        {
+          "prov_id": 16,
+          "province": "Jawa Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 31950.0,
+          "price_diff": "Rp1050",
+          "national_avg": 39750.0,
+          "percentage_change": 3.4
+        },
+        {
+          "prov_id": 3,
+          "province": "Sumatera Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 32000.0,
+          "price_diff": "-Rp2000",
+          "national_avg": 39750.0,
+          "percentage_change": -5.88
+        },
+        {
+          "prov_id": 4,
+          "province": "Riau",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 32250.0,
+          "price_diff": "-Rp400",
+          "national_avg": 39750.0,
+          "percentage_change": -1.23
+        },
+        {
+          "prov_id": 2,
+          "province": "Sumatera Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 32550.0,
+          "price_diff": "Rp100",
+          "national_avg": 39750.0,
+          "percentage_change": 0.31
+        },
+        {
+          "prov_id": 14,
+          "province": "Jawa Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 32800.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 10,
+          "province": "Lampung",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 33000.0,
+          "price_diff": "-Rp150",
+          "national_avg": 39750.0,
+          "percentage_change": -0.45
+        },
+        {
+          "prov_id": 19,
+          "province": "Nusa Tenggara Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 34150.0,
+          "price_diff": "-Rp450",
+          "national_avg": 39750.0,
+          "percentage_change": -1.3
+        },
+        {
+          "prov_id": 26,
+          "province": "Sulawesi Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 34750.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 8,
+          "province": "Sumatera Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 35900.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 12,
+          "province": "Jawa Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 36400.0,
+          "price_diff": "-Rp50",
+          "national_avg": 39750.0,
+          "percentage_change": -0.14
+        },
+        {
+          "prov_id": 21,
+          "province": "Kalimantan Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 37250.0,
+          "price_diff": "-Rp350",
+          "national_avg": 39750.0,
+          "percentage_change": -0.93
+        },
+        {
+          "prov_id": 11,
+          "province": "Banten",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 37350.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 13,
+          "province": "DKI Jakarta",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 37700.0,
+          "price_diff": "-Rp450",
+          "national_avg": 39750.0,
+          "percentage_change": -1.18
+        },
+        {
+          "prov_id": 5,
+          "province": "Kepulauan Riau",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 38000.0,
+          "price_diff": "-Rp250",
+          "national_avg": 39750.0,
+          "percentage_change": -0.65
+        },
+        {
+          "prov_id": 22,
+          "province": "Kalimantan Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 38500.0,
+          "price_diff": "-Rp900",
+          "national_avg": 39750.0,
+          "percentage_change": -2.28
+        },
+        {
+          "prov_id": 23,
+          "province": "Kalimantan Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 39750.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 39750.0,
+          "percentage_change": -3.05
+        },
+        {
+          "prov_id": 25,
+          "province": "Gorontalo",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 40000.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 30,
+          "province": "Sulawesi Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 40400.0,
+          "price_diff": "-Rp850",
+          "national_avg": 39750.0,
+          "percentage_change": -2.06
+        },
+        {
+          "prov_id": 15,
+          "province": "DI Yogyakarta",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 40500.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 9,
+          "province": "Kepulauan Bangka Belitung",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 42150.0,
+          "price_diff": "-Rp750",
+          "national_avg": 39750.0,
+          "percentage_change": -1.75
+        },
+        {
+          "prov_id": 28,
+          "province": "Sulawesi Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 42400.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 29,
+          "province": "Sulawesi Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 44250.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 7,
+          "province": "Bengkulu",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 44500.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 24,
+          "province": "Kalimantan Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 45400.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 27,
+          "province": "Sulawesi Tenggara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 46250.0,
+          "price_diff": "-Rp650",
+          "national_avg": 39750.0,
+          "percentage_change": -1.39
+        },
+        {
+          "prov_id": 31,
+          "province": "Maluku",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 48750.0,
+          "price_diff": "-Rp150",
+          "national_avg": 39750.0,
+          "percentage_change": -0.31
+        },
+        {
+          "prov_id": 34,
+          "province": "Papua Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 52500.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 32,
+          "province": "Maluku Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 62500.0,
+          "price_diff": "Rp0",
+          "national_avg": 39750.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 33,
+          "province": "Papua",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Merah",
+          "price": 65650.0,
+          "price_diff": "-Rp100",
+          "national_avg": 39750.0,
+          "percentage_change": -0.15
+        }
+      ]
+    },
+    "Bawang Putih": {
+      "commodity_id": "6",
+      "national_avg": 41300.0,
+      "provinces_count": 32,
+      "prices": [
+        {
+          "prov_id": 16,
+          "province": "Jawa Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 30550.0,
+          "price_diff": "Rp200",
+          "national_avg": 41300.0,
+          "percentage_change": 0.66
+        },
+        {
+          "prov_id": 5,
+          "province": "Kepulauan Riau",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 31100.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 17,
+          "province": "Bali",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 33800.0,
+          "price_diff": "-Rp200",
+          "national_avg": 41300.0,
+          "percentage_change": -0.59
+        },
+        {
+          "prov_id": 6,
+          "province": "Jambi",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 34150.0,
+          "price_diff": "-Rp250",
+          "national_avg": 41300.0,
+          "percentage_change": -0.73
+        },
+        {
+          "prov_id": 2,
+          "province": "Sumatera Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36150.0,
+          "price_diff": "Rp100",
+          "national_avg": 41300.0,
+          "percentage_change": 0.28
+        },
+        {
+          "prov_id": 10,
+          "province": "Lampung",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36400.0,
+          "price_diff": "-Rp500",
+          "national_avg": 41300.0,
+          "percentage_change": -1.36
+        },
+        {
+          "prov_id": 3,
+          "province": "Sumatera Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36500.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 41300.0,
+          "percentage_change": -3.31
+        },
+        {
+          "prov_id": 4,
+          "province": "Riau",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36600.0,
+          "price_diff": "-Rp300",
+          "national_avg": 41300.0,
+          "percentage_change": -0.81
+        },
+        {
+          "prov_id": 18,
+          "province": "Nusa Tenggara Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36650.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 21,
+          "province": "Kalimantan Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 36850.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 9,
+          "province": "Kepulauan Bangka Belitung",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 37400.0,
+          "price_diff": "Rp400",
+          "national_avg": 41300.0,
+          "percentage_change": 1.08
+        },
+        {
+          "prov_id": 11,
+          "province": "Banten",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 37400.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 14,
+          "province": "Jawa Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 37400.0,
+          "price_diff": "-Rp50",
+          "national_avg": 41300.0,
+          "percentage_change": -0.13
+        },
+        {
+          "prov_id": 8,
+          "province": "Sumatera Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 38900.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 22,
+          "province": "Kalimantan Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 39000.0,
+          "price_diff": "-Rp900",
+          "national_avg": 41300.0,
+          "percentage_change": -2.26
+        },
+        {
+          "prov_id": 12,
+          "province": "Jawa Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 39900.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 26,
+          "province": "Sulawesi Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 39950.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 30,
+          "province": "Sulawesi Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 40400.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 29,
+          "province": "Sulawesi Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 41400.0,
+          "price_diff": "-Rp500",
+          "national_avg": 41300.0,
+          "percentage_change": -1.19
+        },
+        {
+          "prov_id": 25,
+          "province": "Gorontalo",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 42500.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 28,
+          "province": "Sulawesi Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 42500.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 24,
+          "province": "Kalimantan Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 43150.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 7,
+          "province": "Bengkulu",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 43250.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 23,
+          "province": "Kalimantan Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 43750.0,
+          "price_diff": "Rp1850",
+          "national_avg": 41300.0,
+          "percentage_change": 4.42
+        },
+        {
+          "prov_id": 15,
+          "province": "DI Yogyakarta",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 44000.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 31,
+          "province": "Maluku",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 45650.0,
+          "price_diff": "-Rp600",
+          "national_avg": 41300.0,
+          "percentage_change": -1.3
+        },
+        {
+          "prov_id": 13,
+          "province": "DKI Jakarta",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 45850.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 19,
+          "province": "Nusa Tenggara Timur",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 47900.0,
+          "price_diff": "-Rp850",
+          "national_avg": 41300.0,
+          "percentage_change": -1.74
+        },
+        {
+          "prov_id": 27,
+          "province": "Sulawesi Tenggara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 48150.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 34,
+          "province": "Papua Barat",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 53750.0,
+          "price_diff": "Rp1250",
+          "national_avg": 41300.0,
+          "percentage_change": 2.38
+        },
+        {
+          "prov_id": 33,
+          "province": "Papua",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 58150.0,
+          "price_diff": "-Rp100",
+          "national_avg": 41300.0,
+          "percentage_change": -0.17
+        },
+        {
+          "prov_id": 32,
+          "province": "Maluku Utara",
+          "date": "06 Agt 26",
+          "commodity": "Bawang Putih",
+          "price": 62500.0,
+          "price_diff": "Rp0",
+          "national_avg": 41300.0,
+          "percentage_change": 0.0
+        }
+      ]
+    },
+    "Cabai Merah": {
+      "commodity_id": "7",
+      "national_avg": 48800.0,
+      "provinces_count": 32,
+      "prices": [
+        {
+          "prov_id": 29,
+          "province": "Sulawesi Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 31250.0,
+          "price_diff": "Rp1850",
+          "national_avg": 48800.0,
+          "percentage_change": 6.29
+        },
+        {
+          "prov_id": 16,
+          "province": "Jawa Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 34300.0,
+          "price_diff": "Rp0",
+          "national_avg": 48800.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 28,
+          "province": "Sulawesi Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 35000.0,
+          "price_diff": "Rp800",
+          "national_avg": 48800.0,
+          "percentage_change": 2.34
+        },
+        {
+          "prov_id": 18,
+          "province": "Nusa Tenggara Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 35750.0,
+          "price_diff": "-Rp1050",
+          "national_avg": 48800.0,
+          "percentage_change": -2.85
+        },
+        {
+          "prov_id": 17,
+          "province": "Bali",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 36550.0,
+          "price_diff": "-Rp50",
+          "national_avg": 48800.0,
+          "percentage_change": -0.14
+        },
+        {
+          "prov_id": 14,
+          "province": "Jawa Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 36600.0,
+          "price_diff": "Rp400",
+          "national_avg": 48800.0,
+          "percentage_change": 1.1
+        },
+        {
+          "prov_id": 15,
+          "province": "DI Yogyakarta",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 38250.0,
+          "price_diff": "Rp1250",
+          "national_avg": 48800.0,
+          "percentage_change": 3.38
+        },
+        {
+          "prov_id": 6,
+          "province": "Jambi",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 38650.0,
+          "price_diff": "-Rp900",
+          "national_avg": 48800.0,
+          "percentage_change": -2.28
+        },
+        {
+          "prov_id": 2,
+          "province": "Sumatera Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 38800.0,
+          "price_diff": "-Rp1350",
+          "national_avg": 48800.0,
+          "percentage_change": -3.36
+        },
+        {
+          "prov_id": 26,
+          "province": "Sulawesi Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 39050.0,
+          "price_diff": "-Rp250",
+          "national_avg": 48800.0,
+          "percentage_change": -0.64
+        },
+        {
+          "prov_id": 30,
+          "province": "Sulawesi Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 41250.0,
+          "price_diff": "Rp400",
+          "national_avg": 48800.0,
+          "percentage_change": 0.98
+        },
+        {
+          "prov_id": 25,
+          "province": "Gorontalo",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 41900.0,
+          "price_diff": "Rp0",
+          "national_avg": 48800.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 11,
+          "province": "Banten",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 42700.0,
+          "price_diff": "Rp1450",
+          "national_avg": 48800.0,
+          "percentage_change": 3.52
+        },
+        {
+          "prov_id": 10,
+          "province": "Lampung",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 43150.0,
+          "price_diff": "-Rp1700",
+          "national_avg": 48800.0,
+          "percentage_change": -3.79
+        },
+        {
+          "prov_id": 32,
+          "province": "Maluku Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 43750.0,
+          "price_diff": "Rp0",
+          "national_avg": 48800.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 3,
+          "province": "Sumatera Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 44000.0,
+          "price_diff": "-Rp2650",
+          "national_avg": 48800.0,
+          "percentage_change": -5.68
+        },
+        {
+          "prov_id": 13,
+          "province": "DKI Jakarta",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 45200.0,
+          "price_diff": "-Rp400",
+          "national_avg": 48800.0,
+          "percentage_change": -0.88
+        },
+        {
+          "prov_id": 7,
+          "province": "Bengkulu",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 49650.0,
+          "price_diff": "Rp500",
+          "national_avg": 48800.0,
+          "percentage_change": 1.02
+        },
+        {
+          "prov_id": 12,
+          "province": "Jawa Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 49750.0,
+          "price_diff": "Rp400",
+          "national_avg": 48800.0,
+          "percentage_change": 0.81
+        },
+        {
+          "prov_id": 19,
+          "province": "Nusa Tenggara Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 50650.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 48800.0,
+          "percentage_change": -2.41
+        },
+        {
+          "prov_id": 9,
+          "province": "Kepulauan Bangka Belitung",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 51150.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 48800.0,
+          "percentage_change": -2.39
+        },
+        {
+          "prov_id": 8,
+          "province": "Sumatera Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 51750.0,
+          "price_diff": "Rp2500",
+          "national_avg": 48800.0,
+          "percentage_change": 5.08
+        },
+        {
+          "prov_id": 4,
+          "province": "Riau",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 51900.0,
+          "price_diff": "-Rp1150",
+          "national_avg": 48800.0,
+          "percentage_change": -2.17
+        },
+        {
+          "prov_id": 23,
+          "province": "Kalimantan Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 52500.0,
+          "price_diff": "-Rp4100",
+          "national_avg": 48800.0,
+          "percentage_change": -7.24
+        },
+        {
+          "prov_id": 5,
+          "province": "Kepulauan Riau",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 54200.0,
+          "price_diff": "-Rp300",
+          "national_avg": 48800.0,
+          "percentage_change": -0.55
+        },
+        {
+          "prov_id": 21,
+          "province": "Kalimantan Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 55200.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 48800.0,
+          "percentage_change": -2.21
+        },
+        {
+          "prov_id": 27,
+          "province": "Sulawesi Tenggara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 59600.0,
+          "price_diff": "Rp350",
+          "national_avg": 48800.0,
+          "percentage_change": 0.59
+        },
+        {
+          "prov_id": 24,
+          "province": "Kalimantan Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 61450.0,
+          "price_diff": "-Rp250",
+          "national_avg": 48800.0,
+          "percentage_change": -0.41
+        },
+        {
+          "prov_id": 34,
+          "province": "Papua Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 73750.0,
+          "price_diff": "-Rp1250",
+          "national_avg": 48800.0,
+          "percentage_change": -1.67
+        },
+        {
+          "prov_id": 33,
+          "province": "Papua",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 75800.0,
+          "price_diff": "Rp600",
+          "national_avg": 48800.0,
+          "percentage_change": 0.8
+        },
+        {
+          "prov_id": 31,
+          "province": "Maluku",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 78750.0,
+          "price_diff": "Rp600",
+          "national_avg": 48800.0,
+          "percentage_change": 0.77
+        },
+        {
+          "prov_id": 22,
+          "province": "Kalimantan Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Merah",
+          "price": 79700.0,
+          "price_diff": "Rp0",
+          "national_avg": 48800.0,
+          "percentage_change": 0.0
+        }
+      ]
+    },
+    "Cabai Rawit": {
+      "commodity_id": "8",
+      "national_avg": 56450.0,
+      "provinces_count": 32,
+      "prices": [
+        {
+          "prov_id": 26,
+          "province": "Sulawesi Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 31350.0,
+          "price_diff": "Rp650",
+          "national_avg": 56450.0,
+          "percentage_change": 2.12
+        },
+        {
+          "prov_id": 30,
+          "province": "Sulawesi Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 37700.0,
+          "price_diff": "Rp3300",
+          "national_avg": 56450.0,
+          "percentage_change": 9.59
+        },
+        {
+          "prov_id": 16,
+          "province": "Jawa Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 41000.0,
+          "price_diff": "-Rp700",
+          "national_avg": 56450.0,
+          "percentage_change": -1.68
+        },
+        {
+          "prov_id": 14,
+          "province": "Jawa Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 41650.0,
+          "price_diff": "-Rp100",
+          "national_avg": 56450.0,
+          "percentage_change": -0.24
+        },
+        {
+          "prov_id": 15,
+          "province": "DI Yogyakarta",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 45250.0,
+          "price_diff": "-Rp650",
+          "national_avg": 56450.0,
+          "percentage_change": -1.42
+        },
+        {
+          "prov_id": 21,
+          "province": "Kalimantan Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 46250.0,
+          "price_diff": "-Rp2100",
+          "national_avg": 56450.0,
+          "percentage_change": -4.34
+        },
+        {
+          "prov_id": 18,
+          "province": "Nusa Tenggara Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 46400.0,
+          "price_diff": "-Rp950",
+          "national_avg": 56450.0,
+          "percentage_change": -2.01
+        },
+        {
+          "prov_id": 17,
+          "province": "Bali",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 47350.0,
+          "price_diff": "-Rp100",
+          "national_avg": 56450.0,
+          "percentage_change": -0.21
+        },
+        {
+          "prov_id": 27,
+          "province": "Sulawesi Tenggara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 47850.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 25,
+          "province": "Gorontalo",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 48750.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 10,
+          "province": "Lampung",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 50000.0,
+          "price_diff": "-Rp50",
+          "national_avg": 56450.0,
+          "percentage_change": -0.1
+        },
+        {
+          "prov_id": 11,
+          "province": "Banten",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 51000.0,
+          "price_diff": "-Rp550",
+          "national_avg": 56450.0,
+          "percentage_change": -1.07
+        },
+        {
+          "prov_id": 28,
+          "province": "Sulawesi Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 51900.0,
+          "price_diff": "Rp300",
+          "national_avg": 56450.0,
+          "percentage_change": 0.58
+        },
+        {
+          "prov_id": 12,
+          "province": "Jawa Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 53200.0,
+          "price_diff": "Rp600",
+          "national_avg": 56450.0,
+          "percentage_change": 1.14
+        },
+        {
+          "prov_id": 13,
+          "province": "DKI Jakarta",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 53300.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 6,
+          "province": "Jambi",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 56550.0,
+          "price_diff": "Rp3600",
+          "national_avg": 56450.0,
+          "percentage_change": 6.8
+        },
+        {
+          "prov_id": 3,
+          "province": "Sumatera Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 57500.0,
+          "price_diff": "-Rp7500",
+          "national_avg": 56450.0,
+          "percentage_change": -11.54
+        },
+        {
+          "prov_id": 23,
+          "province": "Kalimantan Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 58750.0,
+          "price_diff": "Rp4650",
+          "national_avg": 56450.0,
+          "percentage_change": 8.6
+        },
+        {
+          "prov_id": 29,
+          "province": "Sulawesi Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 59100.0,
+          "price_diff": "Rp100",
+          "national_avg": 56450.0,
+          "percentage_change": 0.17
+        },
+        {
+          "prov_id": 7,
+          "province": "Bengkulu",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 59400.0,
+          "price_diff": "Rp1900",
+          "national_avg": 56450.0,
+          "percentage_change": 3.3
+        },
+        {
+          "prov_id": 8,
+          "province": "Sumatera Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 60150.0,
+          "price_diff": "-Rp1050",
+          "national_avg": 56450.0,
+          "percentage_change": -1.72
+        },
+        {
+          "prov_id": 5,
+          "province": "Kepulauan Riau",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 60400.0,
+          "price_diff": "-Rp950",
+          "national_avg": 56450.0,
+          "percentage_change": -1.55
+        },
+        {
+          "prov_id": 24,
+          "province": "Kalimantan Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 61250.0,
+          "price_diff": "Rp400",
+          "national_avg": 56450.0,
+          "percentage_change": 0.66
+        },
+        {
+          "prov_id": 4,
+          "province": "Riau",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 61900.0,
+          "price_diff": "-Rp200",
+          "national_avg": 56450.0,
+          "percentage_change": -0.32
+        },
+        {
+          "prov_id": 9,
+          "province": "Kepulauan Bangka Belitung",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 64300.0,
+          "price_diff": "-Rp300",
+          "national_avg": 56450.0,
+          "percentage_change": -0.46
+        },
+        {
+          "prov_id": 2,
+          "province": "Sumatera Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 65100.0,
+          "price_diff": "-Rp650",
+          "national_avg": 56450.0,
+          "percentage_change": -0.99
+        },
+        {
+          "prov_id": 22,
+          "province": "Kalimantan Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 69100.0,
+          "price_diff": "-Rp900",
+          "national_avg": 56450.0,
+          "percentage_change": -1.29
+        },
+        {
+          "prov_id": 19,
+          "province": "Nusa Tenggara Timur",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 69400.0,
+          "price_diff": "Rp4000",
+          "national_avg": 56450.0,
+          "percentage_change": 6.12
+        },
+        {
+          "prov_id": 32,
+          "province": "Maluku Utara",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 70000.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 33,
+          "province": "Papua",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 71700.0,
+          "price_diff": "Rp500",
+          "national_avg": 56450.0,
+          "percentage_change": 0.7
+        },
+        {
+          "prov_id": 34,
+          "province": "Papua Barat",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 75000.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 31,
+          "province": "Maluku",
+          "date": "06 Agt 26",
+          "commodity": "Cabai Rawit",
+          "price": 93750.0,
+          "price_diff": "Rp0",
+          "national_avg": 56450.0,
+          "percentage_change": 0.0
+        }
+      ]
+    },
+    "Beras": {
+      "commodity_id": "1",
+      "national_avg": 16250.0,
+      "provinces_count": 32,
+      "prices": [
+        {
+          "prov_id": 18,
+          "province": "Nusa Tenggara Barat",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 13800.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 26,
+          "province": "Sulawesi Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 14400.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 15,
+          "province": "DI Yogyakarta",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 14450.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 30,
+          "province": "Sulawesi Barat",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 14600.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 16,
+          "province": "Jawa Timur",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 14950.0,
+          "price_diff": "-Rp100",
+          "national_avg": 16250.0,
+          "percentage_change": -0.66
+        },
+        {
+          "prov_id": 12,
+          "province": "Jawa Barat",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15350.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 2,
+          "province": "Sumatera Utara",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15400.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 19,
+          "province": "Nusa Tenggara Timur",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15400.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 9,
+          "province": "Kepulauan Bangka Belitung",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15450.0,
+          "price_diff": "Rp50",
+          "national_avg": 16250.0,
+          "percentage_change": 0.32
+        },
+        {
+          "prov_id": 14,
+          "province": "Jawa Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15450.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 5,
+          "province": "Kepulauan Riau",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15500.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 10,
+          "province": "Lampung",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15500.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 6,
+          "province": "Jambi",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15550.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 27,
+          "province": "Sulawesi Tenggara",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15800.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 7,
+          "province": "Bengkulu",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15850.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 17,
+          "province": "Bali",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15900.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 8,
+          "province": "Sumatera Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15950.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 29,
+          "province": "Sulawesi Utara",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 15950.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 11,
+          "province": "Banten",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16100.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 28,
+          "province": "Sulawesi Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16250.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 23,
+          "province": "Kalimantan Timur",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16600.0,
+          "price_diff": "Rp50",
+          "national_avg": 16250.0,
+          "percentage_change": 0.3
+        },
+        {
+          "prov_id": 25,
+          "province": "Gorontalo",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16700.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 4,
+          "province": "Riau",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16800.0,
+          "price_diff": "Rp150",
+          "national_avg": 16250.0,
+          "percentage_change": 0.9
+        },
+        {
+          "prov_id": 13,
+          "province": "DKI Jakarta",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16850.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 31,
+          "province": "Maluku",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 16950.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 24,
+          "province": "Kalimantan Utara",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 17150.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 34,
+          "province": "Papua Barat",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 17200.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 32,
+          "province": "Maluku Utara",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 17650.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 3,
+          "province": "Sumatera Barat",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 17900.0,
+          "price_diff": "-Rp250",
+          "national_avg": 16250.0,
+          "percentage_change": -1.38
+        },
+        {
+          "prov_id": 33,
+          "province": "Papua",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 19150.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 21,
+          "province": "Kalimantan Selatan",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 19300.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        },
+        {
+          "prov_id": 22,
+          "province": "Kalimantan Tengah",
+          "date": "06 Agt 26",
+          "commodity": "Beras",
+          "price": 19850.0,
+          "price_diff": "Rp0",
+          "national_avg": 16250.0,
+          "percentage_change": 0.0
+        }
+      ]
+    }
+  }
+}
