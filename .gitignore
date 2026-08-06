@@ -1,0 +1,5 @@
+node_modules
+dist
+prompt-aplikasi-tanipintar.md
+.DS_Store
+*.log
