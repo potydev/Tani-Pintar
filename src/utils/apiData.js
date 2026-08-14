@@ -1,6 +1,14 @@
 import liveData from "../data/harga_pangan_realtime.json";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && window.location.port === '3000') {
+    return 'http://localhost:5000/api';
+  }
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export function getLiveCommodityPrices() {
   if (!liveData || !liveData.commodities) {

@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tani_pintar_app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=Sandibaruu11
+      - DB_NAME=db_tani_pintar
+      - DB_PORT=3306
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: tani_pintar_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Sandibaruu11
+      MYSQL_DATABASE: db_tani_pintar
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

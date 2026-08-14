@@ -8,12 +8,25 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MySQL Pool Connection Settings
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(express.json());
+
+// MySQL Pool Connection Settings with ENV Fallbacks
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: 'Sandibaruu11',
-  database: 'db_tani_pintar',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Sandibaruu11',
+  database: process.env.DB_NAME || 'db_tani_pintar',
+  port: parseInt(process.env.DB_PORT || '3306'),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -23,7 +36,7 @@ let pool;
 
 try {
   pool = mysql.createPool(dbConfig);
-  console.log('[MySQL] Pool created successfully for db_tani_pintar.');
+  console.log(`[MySQL] Pool created for ${dbConfig.database} on ${dbConfig.host}:${dbConfig.port}`);
 } catch (err) {
   console.error('[MySQL] Error creating connection pool:', err);
 }
@@ -183,8 +196,19 @@ app.get('/api/recommendations', async (req, res) => {
   }
 });
 
+// Serve Static Frontend Assets in Production
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(distPath, 'index.html'));
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`=================================================`);
-  console.log(`  TaniPintar Backend API Server Running on Port ${PORT}`);
+  console.log(`  TaniPintar Application Server Running on Port ${PORT}`);
   console.log(`=================================================`);
 });
+
