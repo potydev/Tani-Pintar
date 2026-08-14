@@ -1,5 +1,7 @@
 import liveData from "../data/harga_pangan_realtime.json";
 
+const API_BASE_URL = "http://localhost:5000/api";
+
 export function getLiveCommodityPrices() {
   if (!liveData || !liveData.commodities) {
     return null;
@@ -28,10 +30,12 @@ export function getLiveTickerItems() {
 
 export function getRegionalDemandData() {
   const commodities = getLiveCommodityPrices();
-  if (!commodities || !commodities["Cabai Merah"]) return [];
+  if (!commodities) return [];
 
-  const cabaiPrices = commodities["Cabai Merah"].prices || [];
-  // Select key representative regions
+  const cabaiData = commodities["Cabai Merah"] || commodities["Cabai Merah Besar"] || commodities["Cabai Merah Keriting"];
+  if (!cabaiData) return [];
+
+  const cabaiPrices = cabaiData.prices || [];
   const selectedProvinces = ["DKI Jakarta", "Jawa Barat", "Jawa Tengah", "DI Yogyakarta", "Jawa Timur"];
 
   return cabaiPrices
@@ -45,3 +49,42 @@ export function getRegionalDemandData() {
       color: p.percentage_change > 2 ? "#16A34A" : p.percentage_change >= 0 ? "#EAB308" : "#EF4444"
     }));
 }
+
+// ASYNC BACKEND API FETCHERS (MySQL Integration)
+
+export async function fetchPriceHistory(commodity = 'Cabai Merah') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/prices/history?commodity=${encodeURIComponent(commodity)}`);
+    if (!res.ok) throw new Error("API Network response was not ok");
+    const json = await res.json();
+    return json.data;
+  } catch (err) {
+    console.warn("Backend API not reachable, using local fallback history.", err);
+    return null;
+  }
+}
+
+export async function fetchRegionalDemand(commodity = 'Cabai Merah') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/demand/regional?commodity=${encodeURIComponent(commodity)}`);
+    if (!res.ok) throw new Error("API Network response was not ok");
+    const json = await res.json();
+    return json.data;
+  } catch (err) {
+    console.warn("Backend API not reachable, using local fallback demand.", err);
+    return getRegionalDemandData();
+  }
+}
+
+export async function fetchAIRecommendations(origin = 'Jawa Tengah', commodity = 'Cabai Merah') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`);
+    if (!res.ok) throw new Error("API Network response was not ok");
+    const json = await res.json();
+    return json.data;
+  } catch (err) {
+    console.warn("Backend API not reachable, using local fallback recommendations.", err);
+    return null;
+  }
+}
+

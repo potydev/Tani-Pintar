@@ -1,22 +1,32 @@
-import React from "react";
-import { Truck, MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { Truck, MapPin, CheckCircle2 } from "lucide-react";
 import { RECENT_ORDERS_DATA } from "../../data/mockData";
 
 export function RecentOrdersPanel() {
+  const [orders, setOrders] = useState(RECENT_ORDERS_DATA);
+
+  const handleUpdateStatus = (id, newStatus, newStatusType) => {
+    setOrders(
+      orders.map((o) =>
+        o.id === id ? { ...o, status: newStatus, statusType: newStatusType, actionState: "Diproses" } : o
+      )
+    );
+  };
+
   return (
     <div className="tp-card p-5 mt-5">
       <div className="flex items-center justify-between mb-4">
         <h4 className="font-heading font-bold text-slate-900 text-sm">Pesanan Masuk Terbaru</h4>
-        <a href="#" className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
+        <button className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
           Lihat Semua &rarr;
-        </a>
+        </button>
       </div>
 
       <div className="space-y-3">
-        {RECENT_ORDERS_DATA.map((order) => (
+        {orders.map((order) => (
           <div key={order.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-slate-600 font-bold text-xs">
                 <Truck size={18} className="text-emerald-700" />
               </div>
               <div>
@@ -35,7 +45,16 @@ export function RecentOrdersPanel() {
 
             <div className="text-right">
               <div className="font-heading font-extrabold text-slate-900 text-sm">{order.price}</div>
-              <span className="text-[11px] font-bold text-slate-500 block mt-0.5">{order.actionState}</span>
+              {order.status === "Baru" ? (
+                <button
+                  onClick={() => handleUpdateStatus(order.id, "Dikemas", "green")}
+                  className="mt-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm flex items-center gap-1 ml-auto"
+                >
+                  <CheckCircle2 size={10} /> Terima
+                </button>
+              ) : (
+                <span className="text-[11px] font-bold text-emerald-700 block mt-0.5">✓ {order.actionState}</span>
+              )}
             </div>
           </div>
         ))}
@@ -43,3 +62,4 @@ export function RecentOrdersPanel() {
     </div>
   );
 }
+

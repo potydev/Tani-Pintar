@@ -1,0 +1,190 @@
+import express from 'express';
+import cors from 'cors';
+import mysql from 'mysql2/promise';
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(express.json());
+
+// MySQL Pool Connection Settings
+const dbConfig = {
+  host: 'localhost',
+  user: 'root',
+  password: 'Sandibaruu11',
+  database: 'db_tani_pintar',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+};
+
+let pool;
+
+try {
+  pool = mysql.createPool(dbConfig);
+  console.log('[MySQL] Pool created successfully for db_tani_pintar.');
+} catch (err) {
+  console.error('[MySQL] Error creating connection pool:', err);
+}
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'TaniPintar API Server is running', timestamp: new Date() });
+});
+
+// GET /api/prices/latest - Get latest scraped prices summary per commodity
+app.get('/api/prices/latest', async (req, res) => {
+  try {
+    const query = `
+      SELECT commodity_name, tanggal_bi, national_avg, AVG(percentage_change) as avg_pct_change, COUNT(DISTINCT province_name) as total_provinces
+      FROM harga_pangan
+      WHERE tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan)
+      GROUP BY commodity_name, tanggal_bi, national_avg
+      ORDER BY commodity_name ASC;
+    `;
+    const [rows] = await pool.query(query);
+    res.json({ success: true, count: rows.length, data: rows });
+  } catch (err) {
+    console.error('Error fetching latest prices:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/prices/history - Get historical price trends for chart (30 Jul - 6 Aug)
+app.get('/api/prices/history', async (req, res) => {
+  try {
+    const commodity = req.query.commodity || 'Cabai Merah Besar';
+    const query = `
+      SELECT tanggal_bi, province_name, price, national_avg
+      FROM harga_pangan
+      WHERE (commodity_name LIKE ? OR commodity_name LIKE ?)
+      AND province_name IN ('DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'DI Yogyakarta')
+      ORDER BY tanggal_bi ASC;
+    `;
+    const searchPattern = `%${commodity}%`;
+    const [rows] = await pool.query(query, [searchPattern, searchPattern]);
+
+    // Pivot data by date for Recharts format: [{ date: '30 Jul', Jakarta: 42000, Bandung: 41500, Cilacap: 38000 }]
+    const dateMap = {};
+    rows.forEach(r => {
+      const dateStr = new Date(r.tanggal_bi).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+      if (!dateMap[dateStr]) {
+        dateMap[dateStr] = { date: dateStr, RataNasional: Math.round(r.national_avg || 0) };
+      }
+      const provKey = r.province_name.replace('Jawa Tengah', 'Cilacap (Asal)').replace('Jawa Barat', 'Bandung').replace('DKI Jakarta', 'Jakarta').replace('Jawa Timur', 'Surabaya');
+      dateMap[dateStr][provKey] = Math.round(r.price);
+    });
+
+    const chartData = Object.values(dateMap);
+    res.json({ success: true, commodity, count: chartData.length, data: chartData });
+  } catch (err) {
+    console.error('Error fetching price history:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/demand/regional - Get regional demand comparison
+app.get('/api/demand/regional', async (req, res) => {
+  try {
+    const commodity = req.query.commodity || 'Cabai Merah';
+    const query = `
+      SELECT province_name, price, percentage_change, price_diff
+      FROM harga_pangan
+      WHERE (commodity_name LIKE ? OR commodity_name LIKE ?)
+        AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan)
+      ORDER BY price DESC
+      LIMIT 10;
+    `;
+    const searchPattern = `%${commodity}%`;
+    const [rows] = await pool.query(query, [searchPattern, searchPattern]);
+
+    const formatted = rows.map(r => ({
+      city: r.province_name,
+      price: Math.round(r.price),
+      status: r.percentage_change > 2 ? "Tinggi" : r.percentage_change >= 0 ? "Sedang" : "Rendah",
+      percent: `${r.percentage_change >= 0 ? '↑' : '↓'} ${Math.abs(r.percentage_change)}%`,
+      val: Math.min(100, Math.max(25, Math.round((r.price / 70000) * 100))),
+      color: r.percentage_change > 2 ? "#16A34A" : r.percentage_change >= 0 ? "#EAB308" : "#EF4444"
+    }));
+
+    res.json({ success: true, count: formatted.length, data: formatted });
+  } catch (err) {
+    console.error('Error fetching regional demand:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/recommendations - Get AI calculated selling recommendations
+app.get('/api/recommendations', async (req, res) => {
+  try {
+    const originProv = req.query.origin || 'Jawa Tengah';
+    const commodity = req.query.commodity || 'Cabai Merah Besar';
+    const searchPattern = `%${commodity}%`;
+
+    // Fetch origin price
+    const [originRows] = await pool.query(
+      `SELECT price FROM harga_pangan WHERE province_name = ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) LIMIT 1`,
+      [originProv, searchPattern]
+    );
+
+    const originPrice = originRows.length > 0 ? originRows[0].price : 38000;
+
+    // Fetch destination prices
+    const [destRows] = await pool.query(
+      `SELECT province_name, price, percentage_change FROM harga_pangan WHERE province_name != ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) ORDER BY price DESC LIMIT 5`,
+      [originProv, searchPattern]
+    );
+
+    const distanceMap = {
+      'Jawa Barat': { city: 'Bandung', dist: '312 km', cost: 500000, time: '8-10 jam' },
+      'DKI Jakarta': { city: 'Jakarta', dist: '390 km', cost: 650000, time: '10-12 jam' },
+      'Jawa Timur': { city: 'Surabaya', dist: '340 km', cost: 550000, time: '9-11 jam' },
+      'DI Yogyakarta': { city: 'Yogyakarta', dist: '120 km', cost: 250000, time: '3-4 jam' },
+      'Banten': { city: 'Serang', dist: '480 km', cost: 750000, time: '12-14 jam' }
+    };
+
+    const recommendations = destRows.map((r, idx) => {
+      const destInfo = distanceMap[r.province_name] || { city: r.province_name, dist: '250 km', cost: 400000, time: '6-8 jam' };
+      const qty = 500; // 500 kg batch
+      const marginDiffTotal = (r.price - originPrice) * qty;
+      const netProfitVal = Math.max(0, marginDiffTotal - destInfo.cost);
+      const diffPct = (((r.price - originPrice) / originPrice) * 100).toFixed(1);
+
+      return {
+        rank: idx + 1,
+        city: destInfo.city,
+        province: r.province_name,
+        badge: idx === 0 ? "Sangat Direkomendasikan" : "Direkomendasikan",
+        originPrice: `Rp ${Math.round(originPrice).toLocaleString('id-ID')}`,
+        destPrice: `Rp ${Math.round(r.price).toLocaleString('id-ID')}`,
+        diffPercent: `+${diffPct}% Lebih tinggi`,
+        marginDiff: `Rp ${Math.round(marginDiffTotal).toLocaleString('id-ID')}`,
+        shippingCost: `Rp ${destInfo.cost.toLocaleString('id-ID')}`,
+        netProfit: `Rp ${Math.round(netProfitVal).toLocaleString('id-ID')}`,
+        netProfitQty: `per ${qty} kg`,
+        aiReasons: [
+          `Harga ${diffPct}% lebih tinggi dari lokasi Anda`,
+          `Permintaan tinggi di wilayah ${destInfo.city}`,
+          `Margin keuntungan bersih paling optimal`
+        ],
+        shippingInfo: {
+          distance: destInfo.dist,
+          cost: `Rp ${destInfo.cost.toLocaleString('id-ID')}`,
+          duration: destInfo.time
+        }
+      };
+    });
+
+    res.json({ success: true, origin: originProv, data: recommendations });
+  } catch (err) {
+    console.error('Error calculating recommendations:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`=================================================`);
+  console.log(`  TaniPintar Backend API Server Running on Port ${PORT}`);
+  console.log(`=================================================`);
+});

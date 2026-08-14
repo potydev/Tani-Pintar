@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Leaf,
   LayoutDashboard,
@@ -7,8 +7,6 @@ import {
   ShoppingCart,
   Tag,
   Calculator,
-  Store,
-  PackageCheck,
   BarChart3,
   History,
   Database,
@@ -17,6 +15,28 @@ import {
 } from "lucide-react";
 
 export function DashboardSidebar({ name, onLogout }) {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  const menuGroups = [
+    {
+      title: "Keputusan Penjualan AI",
+      items: [
+        { id: "peluang", label: "Peluang Penjualan", icon: Target },
+        { id: "prediksi", label: "Prediksi Harga", icon: LineChartIcon },
+        { id: "pembeli", label: "Pembeli Terbaik", icon: ShoppingCart },
+        { id: "rekomendasi", label: "Rekomendasi Harga", icon: Tag },
+        { id: "hitung", label: "Hitung Keuntungan", icon: Calculator },
+      ]
+    },
+    {
+      title: "Data & Analytics",
+      items: [
+        { id: "analytics", label: "Market Analytics", icon: BarChart3 },
+        { id: "riwayat", label: "Riwayat Transaksi", icon: History },
+      ]
+    }
+  ];
+
   return (
     <aside className="w-72 shrink-0 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 overflow-y-auto tp-scrollbar">
       <div>
@@ -41,85 +61,46 @@ export function DashboardSidebar({ name, onLogout }) {
         <div className="p-4 space-y-6">
           {/* Main Dashboard Link */}
           <div>
-            <button className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-emerald-700 text-white font-semibold text-sm shadow-sm">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === "dashboard"
+                ? "bg-emerald-700 text-white shadow-sm"
+                : "text-slate-700 hover:bg-slate-50"
+                }`}
+            >
               <LayoutDashboard size={18} />
               <span>Dashboard</span>
             </button>
             <div className="pl-9 text-[11px] text-slate-400 font-medium mt-1">Ringkasan &amp; Peluang</div>
           </div>
 
-          {/* Section: Keputusan Penjualan AI */}
-          <div>
-            <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-3 mb-2">
-              Keputusan Penjualan AI
+          {/* Dynamic Menu Groups */}
+          {menuGroups.map((group, gIdx) => (
+            <div key={gIdx}>
+              <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-3 mb-2">
+                {group.title}
+              </div>
+              <div className="space-y-1">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                        ? "bg-emerald-50 text-emerald-800 font-bold border-r-2 border-emerald-600"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        }`}
+                    >
+                      <Icon size={16} className={isActive ? "text-emerald-700" : "text-slate-400"} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="space-y-1">
-              <a href="#" className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <div className="flex items-center gap-3">
-                  <Target size={16} className="text-slate-400" />
-                  <span>Peluang Penjualan</span>
-                </div>
-              </a>
-              <a href="#" className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <div className="flex items-center gap-3">
-                  <LineChartIcon size={16} className="text-slate-400" />
-                  <span>Prediksi Harga</span>
-                </div>
-              </a>
-              <a href="#" className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <div className="flex items-center gap-3">
-                  <ShoppingCart size={16} className="text-slate-400" />
-                  <span>Pembeli Terbaik</span>
-                </div>
-              </a>
-              <a href="#" className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <div className="flex items-center gap-3">
-                  <Tag size={16} className="text-slate-400" />
-                  <span>Rekomendasi Harga</span>
-                </div>
-              </a>
-              <a href="#" className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <div className="flex items-center gap-3">
-                  <Calculator size={16} className="text-slate-400" />
-                  <span>Hitung Keuntungan</span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          {/* Section: Marketplace */}
-          <div>
-            <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-3 mb-2">
-              Marketplace
-            </div>
-            <div className="space-y-1">
-              <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <Store size={16} className="text-slate-400" />
-                <span>Marketplace Saya</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <PackageCheck size={16} className="text-slate-400" />
-                <span>Pesanan Masuk</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Section: Data & Analytics */}
-          <div>
-            <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-3 mb-2">
-              Data &amp; Analytics
-            </div>
-            <div className="space-y-1">
-              <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <BarChart3 size={16} className="text-slate-400" />
-                <span>Market Analytics</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 text-sm font-medium">
-                <History size={16} className="text-slate-400" />
-                <span>Riwayat Transaksi</span>
-              </a>
-            </div>
-          </div>
+          ))}
 
           {/* Sumber Data AI Box */}
           <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-xl space-y-2 text-xs">
@@ -129,8 +110,8 @@ export function DashboardSidebar({ name, onLogout }) {
             </div>
             <div className="space-y-1.5 text-slate-600 text-[11px]">
               <div className="flex justify-between">
-                <span>Harga Pangan (Bapanas)</span>
-                <span className="text-emerald-700 font-medium">Update harian</span>
+                <span>Harga Pangan (BI PIHPS)</span>
+                <span className="text-emerald-700 font-medium">MySQL DB</span>
               </div>
               <div className="flex justify-between">
                 <span>Produksi &amp; Konsumsi (BPS)</span>
@@ -178,3 +159,4 @@ export function DashboardSidebar({ name, onLogout }) {
     </aside>
   );
 }
+

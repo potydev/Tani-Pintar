@@ -1,9 +1,13 @@
 import React from "react";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { TICKER_DATA } from "../../data/mockData";
+import { getLiveTickerItems } from "../../utils/apiData";
 
 export function LandingTicker() {
-  const items = [...TICKER_DATA, ...TICKER_DATA];
+  const liveItems = getLiveTickerItems();
+  const rawItems = liveItems.length > 0 ? liveItems : TICKER_DATA;
+  const items = [...rawItems, ...rawItems];
+
   return (
     <div className="w-full bg-slate-900 border-b border-slate-800 text-white overflow-hidden">
       <div className="tp-ticker-container">
@@ -23,3 +27,4 @@ export function LandingTicker() {
     </div>
   );
 }
+

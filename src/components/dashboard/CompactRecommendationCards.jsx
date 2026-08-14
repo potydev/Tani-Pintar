@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
+import { ShippingModal } from "./ShippingModal";
 
 export function CompactRecommendationCards() {
+  const [selectedItem, setSelectedItem] = useState(null);
+
   return (
     <div className="space-y-3 mb-6">
       {RECOMMENDATIONS_COMPACT.map((item) => (
@@ -30,12 +33,24 @@ export function CompactRecommendationCards() {
               <span className="text-xs text-slate-400 block">Keuntungan Bersih</span>
               <span className="font-extrabold text-emerald-700">{item.netProfit}</span>
             </div>
-            <button className="tp-btn-outline px-4 py-2 rounded-lg text-xs font-semibold">
+            <button
+              onClick={() => setSelectedItem(item)}
+              className="tp-btn-outline px-4 py-2 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors"
+            >
               Lihat Detail
             </button>
           </div>
         </div>
       ))}
+
+      {selectedItem && (
+        <ShippingModal
+          destination={selectedItem.city}
+          netProfit={selectedItem.netProfit}
+          onClose={() => setSelectedItem(null)}
+        />
+      )}
     </div>
   );
 }
+

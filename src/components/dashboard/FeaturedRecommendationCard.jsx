@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { CheckCircle2, MapPin, Truck, Clock } from "lucide-react";
 import { RECOMMENDATION_FEATURED } from "../../data/mockData";
+import { ShippingModal } from "./ShippingModal";
 
 export function FeaturedRecommendationCard() {
   const data = RECOMMENDATION_FEATURED;
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/30 via-white to-white mb-4">
       {/* Header Badge */}
@@ -102,11 +105,23 @@ export function FeaturedRecommendationCard() {
               <span>Estimasi Waktu: <strong>{data.shippingInfo.duration}</strong></span>
             </div>
           </div>
-          <button className="tp-btn-primary w-full py-2.5 rounded-lg text-xs font-bold shadow-sm">
+          <button
+            onClick={() => setShowModal(true)}
+            className="tp-btn-primary w-full py-2.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:brightness-110 active:scale-95"
+          >
             Kirim Sekarang
           </button>
         </div>
       </div>
+
+      {showModal && (
+        <ShippingModal
+          destination={data.city}
+          netProfit={data.netProfit}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
+
