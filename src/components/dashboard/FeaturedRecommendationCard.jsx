@@ -105,12 +105,6 @@ export function FeaturedRecommendationCard() {
               <span>Estimasi Waktu: <strong>{data.shippingInfo.duration}</strong></span>
             </div>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="tp-btn-primary w-full py-2.5 rounded-lg text-xs font-bold shadow-sm transition-all hover:brightness-110 active:scale-95"
-          >
-            Kirim Sekarang
-          </button>
         </div>
       </div>
 
