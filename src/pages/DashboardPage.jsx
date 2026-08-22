@@ -24,18 +24,23 @@ export function DashboardPage({ name, onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("23 Agt 2026");
+  const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
 
   useEffect(() => {
     const savedUser = localStorage.getItem("tanipintar_user");
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const u = JSON.parse(savedUser);
+        setUser(u);
+        if (u.farm_location) setSelectedLocation(u.farm_location);
       } catch (e) {}
     }
   }, []);
 
   const handleAuthSuccess = (userData) => {
     setUser(userData);
+    if (userData.farm_location) setSelectedLocation(userData.farm_location);
   };
 
   const handleLogoutUser = () => {
@@ -49,13 +54,13 @@ export function DashboardPage({ name, onLogout }) {
   const renderContent = () => {
     switch (activeTab) {
       case "peluang":
-        return <SalesOpportunitiesPage originLocation={user?.farm_location || "Jawa Tengah"} />;
+        return <SalesOpportunitiesPage originLocation={selectedLocation} selectedDate={selectedDate} />;
       case "prediksi":
-        return <PriceForecastingPage />;
+        return <PriceForecastingPage originLocation={selectedLocation} selectedDate={selectedDate} />;
       case "pembeli":
         return <TopBuyersPage />;
       case "rekomendasi":
-        return <PriceRecommendationPage />;
+        return <PriceRecommendationPage originLocation={selectedLocation} selectedDate={selectedDate} />;
       case "hitung":
         return <ProfitCalculatorPage />;
       case "analytics":
@@ -73,7 +78,7 @@ export function DashboardPage({ name, onLogout }) {
               <div className="lg:col-span-8">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-heading font-bold text-slate-900 text-base">
-                    Peluang Penjualan Terbaik untuk Anda
+                    Peluang Penjualan Terbaik untuk Anda ({selectedLocation})
                   </h3>
                   <button
                     onClick={() => setActiveTab("peluang")}
@@ -83,16 +88,16 @@ export function DashboardPage({ name, onLogout }) {
                   </button>
                 </div>
 
-                {/* Featured AI Recommendation (#1 Bandung) */}
-                <FeaturedRecommendationCard />
+                {/* Featured AI Recommendation */}
+                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} />
 
-                {/* Compact AI Recommendations (#2 Purwokerto & #3 Yogyakarta) */}
-                <CompactRecommendationCards />
+                {/* Compact AI Recommendations */}
+                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} />
 
                 {/* 3 Panels Analytics Row */}
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <PriceTrendPanel />
-                  <DemandRegionPanel />
+                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} />
+                  <DemandRegionPanel originLocation={selectedLocation} selectedDate={selectedDate} />
                 </div>
 
                 {/* Supply Status Card */}
@@ -128,7 +133,15 @@ export function DashboardPage({ name, onLogout }) {
       {/* Scrollable Main Workspace */}
       <main className="flex-1 p-6 lg:p-8 overflow-y-auto tp-scrollbar">
         {/* Top Greeting & Action Header */}
-        <DashboardHeader name={displayName} user={user} onOpenAuth={() => setIsAuthOpen(true)} />
+        <DashboardHeader
+          name={displayName}
+          user={user}
+          onOpenAuth={() => setIsAuthOpen(true)}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
 
         {/* Dynamic Workspace Render */}
         {renderContent()}

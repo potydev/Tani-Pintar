@@ -4,19 +4,29 @@ import { RECOMMENDATION_FEATURED } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
-export function FeaturedRecommendationCard() {
+export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng", selectedDate }) {
   const [data, setData] = useState(RECOMMENDATION_FEATURED);
   const [showModal, setShowModal] = useState(false);
 
+  // Extract province from origin string (e.g. "Cilacap, Jateng" -> "Jawa Tengah")
+  const provMap = {
+    "Jateng": "Jawa Tengah",
+    "Jabar": "Jawa Barat",
+    "Jatim": "Jawa Timur",
+    "Sumut": "Sumatera Utara"
+  };
+  const provKey = Object.keys(provMap).find(k => originLocation.includes(k));
+  const provName = provKey ? provMap[provKey] : "Jawa Tengah";
+
   useEffect(() => {
     async function loadData() {
-      const liveRecs = await fetchAIRecommendations('Jawa Tengah', 'Cabai Merah');
+      const liveRecs = await fetchAIRecommendations(provName, 'Cabai Merah');
       if (liveRecs && liveRecs.length > 0) {
         setData(liveRecs[0]);
       }
     }
     loadData();
-  }, []);
+  }, [originLocation, selectedDate]);
 
   return (
     <div className="tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/30 via-white to-white mb-4">
@@ -58,9 +68,9 @@ export function FeaturedRecommendationCard() {
         {/* Price Comparison */}
         <div className="md:col-span-3 space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
           <div>
-            <div className="text-[11px] font-medium text-slate-500">Harga di Cilacap (Anda)</div>
+            <div className="text-[11px] font-medium text-slate-500">Harga di {originLocation}</div>
             <div className="font-heading font-bold text-slate-900 text-base">
-              {data.originPrice} <span className="text-xs font-normal text-slate-500">/kg Hari ini</span>
+              {data.originPrice} <span className="text-xs font-normal text-slate-500">/kg</span>
             </div>
           </div>
           <div className="pt-2 border-t border-slate-200">

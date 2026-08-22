@@ -3,19 +3,28 @@ import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
-export function CompactRecommendationCards() {
+export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng", selectedDate }) {
   const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const provMap = {
+    "Jateng": "Jawa Tengah",
+    "Jabar": "Jawa Barat",
+    "Jatim": "Jawa Timur",
+    "Sumut": "Sumatera Utara"
+  };
+  const provKey = Object.keys(provMap).find(k => originLocation.includes(k));
+  const provName = provKey ? provMap[provKey] : "Jawa Tengah";
+
   useEffect(() => {
     async function loadData() {
-      const liveRecs = await fetchAIRecommendations('Jawa Tengah', 'Cabai Merah');
+      const liveRecs = await fetchAIRecommendations(provName, 'Cabai Merah');
       if (liveRecs && liveRecs.length > 1) {
         setItems(liveRecs.slice(1, 3));
       }
     }
     loadData();
-  }, []);
+  }, [originLocation, selectedDate]);
 
   return (
     <div className="space-y-3 mb-6">

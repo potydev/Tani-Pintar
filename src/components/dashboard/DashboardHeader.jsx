@@ -1,21 +1,25 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Bell, Calendar, MapPin, ChevronDown, Check, CheckCircle2 } from "lucide-react";
 
-export function DashboardHeader({ name, user, onOpenAuth }) {
+export function DashboardHeader({
+  name,
+  user,
+  onOpenAuth,
+  selectedDate,
+  setSelectedDate,
+  selectedLocation,
+  setSelectedLocation
+}) {
   const [showNotif, setShowNotif] = useState(false);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showLocDropdown, setShowLocDropdown] = useState(false);
 
   const displayName = user?.full_name || name || "Pak Joko Slamet";
-  const userLoc = user?.farm_location || "Cilacap, Jateng";
-
-  const [selectedDate, setSelectedDate] = useState("Hari ini, 6 Agt 2026");
-  const [selectedLocation, setSelectedLocation] = useState(userLoc);
 
   const [notifications, setNotifications] = useState([
-    { id: 1, text: "Pesanan baru dari Pembeli Grosir Bandung (500 kg)", time: "10 menit lalu", unread: true },
+    { id: 1, text: "Pasokan Cabai Merah di pasar pilihan Anda siap dipantau", time: "10 menit lalu", unread: true },
     { id: 2, text: "Harga Cabai Merah di Semarang naik +5.2%", time: "1 jam lalu", unread: true },
-    { id: 3, text: "Pasokan Cabai Rawit nasional diprediksi menurun minggu ini", time: "3 jam lalu", unread: true },
+    { id: 3, text: "Pasokan Cabai Rawit nasional diprediksi stabil minggu ini", time: "3 jam lalu", unread: true },
   ]);
 
   const notifRef = useRef(null);
@@ -23,20 +27,20 @@ export function DashboardHeader({ name, user, onOpenAuth }) {
   const locRef = useRef(null);
 
   const dates = [
-    "Hari ini, 6 Agt 2026",
-    "Rabu, 5 Agt 2026",
-    "Selasa, 4 Agt 2026",
-    "Senin, 3 Agt 2026",
-    "Jumat, 31 Jul 2026",
-    "Kamis, 30 Jul 2026"
+    "23 Agt 2026",
+    "22 Agt 2026",
+    "21 Agt 2026",
+    "6 Agt 2026",
+    "5 Agt 2026",
+    "30 Jul 2026"
   ];
 
   const locations = [
-    { name: "Cilacap, Jateng", desc: "Wilayah Asal Utama" },
-    { name: "Brebes, Jateng", desc: "Sentra Bawang & Cabai" },
-    { name: "Bandung, Jabar", desc: "Pasar Induk Cariu" },
-    { name: "Malang, Jatim", desc: "Sentra Sayur Mayur" },
-    { name: "Medan, Sumut", desc: "Pasar Induk Lau Cih" }
+    { name: "Cilacap, Jateng", desc: "Wilayah Asal Utama (Jateng)" },
+    { name: "Brebes, Jateng", desc: "Sentra Bawang & Cabai (Jateng)" },
+    { name: "Bandung, Jabar", desc: "Pasar Induk Cariu (Jabar)" },
+    { name: "Surabaya, Jatim", desc: "Osowilangun (Jatim)" },
+    { name: "Medan, Sumut", desc: "Pasar Induk Lau Cih (Sumut)" }
   ];
 
   // Close dropdowns on outside click
