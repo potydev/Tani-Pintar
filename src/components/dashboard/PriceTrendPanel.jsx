@@ -3,10 +3,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { PRICE_TREND_DATA } from "../../data/mockData";
 import { fetchPriceHistory } from "../../utils/apiData";
 
-export function PriceTrendPanel() {
+export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDate }) {
   const [commodity, setCommodity] = useState("Cabai Merah");
   const [chartData, setChartData] = useState(PRICE_TREND_DATA);
   const [loading, setLoading] = useState(false);
+
+  const originCity = originLocation ? originLocation.split(',')[0] : "Cilacap";
 
   useEffect(() => {
     let isMounted = true;
@@ -24,14 +26,14 @@ export function PriceTrendPanel() {
     }
     loadData();
     return () => { isMounted = false; };
-  }, [commodity]);
+  }, [commodity, originLocation, selectedDate]);
 
   return (
     <div className="tp-card p-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
-          <h4 className="font-heading font-bold text-slate-900 text-sm">Tren Harga Pasar (MySQL Real-Data)</h4>
-          <div className="text-[11px] text-slate-400">Data Historis 30 Jul - 6 Agt 2026 per Wilayah</div>
+          <h4 className="font-heading font-bold text-slate-900 text-sm">Tren Harga Pasar Real-Time</h4>
+          <div className="text-[11px] text-slate-400">Data Historis BI PIHPS per Wilayah</div>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -53,7 +55,7 @@ export function PriceTrendPanel() {
       <div className="h-48 w-full relative">
         {loading && (
           <div className="absolute inset-0 bg-white/70 backdrop-blur-xs flex items-center justify-center z-10 text-xs font-bold text-emerald-700">
-            Memuat Data MySQL...
+            Memuat Data...
           </div>
         )}
         <ResponsiveContainer width="100%" height="100%">
@@ -67,7 +69,7 @@ export function PriceTrendPanel() {
             />
             {chartData[0] && chartData[0]["Cilacap (Asal)"] !== undefined ? (
               <>
-                <Line type="monotone" dataKey="Cilacap (Asal)" name="Cilacap (Asal)" stroke="#00875A" strokeWidth={2.5} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="Cilacap (Asal)" name={`${originCity} (Asal)`} stroke="#00875A" strokeWidth={2.5} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="Bandung" name="Bandung" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="Jakarta" name="Jakarta" stroke="#D97706" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="RataNasional" name="Rata-rata Nasional" stroke="#7C3AED" strokeWidth={2} strokeDasharray="3 3" dot={false} />
@@ -84,7 +86,7 @@ export function PriceTrendPanel() {
 
       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
         <div className="flex flex-wrap items-center gap-3 text-slate-600 text-[10px]">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-600" /> Cilacap</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-600" /> {originCity} (Asal)</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-600" /> Bandung</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-600" /> Jakarta</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-600" /> Nasional</span>

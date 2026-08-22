@@ -235,25 +235,77 @@ app.get('/api/demand/regional', async (req, res) => {
   }
 });
 
+// GET /api/dates - Get available scraped dates from database
+app.get('/api/dates', async (req, res) => {
+  try {
+    const rows = await queryDB(`
+      SELECT DISTINCT tanggal_bi
+      FROM harga_pangan
+      ORDER BY tanggal_bi DESC
+      LIMIT 15;
+    `);
+
+    const monthsMap = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+    const dates = rows.map((r, idx) => {
+      const d = new Date(r.tanggal_bi);
+      const day = d.getDate();
+      const month = monthsMap[d.getMonth()];
+      const year = d.getFullYear();
+      const formatted = `${day} ${month} ${year}`;
+      const isoDate = d.toISOString().split('T')[0];
+      return {
+        date: r.tanggal_bi,
+        isoDate: isoDate,
+        label: idx === 0 ? `${formatted} (Terbaru)` : formatted
+      };
+    });
+
+    res.json({ success: true, count: dates.length, data: dates });
+  } catch (err) {
+    console.error('Error fetching dates:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // GET /api/recommendations - Get AI calculated selling recommendations
 app.get('/api/recommendations', async (req, res) => {
   try {
-    const originProv = req.query.origin || 'Jawa Tengah';
+    const rawOrigin = req.query.origin || 'Cilacap, Jateng';
     const commodity = req.query.commodity || 'Cabai Merah Besar';
+    const dateParam = req.query.date;
+
+    // Parse province name & city name from rawOrigin
+    let originProv = 'Jawa Tengah';
+    if (rawOrigin.includes('Jabar') || rawOrigin.includes('Jawa Barat')) originProv = 'Jawa Barat';
+    else if (rawOrigin.includes('Jatim') || rawOrigin.includes('Jawa Timur')) originProv = 'Jawa Timur';
+    else if (rawOrigin.includes('Sumut') || rawOrigin.includes('Sumatera Utara')) originProv = 'Sumatera Utara';
+    else if (rawOrigin.includes('Jakarta') || rawOrigin.includes('DKI')) originProv = 'DKI Jakarta';
+
+    const originCity = rawOrigin.split(',')[0].trim();
     const searchPattern = `%${commodity}%`;
+
+    let dateSubquery = `(SELECT MAX(tanggal_bi) FROM harga_pangan)`;
+    const paramsOrigin = [originProv, searchPattern];
+    const paramsDest = [originProv, searchPattern];
+
+    if (dateParam && dateParam !== 'latest') {
+      dateSubquery = `?`;
+      paramsOrigin.push(dateParam);
+      paramsDest.push(dateParam);
+    }
 
     // Fetch origin price
     const originRows = await queryDB(
-      `SELECT price FROM harga_pangan WHERE province_name = ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) LIMIT 1`,
-      [originProv, searchPattern]
+      `SELECT price FROM harga_pangan WHERE province_name = ? AND commodity_name LIKE ? AND tanggal_bi = ${dateSubquery} LIMIT 1`,
+      paramsOrigin
     );
 
-    const originPrice = originRows.length > 0 ? originRows[0].price : 38000;
+    const originPrice = originRows.length > 0 ? parseFloat(originRows[0].price) : 38000;
 
     // Fetch destination prices
     const destRows = await queryDB(
-      `SELECT province_name, price, percentage_change FROM harga_pangan WHERE province_name != ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) ORDER BY price DESC LIMIT 5`,
-      [originProv, searchPattern]
+      `SELECT province_name, price, percentage_change FROM harga_pangan WHERE province_name != ? AND commodity_name LIKE ? AND tanggal_bi = ${dateSubquery} ORDER BY price DESC LIMIT 5`,
+      paramsDest
     );
 
     const distanceMap = {
@@ -261,7 +313,8 @@ app.get('/api/recommendations', async (req, res) => {
       'DKI Jakarta': { city: 'Jakarta', dist: '390 km', cost: 650000, time: '10-12 jam' },
       'Jawa Timur': { city: 'Surabaya', dist: '340 km', cost: 550000, time: '9-11 jam' },
       'DI Yogyakarta': { city: 'Yogyakarta', dist: '120 km', cost: 250000, time: '3-4 jam' },
-      'Banten': { city: 'Serang', dist: '480 km', cost: 750000, time: '12-14 jam' }
+      'Banten': { city: 'Serang', dist: '480 km', cost: 750000, time: '12-14 jam' },
+      'Jawa Tengah': { city: 'Semarang', dist: '150 km', cost: 300000, time: '4-5 jam' }
     };
 
     const recommendations = destRows.map((r, idx) => {
@@ -275,6 +328,8 @@ app.get('/api/recommendations', async (req, res) => {
         rank: idx + 1,
         city: destInfo.city,
         province: r.province_name,
+        originCity: originCity,
+        originLocation: rawOrigin,
         badge: idx === 0 ? "Sangat Direkomendasikan" : "Direkomendasikan",
         originPrice: `Rp ${Math.round(originPrice).toLocaleString('id-ID')}`,
         destPrice: `Rp ${Math.round(r.price).toLocaleString('id-ID')}`,
@@ -284,7 +339,7 @@ app.get('/api/recommendations', async (req, res) => {
         netProfit: `Rp ${Math.round(netProfitVal).toLocaleString('id-ID')}`,
         netProfitQty: `per ${qty} kg`,
         aiReasons: [
-          `Harga ${diffPct}% lebih tinggi dari lokasi Anda`,
+          `Harga ${diffPct}% lebih tinggi dari lokasi Anda (${originCity})`,
           `Permintaan tinggi di wilayah ${destInfo.city}`,
           `Margin keuntungan bersih paling optimal`
         ],
@@ -296,7 +351,7 @@ app.get('/api/recommendations', async (req, res) => {
       };
     });
 
-    res.json({ success: true, origin: originProv, data: recommendations });
+    res.json({ success: true, origin: originProv, originCity, data: recommendations });
   } catch (err) {
     console.error('Error calculating recommendations:', err);
     res.status(500).json({ success: false, error: err.message });

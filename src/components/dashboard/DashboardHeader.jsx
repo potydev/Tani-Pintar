@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Bell, Calendar, MapPin, ChevronDown, Check, CheckCircle2 } from "lucide-react";
+import { fetchAvailableDates } from "../../utils/apiData";
 
 export function DashboardHeader({
   name,
@@ -26,14 +25,24 @@ export function DashboardHeader({
   const dateRef = useRef(null);
   const locRef = useRef(null);
 
-  const dates = [
-    "23 Agt 2026",
+  const [datesList, setDatesList] = useState([
+    "23 Agt 2026 (Terbaru)",
     "22 Agt 2026",
     "21 Agt 2026",
     "6 Agt 2026",
     "5 Agt 2026",
     "30 Jul 2026"
-  ];
+  ]);
+
+  useEffect(() => {
+    async function loadDates() {
+      const datesFromDb = await fetchAvailableDates();
+      if (datesFromDb && datesFromDb.length > 0) {
+        setDatesList(datesFromDb.map(d => d.label));
+      }
+    }
+    loadDates();
+  }, []);
 
   const locations = [
     { name: "Cilacap, Jateng", desc: "Wilayah Asal Utama (Jateng)" },
@@ -141,7 +150,7 @@ export function DashboardHeader({
               <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Pilih Tanggal Acuan
               </div>
-              {dates.map((d, i) => (
+              {datesList.map((d, i) => (
                 <button
                   key={i}
                   onClick={() => {

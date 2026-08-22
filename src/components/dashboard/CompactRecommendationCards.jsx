@@ -18,7 +18,7 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
 
   useEffect(() => {
     async function loadData() {
-      const liveRecs = await fetchAIRecommendations(provName, 'Cabai Merah');
+      const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
       if (liveRecs && liveRecs.length > 1) {
         setItems(liveRecs.slice(1, 3));
       }

@@ -20,13 +20,15 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
 
   useEffect(() => {
     async function loadData() {
-      const liveRecs = await fetchAIRecommendations(provName, 'Cabai Merah');
+      const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
       if (liveRecs && liveRecs.length > 0) {
         setData(liveRecs[0]);
       }
     }
     loadData();
   }, [originLocation, selectedDate]);
+
+  const displayOriginCity = data.originCity || originLocation.split(',')[0];
 
   return (
     <div className="tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/30 via-white to-white mb-4">
@@ -68,13 +70,13 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
         {/* Price Comparison */}
         <div className="md:col-span-3 space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
           <div>
-            <div className="text-[11px] font-medium text-slate-500">Harga di {originLocation}</div>
+            <div className="text-[11px] font-medium text-slate-500">Harga di {displayOriginCity} (Anda)</div>
             <div className="font-heading font-bold text-slate-900 text-base">
               {data.originPrice} <span className="text-xs font-normal text-slate-500">/kg</span>
             </div>
           </div>
           <div className="pt-2 border-t border-slate-200">
-            <div className="text-[11px] font-medium text-slate-500">Harga di Bandung</div>
+            <div className="text-[11px] font-medium text-slate-500">Harga di {data.city}</div>
             <div className="font-heading font-extrabold text-emerald-700 text-lg flex items-center gap-1.5">
               <span>{data.destPrice}</span>
               <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">

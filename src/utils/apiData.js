@@ -84,9 +84,23 @@ export async function fetchRegionalDemand(commodity = 'Cabai Merah') {
   }
 }
 
-export async function fetchAIRecommendations(origin = 'Jawa Tengah', commodity = 'Cabai Merah') {
+export async function fetchAvailableDates() {
   try {
-    const res = await fetch(`${API_BASE_URL}/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`);
+    const res = await fetch(`${API_BASE_URL}/dates`);
+    if (!res.ok) throw new Error("API response not ok");
+    const json = await res.json();
+    return json.data;
+  } catch (err) {
+    console.warn("Backend API not reachable for dates, using fallback.", err);
+    return null;
+  }
+}
+
+export async function fetchAIRecommendations(origin = 'Cilacap, Jateng', commodity = 'Cabai Merah', date = null) {
+  try {
+    let url = `${API_BASE_URL}/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`;
+    if (date) url += `&date=${encodeURIComponent(date)}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error("API Network response was not ok");
     const json = await res.json();
     return json.data;
