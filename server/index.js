@@ -315,9 +315,12 @@ app.use((req, res, next) => {
   }
 });
 
+import { initAutoScraperCron } from './auto_scraper.js';
+
 app.listen(PORT, () => {
   console.log(`=================================================`);
   console.log(`  TaniPintar Application Server Running on Port ${PORT}`);
   console.log(`=================================================`);
+  initAutoScraperCron();
 });
 
