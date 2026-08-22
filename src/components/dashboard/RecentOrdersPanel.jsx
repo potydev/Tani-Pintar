@@ -1,60 +1,82 @@
-import React, { useState } from "react";
-import { Truck, MapPin, CheckCircle2 } from "lucide-react";
-import { RECENT_ORDERS_DATA } from "../../data/mockData";
+import React from "react";
+import { TrendingUp, TrendingDown, MapPin, Bell } from "lucide-react";
 
 export function RecentOrdersPanel() {
-  const [orders, setOrders] = useState(RECENT_ORDERS_DATA);
-
-  const handleUpdateStatus = (id, newStatus, newStatusType) => {
-    setOrders(
-      orders.map((o) =>
-        o.id === id ? { ...o, status: newStatus, statusType: newStatusType, actionState: "Diproses" } : o
-      )
-    );
-  };
+  const alerts = [
+    {
+      id: "ALT-01",
+      commodity: "Cabai Merah Besar",
+      location: "Jakarta (Pasar Cipinang)",
+      price: "Rp 46.500 / kg",
+      change: "+4.2%",
+      up: true,
+      time: "10 menit lalu"
+    },
+    {
+      id: "ALT-02",
+      commodity: "Cabai Rawit Merah",
+      location: "Bandung (Pasar Caringin)",
+      price: "Rp 52.000 / kg",
+      change: "+3.8%",
+      up: true,
+      time: "25 menit lalu"
+    },
+    {
+      id: "ALT-03",
+      commodity: "Bawang Merah",
+      location: "Semarang (Pasar Johar)",
+      price: "Rp 32.000 / kg",
+      change: "-1.2%",
+      up: false,
+      time: "1 jam lalu"
+    },
+    {
+      id: "ALT-04",
+      commodity: "Beras Medium",
+      location: "Surabaya (Osowilangun)",
+      price: "Rp 14.500 / kg",
+      change: "+0.5%",
+      up: true,
+      time: "2 jam lalu"
+    }
+  ];
 
   return (
     <div className="tp-card p-5 mt-5">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="font-heading font-bold text-slate-900 text-sm">Pesanan Masuk Terbaru</h4>
-        <button className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1">
-          Lihat Semua &rarr;
-        </button>
+      <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <Bell size={16} className="text-emerald-600" />
+          <h4 className="font-heading font-bold text-slate-900 text-sm">Peringkat &amp; Signal Pasar AI</h4>
+        </div>
+        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+          Real-Time
+        </span>
       </div>
 
       <div className="space-y-3">
-        {orders.map((order) => (
-          <div key={order.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
+        {alerts.map((item) => (
+          <div key={item.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-slate-600 font-bold text-xs">
-                <Truck size={18} className="text-emerald-700" />
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${
+                item.up ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+              }`}>
+                {item.up ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-slate-800">{order.id}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${order.statusType === 'green' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
-                    {order.status}
-                  </span>
-                </div>
-                <div className="text-xs font-semibold text-slate-900 mt-0.5">{order.commodity}</div>
-                <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                  <MapPin size={10} /> {order.location} · {order.time}
+                <div className="text-xs font-bold text-slate-900">{item.commodity}</div>
+                <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                  <MapPin size={10} className="text-slate-400" /> {item.location}
                 </div>
               </div>
             </div>
 
             <div className="text-right">
-              <div className="font-heading font-extrabold text-slate-900 text-sm">{order.price}</div>
-              {order.status === "Baru" ? (
-                <button
-                  onClick={() => handleUpdateStatus(order.id, "Dikemas", "green")}
-                  className="mt-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm flex items-center gap-1 ml-auto"
-                >
-                  <CheckCircle2 size={10} /> Terima
-                </button>
-              ) : (
-                <span className="text-[11px] font-bold text-emerald-700 block mt-0.5">✓ {order.actionState}</span>
-              )}
+              <div className="font-heading font-extrabold text-slate-900 text-xs">{item.price}</div>
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded inline-block mt-0.5 ${
+                item.up ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+              }`}>
+                {item.change}
+              </span>
             </div>
           </div>
         ))}
@@ -62,4 +84,3 @@ export function RecentOrdersPanel() {
     </div>
   );
 }
-

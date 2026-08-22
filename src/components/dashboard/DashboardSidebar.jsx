@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Target,
   LineChart as LineChartIcon,
-  ShoppingCart,
+  Building2,
   Tag,
   Calculator,
   BarChart3,
@@ -22,7 +22,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
       items: [
         { id: "peluang", label: "Peluang Penjualan", icon: Target },
         { id: "prediksi", label: "Prediksi Harga", icon: LineChartIcon },
-        { id: "pembeli", label: "Pembeli Terbaik", icon: ShoppingCart },
+        { id: "pembeli", label: "Pasar Induk", icon: Building2 },
         { id: "rekomendasi", label: "Rekomendasi Harga", icon: Tag },
         { id: "hitung", label: "Hitung Keuntungan", icon: Calculator },
       ]
