@@ -7,10 +7,12 @@
     "dev": "vite",
     "server": "node server/index.js",
     "db:migrate:supabase": "node server/migrate_to_supabase.js",
+    "db:seed:supabase": "node server/seed_supabase.js",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "lucide-react": "^0.469.0",
