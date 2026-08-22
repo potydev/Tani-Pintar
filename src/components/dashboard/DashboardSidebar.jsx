@@ -14,8 +14,7 @@ import {
   LogOut
 } from "lucide-react";
 
-export function DashboardSidebar({ name, onLogout }) {
-  const [activeTab, setActiveTab] = useState("dashboard");
+export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab }) {
 
   const menuGroups = [
     {
