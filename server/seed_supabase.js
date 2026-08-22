@@ -3,6 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Auto-load .env file in Node.js
+if (typeof process.loadEnvFile === 'function') {
+  try { process.loadEnvFile(); } catch (e) {}
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

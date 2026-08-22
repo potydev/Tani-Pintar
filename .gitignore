@@ -4,4 +4,7 @@ prompt-aplikasi-tanipintar.md
 .DS_Store
 *.log
 *.sql
+.env
+.env.*
+
 
