@@ -1,9 +1,9 @@
 import {
   Target,
   TrendingUp,
-  ShoppingCart,
+  Globe,
   Wallet,
-  PackageCheck
+  Building2
 } from "lucide-react";
 
 export const TICKER_DATA = [
@@ -38,11 +38,11 @@ export const METRICS_DATA = [
   },
   {
     title: "Permintaan Tinggi",
-    value: "Purwokerto",
+    value: "Bandung",
     unit: "",
     change: "↑ 18% dari kemarin",
     isUp: true,
-    icon: ShoppingCart,
+    icon: Globe,
     iconBg: "#FFEDD5",
     iconColor: "#EA580C"
   },
@@ -57,12 +57,12 @@ export const METRICS_DATA = [
     iconColor: "#2563EB"
   },
   {
-    title: "Pesanan Masuk",
-    value: "5",
-    unit: "pesanan",
-    change: "pesanan baru",
+    title: "Pasar Terpantau",
+    value: "38",
+    unit: "provinsi",
+    change: "Live Data BI PIHPS",
     isUp: true,
-    icon: PackageCheck,
+    icon: Building2,
     iconBg: "#DCFCE7",
     iconColor: "#16A34A"
   }
