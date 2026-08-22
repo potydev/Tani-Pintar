@@ -18,7 +18,6 @@ import { TopBuyersPage } from "./TopBuyersPage";
 import { PriceRecommendationPage } from "./PriceRecommendationPage";
 import { ProfitCalculatorPage } from "./ProfitCalculatorPage";
 import { MarketAnalyticsPage } from "./MarketAnalyticsPage";
-import { TransactionHistoryPage } from "./TransactionHistoryPage";
 
 export function DashboardPage({ name, onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -37,8 +36,6 @@ export function DashboardPage({ name, onLogout }) {
         return <ProfitCalculatorPage />;
       case "analytics":
         return <MarketAnalyticsPage />;
-      case "riwayat":
-        return <TransactionHistoryPage />;
       case "dashboard":
       default:
         return (

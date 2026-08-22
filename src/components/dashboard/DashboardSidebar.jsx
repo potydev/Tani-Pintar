@@ -30,8 +30,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
     {
       title: "Data & Analytics",
       items: [
-        { id: "analytics", label: "Market Analytics", icon: BarChart3 },
-        { id: "riwayat", label: "Riwayat Transaksi", icon: History },
+        { id: "analytics", label: "Market Analytics", icon: BarChart3 }
       ]
     }
   ];
