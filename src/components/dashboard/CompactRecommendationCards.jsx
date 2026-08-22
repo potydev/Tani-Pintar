@@ -1,13 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
+import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
 export function CompactRecommendationCards() {
+  const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    async function loadData() {
+      const liveRecs = await fetchAIRecommendations('Jawa Tengah', 'Cabai Merah');
+      if (liveRecs && liveRecs.length > 1) {
+        setItems(liveRecs.slice(1, 3));
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="space-y-3 mb-6">
-      {RECOMMENDATIONS_COMPACT.map((item) => (
+      {items.map((item) => (
         <div key={item.rank} className="tp-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition-colors">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-full bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center">

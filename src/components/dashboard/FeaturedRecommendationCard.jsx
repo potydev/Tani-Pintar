@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle2, MapPin, Truck, Clock } from "lucide-react";
 import { RECOMMENDATION_FEATURED } from "../../data/mockData";
+import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
 export function FeaturedRecommendationCard() {
-  const data = RECOMMENDATION_FEATURED;
+  const [data, setData] = useState(RECOMMENDATION_FEATURED);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+      const liveRecs = await fetchAIRecommendations('Jawa Tengah', 'Cabai Merah');
+      if (liveRecs && liveRecs.length > 0) {
+        setData(liveRecs[0]);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/30 via-white to-white mb-4">
