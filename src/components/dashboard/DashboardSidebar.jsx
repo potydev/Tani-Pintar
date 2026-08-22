@@ -14,7 +14,7 @@ import {
   LogOut
 } from "lucide-react";
 
-export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab }) {
+export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, user }) {
 
   const menuGroups = [
     {
@@ -131,23 +131,31 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
       {/* Profile Card Bottom */}
       <div className="p-4 border-t border-slate-200 bg-slate-50/50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <button
+            onClick={onOpenAuth}
+            className="flex items-center gap-3 text-left group hover:opacity-80 transition-opacity"
+            title="Kelola Akun / Ganti Akun Petani"
+          >
             <img
-              src="/assets/farmer_avatar.png"
+              src={user?.avatar_url || "/assets/farmer_avatar.png"}
               alt="Avatar"
-              className="w-10 h-10 rounded-full object-cover border-2 border-emerald-600"
+              className="w-10 h-10 rounded-full object-cover border-2 border-emerald-600 shadow-sm"
             />
             <div>
-              <div className="font-heading font-bold text-sm text-slate-900 leading-snug">{name}</div>
-              <div className="text-[11px] text-slate-500">Petani Cabai</div>
-              <div className="text-[10px] text-slate-400 flex items-center gap-0.5">
-                <MapPin size={10} /> Cilacap, Jawa Tengah
+              <div className="font-heading font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
+                {user?.full_name || name}
+              </div>
+              <div className="text-[11px] font-semibold text-emerald-800">
+                {user?.primary_commodity || "Petani Cabai"}
+              </div>
+              <div className="text-[10px] text-slate-400 flex items-center gap-0.5 mt-0.5">
+                <MapPin size={10} /> {user?.farm_location || "Cilacap, Jawa Tengah"}
               </div>
             </div>
-          </div>
+          </button>
           <button
             onClick={onLogout}
-            title="Keluar"
+            title="Keluar / Reset Session"
             className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
           >
             <LogOut size={16} />

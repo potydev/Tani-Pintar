@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { MetricCardsGrid } from "../components/dashboard/MetricCardsGrid";
@@ -10,6 +10,7 @@ import { SupplyStatusPanel } from "../components/dashboard/SupplyStatusPanel";
 import { AIAssistantChatPanel } from "../components/dashboard/AIAssistantChatPanel";
 import { RecentOrdersPanel } from "../components/dashboard/RecentOrdersPanel";
 import { BottomBannerPanel } from "../components/dashboard/BottomBannerPanel";
+import { AuthModal } from "../components/auth/AuthModal";
 
 // Import Sub-Pages
 import { SalesOpportunitiesPage } from "./SalesOpportunitiesPage";
@@ -21,11 +22,34 @@ import { MarketAnalyticsPage } from "./MarketAnalyticsPage";
 
 export function DashboardPage({ name, onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [user, setUser] = useState(null);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("tanipintar_user");
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {}
+    }
+  }, []);
+
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogoutUser = () => {
+    localStorage.removeItem("tanipintar_user");
+    setUser(null);
+    if (onLogout) onLogout();
+  };
+
+  const displayName = user?.full_name || name || "Pak Joko Slamet";
 
   const renderContent = () => {
     switch (activeTab) {
       case "peluang":
-        return <SalesOpportunitiesPage originLocation="Jawa Tengah" />;
+        return <SalesOpportunitiesPage originLocation={user?.farm_location || "Jawa Tengah"} />;
       case "prediksi":
         return <PriceForecastingPage />;
       case "pembeli":
@@ -77,7 +101,7 @@ export function DashboardPage({ name, onLogout }) {
 
               {/* Right Column (4 Cols): AI Chat Assistant & Recent Orders */}
               <div className="lg:col-span-4 flex flex-col justify-between">
-                <AIAssistantChatPanel name={name} />
+                <AIAssistantChatPanel name={displayName} />
                 <RecentOrdersPanel />
               </div>
             </div>
@@ -92,16 +116,31 @@ export function DashboardPage({ name, onLogout }) {
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* Fixed Left Navigation Sidebar */}
-      <DashboardSidebar name={name} onLogout={onLogout} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <DashboardSidebar
+        name={displayName}
+        user={user}
+        onLogout={handleLogoutUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
       {/* Scrollable Main Workspace */}
       <main className="flex-1 p-6 lg:p-8 overflow-y-auto tp-scrollbar">
         {/* Top Greeting & Action Header */}
-        <DashboardHeader name={name} />
+        <DashboardHeader name={displayName} user={user} onOpenAuth={() => setIsAuthOpen(true)} />
 
         {/* Dynamic Workspace Render */}
         {renderContent()}
       </main>
+
+      {/* Real User Auth Modal (Login / Register) */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }
+

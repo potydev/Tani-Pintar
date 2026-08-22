@@ -1,13 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Bell, Calendar, MapPin, ChevronDown, Check, CheckCircle2 } from "lucide-react";
 
-export function DashboardHeader({ name }) {
+export function DashboardHeader({ name, user, onOpenAuth }) {
   const [showNotif, setShowNotif] = useState(false);
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showLocDropdown, setShowLocDropdown] = useState(false);
 
+  const displayName = user?.full_name || name || "Pak Joko Slamet";
+  const userLoc = user?.farm_location || "Cilacap, Jateng";
+
   const [selectedDate, setSelectedDate] = useState("Hari ini, 6 Agt 2026");
-  const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
+  const [selectedLocation, setSelectedLocation] = useState(userLoc);
 
   const [notifications, setNotifications] = useState([
     { id: 1, text: "Pesanan baru dari Pembeli Grosir Bandung (500 kg)", time: "10 menit lalu", unread: true },
@@ -56,9 +59,17 @@ export function DashboardHeader({ name }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-2">
       <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
-          Halo, {name}! 👋
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
+            Halo, {displayName}! 👋
+          </h1>
+          <button
+            onClick={onOpenAuth}
+            className="px-2.5 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-xs font-bold transition-colors"
+          >
+            {user ? "Kelola Akun" : "Masuk / Daftar"}
+          </button>
+        </div>
         <p className="text-slate-500 text-sm mt-1">
           AI TaniPintar menemukan peluang terbaik untuk penjualan hasil panen Anda hari ini.
         </p>
