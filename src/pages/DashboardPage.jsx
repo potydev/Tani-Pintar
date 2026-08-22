@@ -24,7 +24,7 @@ export function DashboardPage({ name, onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("21 Agt 2026 (Terbaru)");
+  const [selectedDate, setSelectedDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
 
   useEffect(() => {

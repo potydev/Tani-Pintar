@@ -89,11 +89,27 @@ export async function fetchAvailableDates() {
     const res = await fetch(`${API_BASE_URL}/dates`);
     if (!res.ok) throw new Error("API response not ok");
     const json = await res.json();
-    return json.data;
+    if (json.data && json.data.length > 0) return json.data;
   } catch (err) {
-    console.warn("Backend API not reachable for dates, using fallback.", err);
-    return null;
+    console.warn("Backend API not reachable for dates, using dynamic generator.", err);
   }
+  
+  // Dynamic fallback generator from current date
+  const monthsMap = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+  const dynamicDates = [];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const label = `${d.getDate()} ${monthsMap[d.getMonth()]} ${d.getFullYear()}`;
+    const isoDate = d.toISOString().split('T')[0];
+    dynamicDates.push({
+      date: isoDate,
+      isoDate: isoDate,
+      label: i === 0 ? `${label} (Terbaru)` : label
+    });
+  }
+  return dynamicDates;
 }
 
 export async function fetchAIRecommendations(origin = 'Cilacap, Jateng', commodity = 'Cabai Merah', date = null) {

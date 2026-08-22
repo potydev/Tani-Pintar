@@ -25,23 +25,21 @@ export function DashboardHeader({
   const dateRef = useRef(null);
   const locRef = useRef(null);
 
-  const [datesList, setDatesList] = useState([
-    "21 Agt 2026 (Terbaru)",
-    "20 Agt 2026",
-    "19 Agt 2026",
-    "18 Agt 2026",
-    "15 Agt 2026",
-    "6 Agt 2026",
-    "5 Agt 2026",
-    "30 Jul 2026"
-  ]);
+  const [datesList, setDatesList] = useState([]);
+  const [loadingDates, setLoadingDates] = useState(true);
 
   useEffect(() => {
     async function loadDates() {
+      setLoadingDates(true);
       const datesFromDb = await fetchAvailableDates();
       if (datesFromDb && datesFromDb.length > 0) {
-        setDatesList(datesFromDb.map(d => d.label));
+        const labels = datesFromDb.map(d => d.label);
+        setDatesList(labels);
+        if (!selectedDate || selectedDate === "Memuat Tanggal...") {
+          setSelectedDate(labels[0]);
+        }
       }
+      setLoadingDates(false);
     }
     loadDates();
   }, []);
