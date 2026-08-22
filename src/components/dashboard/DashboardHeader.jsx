@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from "react";
+import { Bell, CheckCircle2, Calendar, ChevronDown, Check, MapPin } from "lucide-react";
 import { fetchAvailableDates } from "../../utils/apiData";
 
 export function DashboardHeader({
