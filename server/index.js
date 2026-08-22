@@ -4,11 +4,18 @@ import mysql from 'mysql2/promise';
 import pg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 // Auto-load .env file in Node.js
 if (typeof process.loadEnvFile === 'function') {
   try { process.loadEnvFile(); } catch (e) {}
 }
+
+// Supabase JS Client (always available, used for harga_pangan queries)
+const supabaseUrl = process.env.SUPABASE_URL || 'https://cjwmyzgqvciorchchfod.supabase.co';
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('[Supabase JS] Initialized Supabase client for harga_pangan queries.');
 
 const { Pool: PgPool } = pg;
 const __filename = fileURLToPath(import.meta.url);
@@ -235,34 +242,44 @@ app.get('/api/demand/regional', async (req, res) => {
   }
 });
 
-// GET /api/dates - Get available scraped dates from database
+// GET /api/dates - Get available scraped dates from Supabase (via JS client)
 app.get('/api/dates', async (req, res) => {
   try {
-    const rows = await queryDB(`
-      SELECT DISTINCT tanggal_bi
-      FROM harga_pangan
-      ORDER BY tanggal_bi DESC
-      LIMIT 15;
-    `);
+    // Query Supabase JS client directly to always read from the correct DB
+    let allDates = [];
+    let page = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data, error } = await supabase
+        .from('harga_pangan')
+        .select('tanggal_bi')
+        .range(page * pageSize, (page + 1) * pageSize - 1);
+      if (error || !data || data.length === 0) break;
+      allDates = allDates.concat(data.map(r => r.tanggal_bi));
+      if (data.length < pageSize) break;
+      page++;
+    }
+
+    // Get unique sorted dates (newest first)
+    const uniqueSorted = [...new Set(allDates)].sort().reverse().slice(0, 15);
 
     const monthsMap = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
-    const dates = rows.map((r, idx) => {
-      const d = new Date(r.tanggal_bi);
+    const dates = uniqueSorted.map((tanggal_bi, idx) => {
+      const d = new Date(tanggal_bi + 'T00:00:00');
       const day = d.getDate();
       const month = monthsMap[d.getMonth()];
       const year = d.getFullYear();
       const formatted = `${day} ${month} ${year}`;
-      const isoDate = d.toISOString().split('T')[0];
       return {
-        date: r.tanggal_bi,
-        isoDate: isoDate,
+        date: tanggal_bi,
+        isoDate: tanggal_bi,
         label: idx === 0 ? `${formatted} (Terbaru)` : formatted
       };
     });
 
     res.json({ success: true, count: dates.length, data: dates });
   } catch (err) {
-    console.error('Error fetching dates:', err);
+    console.error('Error fetching dates from Supabase:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
