@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
+import pg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const { Pool: PgPool } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -13,25 +15,44 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MySQL Pool Connection Settings with ENV Fallbacks
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Sandibaruu11',
-  database: process.env.DB_NAME || 'db_tani_pintar',
-  port: parseInt(process.env.DB_PORT || '3306'),
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-};
+// Universal Database Query Function (Supports Supabase PostgreSQL & MySQL)
+const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
+let queryDB;
 
-let pool;
+if (databaseUrl) {
+  const pgPool = new PgPool({
+    connectionString: databaseUrl,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+  console.log('[Database] Connecting via Supabase PostgreSQL Connection Pool.');
 
-try {
-  pool = mysql.createPool(dbConfig);
-  console.log(`[MySQL] Pool created for ${dbConfig.database} on ${dbConfig.host}:${dbConfig.port}`);
-} catch (err) {
-  console.error('[MySQL] Error creating connection pool:', err);
+  queryDB = async (sql, params = []) => {
+    let paramIndex = 1;
+    // Replace MySQL ? with PostgreSQL $1, $2...
+    const pgSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+    const res = await pgPool.query(pgSql, params);
+    return res.rows;
+  };
+} else {
+  // MySQL Pool Connection Settings with ENV Fallbacks
+  const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'Sandibaruu11',
+    database: process.env.DB_NAME || 'db_tani_pintar',
+    port: parseInt(process.env.DB_PORT || '3306'),
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  };
+
+  const mysqlPool = mysql.createPool(dbConfig);
+  console.log(`[Database] Connecting via MySQL Pool (${dbConfig.database} on ${dbConfig.host}:${dbConfig.port})`);
+
+  queryDB = async (sql, params = []) => {
+    const [rows] = await mysqlPool.query(sql, params);
+    return rows;
+  };
 }
 
 // Health check endpoint
@@ -49,7 +70,7 @@ app.get('/api/prices/latest', async (req, res) => {
       GROUP BY commodity_name, tanggal_bi, national_avg
       ORDER BY commodity_name ASC;
     `;
-    const [rows] = await pool.query(query);
+    const rows = await queryDB(query);
     res.json({ success: true, count: rows.length, data: rows });
   } catch (err) {
     console.error('Error fetching latest prices:', err);
@@ -69,7 +90,7 @@ app.get('/api/prices/history', async (req, res) => {
       ORDER BY tanggal_bi ASC;
     `;
     const searchPattern = `%${commodity}%`;
-    const [rows] = await pool.query(query, [searchPattern, searchPattern]);
+    const rows = await queryDB(query, [searchPattern, searchPattern]);
 
     // Pivot data by date for Recharts format: [{ date: '30 Jul', Jakarta: 42000, Bandung: 41500, Cilacap: 38000 }]
     const dateMap = {};
@@ -103,7 +124,7 @@ app.get('/api/demand/regional', async (req, res) => {
       LIMIT 10;
     `;
     const searchPattern = `%${commodity}%`;
-    const [rows] = await pool.query(query, [searchPattern, searchPattern]);
+    const rows = await queryDB(query, [searchPattern, searchPattern]);
 
     const formatted = rows.map(r => ({
       city: r.province_name,
@@ -129,7 +150,7 @@ app.get('/api/recommendations', async (req, res) => {
     const searchPattern = `%${commodity}%`;
 
     // Fetch origin price
-    const [originRows] = await pool.query(
+    const originRows = await queryDB(
       `SELECT price FROM harga_pangan WHERE province_name = ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) LIMIT 1`,
       [originProv, searchPattern]
     );
@@ -137,7 +158,7 @@ app.get('/api/recommendations', async (req, res) => {
     const originPrice = originRows.length > 0 ? originRows[0].price : 38000;
 
     // Fetch destination prices
-    const [destRows] = await pool.query(
+    const destRows = await queryDB(
       `SELECT province_name, price, percentage_change FROM harga_pangan WHERE province_name != ? AND commodity_name LIKE ? AND tanggal_bi = (SELECT MAX(tanggal_bi) FROM harga_pangan) ORDER BY price DESC LIMIT 5`,
       [originProv, searchPattern]
     );
