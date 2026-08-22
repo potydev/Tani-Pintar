@@ -26,9 +26,11 @@ export function DashboardHeader({
   const locRef = useRef(null);
 
   const [datesList, setDatesList] = useState([
-    "23 Agt 2026 (Terbaru)",
-    "22 Agt 2026",
-    "21 Agt 2026",
+    "21 Agt 2026 (Terbaru)",
+    "20 Agt 2026",
+    "19 Agt 2026",
+    "18 Agt 2026",
+    "15 Agt 2026",
     "6 Agt 2026",
     "5 Agt 2026",
     "30 Jul 2026"
