@@ -72,24 +72,6 @@ export function LandingHero({ onLoginClick }) {
                 className="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => { e.target.src = "/homepage.jpg"; }}
               />
-              
-              {/* Overlay Glass Badge */}
-              <div className="absolute bottom-4 left-4 right-4 bg-slate-900/80 backdrop-blur-md p-3.5 rounded-xl border border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-                  <div>
-                    <div className="text-xs font-bold text-white">TaniPintar AI Dashboard</div>
-                    <div className="text-[11px] text-slate-300">Live Market Intelligence Real-Time</div>
-                  </div>
-                </div>
-                <button
-                  onClick={onLoginClick}
-                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1 shrink-0"
-                >
-                  <span>Masuk</span>
-                  <ArrowRight size={12} />
-                </button>
-              </div>
             </div>
           </div>
         </div>
