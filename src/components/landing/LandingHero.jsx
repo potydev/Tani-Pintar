@@ -6,20 +6,9 @@ export function LandingHero({ onLoginClick }) {
 
   return (
     <section id="beranda" className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900 text-white py-24 px-6">
-      {/* Subtle Background Image Overlay with Reduced Opacity */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <img
-          src="/assets/homepage.jpg"
-          alt=""
-          className="w-full h-full object-cover opacity-15 mix-blend-overlay filter blur-[1px]"
-          onError={(e) => { e.target.src = "/homepage.jpg"; }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-emerald-950/60 to-emerald-950/90" />
-      </div>
-
-      {/* Background glow effects with reduced opacity */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 -left-24 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl pointer-events-none" />
+      {/* Background glow effects */}
+      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 -left-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 items-center relative z-10">
         <div className="md:col-span-7">
@@ -71,21 +60,21 @@ export function LandingHero({ onLoginClick }) {
           </div>
         </div>
 
-        {/* Hero Card Visual Preview with Branding Image & Low Opacity Glass Overlay */}
+        {/* Hero Card Visual Preview with Branding Image */}
         <div className="md:col-span-5 flex justify-center">
           <div className="relative w-full max-w-lg">
-            <div className="absolute inset-0 bg-emerald-500/15 rounded-3xl blur-2xl transform rotate-2 scale-95" />
+            <div className="absolute inset-0 bg-emerald-500/30 rounded-3xl blur-2xl transform rotate-2 scale-95" />
             
-            <div className="relative rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-slate-900/90 group">
+            <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-slate-900 group">
               <img
                 src="/assets/homepage.jpg"
                 alt="TaniPintar AI Market Intelligence Dashboard"
-                className="w-full h-auto object-cover opacity-85 transform transition-transform duration-500 group-hover:scale-105 group-hover:opacity-100"
+                className="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => { e.target.src = "/homepage.jpg"; }}
               />
               
-              {/* Overlay Glass Badge with Reduced Opacity */}
-              <div className="absolute bottom-4 left-4 right-4 bg-slate-950/60 backdrop-blur-md p-3.5 rounded-xl border border-white/10 flex items-center justify-between">
+              {/* Overlay Glass Badge */}
+              <div className="absolute bottom-4 left-4 right-4 bg-slate-900/80 backdrop-blur-md p-3.5 rounded-xl border border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
                   <div>
@@ -95,7 +84,7 @@ export function LandingHero({ onLoginClick }) {
                 </div>
                 <button
                   onClick={onLoginClick}
-                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1 shrink-0"
+                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1 shrink-0"
                 >
                   <span>Masuk</span>
                   <ArrowRight size={12} />
