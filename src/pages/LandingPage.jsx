@@ -2,7 +2,6 @@ import React from "react";
 import { LandingHeader } from "../components/landing/LandingHeader";
 import { LandingTicker } from "../components/landing/LandingTicker";
 import { LandingHero } from "../components/landing/LandingHero";
-import { LandingShowcase } from "../components/landing/LandingShowcase";
 import { LandingFeatures } from "../components/landing/LandingFeatures";
 import { LandingFooter } from "../components/landing/LandingFooter";
 
@@ -13,7 +12,6 @@ export function LandingPage({ onLoginClick }) {
       <LandingTicker />
       <main className="flex-1">
         <LandingHero onLoginClick={onLoginClick} />
-        <LandingShowcase onLoginClick={onLoginClick} />
         <LandingFeatures />
       </main>
       <LandingFooter />
