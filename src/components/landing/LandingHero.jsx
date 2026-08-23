@@ -60,18 +60,49 @@ export function LandingHero({ onLoginClick }) {
           </div>
         </div>
 
-        {/* Hero Card Visual Preview with Branding Image */}
+        {/* Hero Card Visual Preview */}
         <div className="md:col-span-5 flex justify-center">
-          <div className="relative w-full max-w-lg">
-            <div className="absolute inset-0 bg-emerald-500/30 rounded-3xl blur-2xl transform rotate-2 scale-95" />
+          <div className="relative w-full max-w-md">
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-3xl blur-2xl transform rotate-3 scale-95" />
             
-            <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-slate-900 group">
-              <img
-                src="/assets/homepage.jpg"
-                alt="TaniPintar AI Market Intelligence Dashboard"
-                className="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => { e.target.src = "/homepage.jpg"; }}
-              />
+            <div className="tp-card p-6 bg-white text-slate-900 shadow-2xl relative rounded-2xl border border-white/20">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
+                    #1
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-slate-500">Rekomendasi AI Hari Ini</div>
+                    <div className="font-heading font-bold text-slate-900">Kirim ke Bandung</div>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                  +9.2% Margin
+                </span>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
+                  <span className="text-slate-500">Harga Asal (Cilacap)</span>
+                  <span className="font-semibold text-slate-700">Rp 38.000 /kg</span>
+                </div>
+                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
+                  <span className="text-slate-500">Harga Tujuan (Bandung)</span>
+                  <span className="font-bold text-emerald-700">Rp 41.500 /kg</span>
+                </div>
+                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
+                  <span className="text-slate-500">Estimasi Profit Clean</span>
+                  <span className="font-extrabold text-emerald-800">Rp 1.250.000 /500kg</span>
+                </div>
+              </div>
+
+              <button
+                onClick={onLoginClick}
+                className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <span>Lihat Simulasi Lengkap</span>
+                <ArrowRight size={16} />
+              </button>
             </div>
           </div>
         </div>
