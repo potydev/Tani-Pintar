@@ -70,7 +70,7 @@ export function DashboardPage({ name, onLogout }) {
         return (
           <>
             {/* Horizontal Metric Cards (5 Cards) */}
-            <MetricCardsGrid />
+            <MetricCardsGrid originLocation={selectedLocation} />
 
             {/* Main Content Grid: Left Analysis & Right Assistant */}
             <div className="grid lg:grid-cols-12 gap-6">
