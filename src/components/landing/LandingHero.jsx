@@ -1,109 +1,209 @@
 import React, { useState } from "react";
-import { Search, Sparkles, ArrowRight } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 
 export function LandingHero({ onLoginClick }) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
 
   return (
-    <section id="beranda" className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900 text-white py-24 px-6">
-      {/* Background glow effects */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 -left-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+    <section
+      id="beranda"
+      className="relative min-h-[88vh] flex flex-col justify-center overflow-hidden"
+      style={{
+        background: "linear-gradient(145deg, #051510 0%, #0b2e1a 40%, #0d5c3a 100%)",
+      }}
+    >
+      {/* Grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 items-center relative z-10">
-        <div className="md:col-span-7">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 text-xs font-semibold mb-6">
-            <Sparkles size={14} className="text-amber-400" />
-            <span>Platform AI Penjualan Hasil Panen #1 di Indonesia</span>
+      {/* Radial glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-10"
+        style={{ background: "radial-gradient(circle, #16a34a 0%, transparent 70%)" }}
+      />
+
+      <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Left */}
+        <div className="flex flex-col gap-6">
+          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] rounded-full px-4 py-1.5 w-fit">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span
+              className="text-white/80 text-xs font-semibold tracking-wide"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              Platform AI Penjualan Hasil Panen #1 di Indonesia
+            </span>
           </div>
 
-          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-            Jual Panen di Waktu &amp; Tempat yang Tepat
+          <h1
+            className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Jual Panen di<br />
+            <span className="text-emerald-400">Waktu & Tempat</span><br />
+            yang Tepat
           </h1>
 
-          <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-xl">
+          <p
+            className="text-white/60 text-base leading-relaxed max-w-md"
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
             TaniPintar menganalisis harga, permintaan pasar, dan biaya logistik secara real-time untuk merekomendasikan keputusan penjualan paling menguntungkan bagi petani.
           </p>
 
-          {/* Quick Commodity Search */}
-          <div className="bg-white p-2 rounded-2xl shadow-2xl max-w-lg flex items-center gap-2 mb-8">
-            <Search size={20} className="text-slate-400 ml-3 shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari komoditas: Cabai Merah, Bawang Merah, Tomat..."
-              className="w-full text-slate-800 text-sm py-2.5 outline-none bg-transparent placeholder:text-slate-400"
-            />
+          {/* Search */}
+          <div className="flex gap-2 max-w-md">
+            <div className="flex-1 flex items-center gap-2.5 bg-white/10 backdrop-blur-sm border border-white/[0.15] rounded-xl px-4">
+              <Search size={16} className="text-white/40 shrink-0" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Cari komoditas: Cabai Merah, Bawang..."
+                className="flex-1 bg-transparent text-white placeholder-white/35 text-sm py-3.5 outline-none"
+                style={{ fontFamily: "Inter, sans-serif" }}
+              />
+            </div>
             <button
               onClick={onLoginClick}
-              className="tp-btn-primary px-6 py-3 rounded-xl text-sm font-semibold shrink-0"
+              className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors shrink-0"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              Cek Peluang AI
+              Cek Peluang <ArrowRight size={14} />
             </button>
           </div>
 
-          {/* Key Metric Highlights */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/10 max-w-lg">
-            <div>
-              <div className="font-heading text-2xl sm:text-3xl font-extrabold text-white">12.450+</div>
-              <div className="text-slate-400 text-xs mt-1">Petani Terhubung</div>
-            </div>
-            <div>
-              <div className="font-heading text-2xl sm:text-3xl font-extrabold text-white">34</div>
-              <div className="text-slate-400 text-xs mt-1">Kota Dipantau</div>
-            </div>
-            <div>
-              <div className="font-heading text-2xl sm:text-3xl font-extrabold text-amber-400">9.2%</div>
-              <div className="text-slate-400 text-xs mt-1">Rata-rata Profit Tambahan</div>
-            </div>
+          {/* Stats row */}
+          <div className="flex flex-wrap gap-6 pt-2">
+            {[
+              { val: "12.450+", label: "Petani Terhubung" },
+              { val: "34", label: "Kota Dipantau" },
+              { val: "9.2%", label: "Rata-rata Profit Tambahan", accent: true },
+            ].map((s) => (
+              <div key={s.label}>
+                <div
+                  className={`text-2xl font-extrabold ${s.accent ? "text-emerald-400" : "text-white"}`}
+                  style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                >
+                  {s.val}
+                </div>
+                <div
+                  className="text-white/45 text-xs mt-0.5"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  {s.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Hero Card Visual Preview */}
-        <div className="md:col-span-5 flex justify-center">
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-0 bg-emerald-500/20 rounded-3xl blur-2xl transform rotate-3 scale-95" />
-            
-            <div className="tp-card p-6 bg-white text-slate-900 shadow-2xl relative rounded-2xl border border-white/20">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
-                    #1
+        {/* Right — AI Card */}
+        <div className="flex flex-col gap-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl shadow-black/40">
+            <div className="flex items-start justify-between mb-5">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <span
+                      className="text-[10px] font-bold text-emerald-700"
+                      style={{ fontFamily: "JetBrains Mono, monospace" }}
+                    >
+                      #1
+                    </span>
                   </div>
-                  <div>
-                    <div className="text-xs font-medium text-slate-500">Rekomendasi AI Hari Ini</div>
-                    <div className="font-heading font-bold text-slate-900">Kirim ke Bandung</div>
-                  </div>
+                  <span
+                    className="text-xs text-[#6b7a6f] font-medium"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    Rekomendasi AI Hari Ini
+                  </span>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                  +9.2% Margin
-                </span>
+                <h3
+                  className="text-[#0b1f13] font-bold text-xl"
+                  style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                >
+                  Kirim ke Bandung
+                </h3>
               </div>
-
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
-                  <span className="text-slate-500">Harga Asal (Cilacap)</span>
-                  <span className="font-semibold text-slate-700">Rp 38.000 /kg</span>
-                </div>
-                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
-                  <span className="text-slate-500">Harga Tujuan (Bandung)</span>
-                  <span className="font-bold text-emerald-700">Rp 41.500 /kg</span>
-                </div>
-                <div className="flex justify-between text-sm py-1.5 border-b border-slate-50">
-                  <span className="text-slate-500">Estimasi Profit Clean</span>
-                  <span className="font-extrabold text-emerald-800">Rp 1.250.000 /500kg</span>
-                </div>
-              </div>
-
-              <button
-                onClick={onLoginClick}
-                className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              <span
+                className="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200"
+                style={{ fontFamily: "JetBrains Mono, monospace" }}
               >
-                <span>Lihat Simulasi Lengkap</span>
-                <ArrowRight size={16} />
-              </button>
+                +9.2% Margin
+              </span>
             </div>
+
+            <div className="flex flex-col gap-3 mb-5">
+              {[
+                { label: "Harga Asal (Cilacap)", val: "Rp 38.000 /kg", bold: false },
+                { label: "Harga Tujuan (Bandung)", val: "Rp 41.500 /kg", bold: false },
+                { label: "Estimasi Profit Bersih", val: "Rp 1.250.000 /500kg", bold: true, green: true },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  className="flex justify-between items-center py-2.5 border-b border-[#f0eeea] last:border-0"
+                >
+                  <span
+                    className="text-[#6b7a6f] text-sm"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    {row.label}
+                  </span>
+                  <span
+                    className={`text-sm font-semibold ${row.green ? "text-emerald-600" : "text-[#0b1f13]"}`}
+                    style={{ fontFamily: "JetBrains Mono, monospace" }}
+                  >
+                    {row.val}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={onLoginClick}
+              className="w-full flex items-center justify-center gap-2 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white font-semibold py-3.5 rounded-xl transition-colors"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              Lihat Simulasi Lengkap <ArrowRight size={15} />
+            </button>
+          </div>
+
+          {/* Secondary cards */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Pasar Alternatif", val: "Surabaya", sub: "+7.1% margin" },
+              { label: "Waktu Jual Optimal", val: "3–5 hari lagi", sub: "Harga diprediksi naik" },
+            ].map((c) => (
+              <div
+                key={c.label}
+                className="bg-white/10 border border-white/[0.12] rounded-xl p-3.5 backdrop-blur-sm"
+              >
+                <div
+                  className="text-white/45 text-[10px] font-medium mb-1"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  {c.label}
+                </div>
+                <div
+                  className="text-white font-bold text-base"
+                  style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                >
+                  {c.val}
+                </div>
+                <div
+                  className="text-emerald-400 text-[11px] font-medium mt-0.5"
+                  style={{ fontFamily: "JetBrains Mono, monospace" }}
+                >
+                  {c.sub}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

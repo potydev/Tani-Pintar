@@ -1,56 +1,102 @@
 import React from "react";
-import { Target, TrendingUp, ShoppingCart, Wallet } from "lucide-react";
+import { BarChart2, Zap, Truck, Bell, Shield, MapPin } from "lucide-react";
+
+const FEATURES = [
+  {
+    icon: BarChart2,
+    title: "Analitik Harga Real-Time",
+    desc: "Pantau pergerakan harga komoditas dari 34 kota secara langsung. Data diperbarui setiap 15 menit dari pasar induk terpercaya.",
+    highlight: "34 Kota Dipantau",
+  },
+  {
+    icon: Zap,
+    title: "Rekomendasi AI Instan",
+    desc: "Algoritma AI menganalisis permintaan, logistik, dan margin untuk memberikan rekomendasi pasar tujual terbaik dalam hitungan detik.",
+    highlight: "+9.2% Rata-rata Profit",
+  },
+  {
+    icon: Truck,
+    title: "Kalkulasi Biaya Logistik",
+    desc: "Hitung biaya pengiriman ke berbagai kota secara otomatis dan bandingkan margin bersih untuk keputusan penjualan yang optimal.",
+    highlight: "Estimasi Akurat 97%",
+  },
+  {
+    icon: Bell,
+    title: "Notifikasi Harga Optimal",
+    desc: "Terima peringatan WhatsApp saat harga komoditas Anda menyentuh target jual. Jangan lewatkan momentum terbaik.",
+    highlight: "Alert Instan",
+  },
+  {
+    icon: Shield,
+    title: "Data Terverifikasi",
+    desc: "Semua data harga bersumber langsung dari BPSP, Kemendag, dan jaringan 450+ pedagang mitra kami yang terverifikasi.",
+    highlight: "450+ Mitra Pedagang",
+  },
+  {
+    icon: MapPin,
+    title: "Peta Pasar Interaktif",
+    desc: "Visualisasikan harga berdasarkan wilayah untuk menemukan pasar dengan demand tertinggi mendekati musim panen Anda.",
+    highlight: "Peta Wilayah Lengkap",
+  },
+];
 
 export function LandingFeatures() {
-  const features = [
-    {
-      icon: Target,
-      color: "bg-emerald-100 text-emerald-700",
-      title: "Peluang Penjualan AI",
-      desc: "Rekomendasi otomatis pasar dan kota mana yang memberikan keuntungan bersih tertinggi untuk hasil panen Anda."
-    },
-    {
-      icon: TrendingUp,
-      color: "bg-purple-100 text-purple-700",
-      title: "Prediksi Harga 5-14 Hari",
-      desc: "Model prediksi berbasis AI untuk membantu Anda memutuskan apakah harus langsung panen atau menunggu harga naik."
-    },
-    {
-      icon: ShoppingCart,
-      color: "bg-amber-100 text-amber-700",
-      title: "Analisis Pembeli Terbaik",
-      desc: "Informasi lengkap pedagang besar, pasar induk, dan pembeli dengan permintaan tertinggi di berbagai wilayah."
-    },
-    {
-      icon: Wallet,
-      color: "bg-blue-100 text-blue-700",
-      title: "Kalkulator Keuntungan Bersih",
-      desc: "Hitung secara otomatis selisih harga dikurangi biaya transportasi, komisi, dan penyusutan logistik."
-    }
-  ];
-
   return (
-    <section id="fitur" className="py-20 px-6 max-w-7xl mx-auto">
-      <div className="text-center max-w-2xl mx-auto mb-16">
-        <div className="text-xs font-extrabold tracking-widest text-emerald-700 uppercase mb-3">Fitur Unggulan</div>
-        <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-slate-900">
-          Solusi Cerdas Penjualan Hasil Panen
-        </h2>
-        <p className="text-slate-600 mt-4 text-base">
-          Dirancang khusus untuk membantu petani Indonesia memaksimalkan keuntungan dari setiap kilogram hasil panen.
-        </p>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {features.map((item, idx) => (
-          <div key={idx} className="tp-card p-6 hover:shadow-lg transition-shadow">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${item.color}`}>
-              <item.icon size={24} />
-            </div>
-            <h3 className="font-heading font-bold text-lg text-slate-900 mb-2">{item.title}</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+    <section id="fitur" className="bg-[#f7f6f2] py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="mb-14">
+          <div
+            className="text-emerald-600 text-xs font-bold tracking-[0.2em] uppercase mb-3"
+            style={{ fontFamily: "JetBrains Mono, monospace" }}
+          >
+            Fitur Unggulan
           </div>
-        ))}
+          <h2
+            className="text-[#0b1f13] text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight max-w-lg"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Semua yang Petani Butuhkan untuk Jual Lebih Mahal
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 rounded-2xl overflow-hidden border border-slate-200">
+          {FEATURES.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <div
+                key={i}
+                className="bg-white p-7 flex flex-col gap-4 group hover:bg-[#f7f6f2] transition-colors"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                  <Icon size={18} className="text-emerald-600" />
+                </div>
+                <div>
+                  <h3
+                    className="text-[#0b1f13] font-bold text-base mb-2"
+                    style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                  >
+                    {f.title}
+                  </h3>
+                  <p
+                    className="text-[#6b7a6f] text-sm leading-relaxed"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    {f.desc}
+                  </p>
+                </div>
+                <div className="mt-auto pt-2">
+                  <span
+                    className="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold"
+                    style={{ fontFamily: "JetBrains Mono, monospace" }}
+                  >
+                    <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
+                    {f.highlight}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

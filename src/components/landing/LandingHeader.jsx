@@ -1,44 +1,112 @@
-import React from "react";
-import { Leaf, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Leaf, ArrowRight, Menu, X } from "lucide-react";
 
 export function LandingHeader({ onLoginClick }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  const navLinks = ["Beranda", "Fitur Utama", "Analitik AI", "Panduan Petani"];
+
   return (
-    <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Brand Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center shadow-md">
-            <Leaf size={22} className="text-white" />
+    <nav
+      id="landing-navbar"
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/50"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Brand */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-[#0d5c3a] rounded-lg flex items-center justify-center">
+            <Leaf size={16} className="text-white" />
           </div>
-          <div>
-            <div className="font-heading font-extrabold text-xl text-slate-900 tracking-tight leading-none">
+          <div className="flex flex-col leading-none">
+            <span
+              className="text-[#0b1f13] font-bold text-base tracking-tight"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
               TaniPintar
-            </div>
-            <div className="text-[11px] font-semibold text-emerald-700 tracking-widest uppercase mt-0.5">
+            </span>
+            <span
+              className="text-[#16a34a] text-[9px] font-semibold tracking-[0.15em] uppercase"
+              style={{ fontFamily: "JetBrains Mono, monospace" }}
+            >
               AI Market Intelligence
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-          <a href="#beranda" className="text-slate-900 font-semibold hover:text-emerald-700 transition-colors">Beranda</a>
-          <a href="#fitur" className="hover:text-emerald-700 transition-colors">Fitur Utama</a>
-          <a href="#analitik" className="hover:text-emerald-700 transition-colors">Analitik AI</a>
-          <a href="#panduan" className="hover:text-emerald-700 transition-colors">Panduan Petani</a>
-        </nav>
+        {/* Desktop Nav Links */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((item) => (
+            <a
+              key={item}
+              href="#"
+              className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              {item}
+            </a>
+          ))}
+        </div>
 
-        {/* Action Button */}
-        <div className="flex items-center gap-4">
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-3">
           <button
             onClick={onLoginClick}
-            className="tp-btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            className="text-sm font-semibold text-[#0d5c3a] hover:text-[#0b1f13] transition-colors"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
-            <span>Masuk ke Dashboard</span>
-            <ArrowRight size={16} />
+            Masuk
+          </button>
+          <button
+            onClick={onLoginClick}
+            className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Masuk ke Dashboard <ArrowRight size={14} />
           </button>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden p-2 text-[#0b1f13]"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-white border-t border-slate-200/50 px-6 py-4 flex flex-col gap-4">
+          {navLinks.map((item) => (
+            <a
+              key={item}
+              href="#"
+              className="text-sm font-medium text-[#0b1f13]/70"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              {item}
+            </a>
+          ))}
+          <button
+            onClick={onLoginClick}
+            className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Masuk ke Dashboard
+          </button>
+        </div>
+      )}
+    </nav>
   );
 }

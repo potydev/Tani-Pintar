@@ -2,28 +2,29 @@ import React from "react";
 
 export const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
     .tp-app {
-      --tp-primary: #00875A;
-      --tp-primary-hover: #00704A;
-      --tp-primary-light: #E8F5E9;
-      --tp-forest-dark: #092C1E;
-      --tp-forest-nav: #0D3623;
+      --tp-primary: #0d5c3a;
+      --tp-primary-hover: #0b4f31;
+      --tp-primary-light: #e6f2ea;
+      --tp-forest-dark: #0b1f13;
+      --tp-forest-nav: #0d2617;
+      --tp-accent: #16a34a;
       --tp-accent-gold: #E3A72B;
       --tp-accent-orange: #F97316;
       --tp-accent-purple: #7C3AED;
       --tp-accent-blue: #2563EB;
       --tp-accent-red: #EF4444;
       
-      --tp-bg-main: #F4F6F8;
+      --tp-bg-main: #f7f6f2;
       --tp-bg-card: #FFFFFF;
-      --tp-border: #E2E8F0;
-      --tp-border-light: #F1F5F9;
+      --tp-border: rgba(13, 31, 19, 0.1);
+      --tp-border-light: #f0eeea;
       
-      --tp-text-dark: #0F172A;
+      --tp-text-dark: #0b1f13;
       --tp-text-body: #334155;
-      --tp-text-muted: #64748B;
+      --tp-text-muted: #6b7a6f;
       --tp-text-subtle: #94A3B8;
 
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -44,7 +45,7 @@ export const GlobalStyles = () => (
     }
     .tp-btn-primary:hover {
       background-color: var(--tp-primary-hover);
-      box-shadow: 0 4px 12px rgba(0, 135, 90, 0.25);
+      box-shadow: 0 4px 12px rgba(13, 92, 58, 0.25);
     }
 
     .tp-btn-outline {
@@ -77,7 +78,7 @@ export const GlobalStyles = () => (
     .tp-ticker-track {
       display: flex;
       white-space: nowrap;
-      animation: tp-scroll 35s linear infinite;
+      animation: tp-scroll 38s linear infinite;
     }
     .tp-ticker-track:hover {
       animation-play-state: paused;
@@ -119,6 +120,11 @@ export const GlobalStyles = () => (
     .tp-badge-purple {
       background-color: #F3E8FF;
       color: #6B21A8;
+    }
+
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
     }
   `}</style>
 );
