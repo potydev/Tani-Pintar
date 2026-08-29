@@ -7,6 +7,7 @@ import { MarketplacePage } from "./src/pages/MarketplacePage";
 import { ProductDetailPage } from "./src/pages/ProductDetailPage";
 import { CheckoutPage } from "./src/pages/CheckoutPage";
 import { LoginPage } from "./src/pages/LoginPage";
+import { AdminDashboardPage } from "./src/pages/AdminDashboardPage";
 
 export default function TaniPintarApp() {
   const [userName, setUserName] = useState("Pak Joko Slamet");
@@ -92,6 +93,12 @@ export default function TaniPintarApp() {
                 <Navigate to="/login?redirect=/dashboard" replace />
               )
             }
+          />
+
+          {/* Admin Verification Portal */}
+          <Route
+            path="/admin"
+            element={<AdminDashboardPage onBackToUserApp={() => window.location.href = "/dashboard"} />}
           />
 
           {/* Catch all redirect to home */}

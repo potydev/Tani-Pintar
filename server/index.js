@@ -138,43 +138,206 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Auth API - Upgrade to Seller / Verified Farmer
+// In-memory verification requests buffer for instant responsiveness
+let pendingFarmerRequests = [
+  {
+    id: 'REQ-001',
+    email: 'petani.sugiono@gmail.com',
+    full_name: 'Pak Hidayat Sugiono',
+    phone: '081399887766',
+    farm_location: 'Cilacap, Jawa Tengah',
+    primary_commodity: 'Cabai Merah Besar',
+    land_size: '1.5 Hektar',
+    land_type: 'Milik Sendiri',
+    harvest_capacity: '1 - 5 Ton',
+    nik: '3301051204850003',
+    group_name: 'Poktan Tani Makmur Cilacap',
+    bank_name: 'BRI (Bank Rakyat Indonesia)',
+    account_number: '0123-01-045678-50-2',
+    ktp_image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
+    verification_status: 'pending',
+    submitted_at: new Date().toISOString()
+  },
+  {
+    id: 'REQ-002',
+    email: 'bambang.brebes@gmail.com',
+    full_name: 'Pak Bambang Suprianto',
+    phone: '082155443322',
+    farm_location: 'Brebes, Jawa Tengah',
+    primary_commodity: 'Bawang Merah',
+    land_size: '2.5 Hektar',
+    land_type: 'Sewa Lahan',
+    harvest_capacity: '5 - 10 Ton',
+    nik: '3329012209780001',
+    group_name: 'Gapoktan Bawang Unggul Brebes',
+    bank_name: 'Bank Mandiri',
+    account_number: '138-00-1928374-1',
+    ktp_image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
+    verification_status: 'pending',
+    submitted_at: new Date().toISOString()
+  }
+];
+
+// Auth API - Upgrade / Submit Farmer Verification (Pending Admin Review)
 app.post('/api/auth/upgrade-seller', async (req, res) => {
   try {
-    const { email, farm_location, primary_commodity, land_size, group_name } = req.body;
-    if (!email || !farm_location || !primary_commodity) {
-      return res.status(400).json({ success: false, error: 'Lokasi panen dan komoditas utama wajib diisi.' });
+    const {
+      email,
+      full_name,
+      phone,
+      farm_location,
+      primary_commodity,
+      land_size,
+      land_type,
+      harvest_capacity,
+      nik,
+      group_name,
+      bank_name,
+      account_number,
+      ktp_image_url
+    } = req.body;
+
+    if (!email || !farm_location || !primary_commodity || !nik) {
+      return res.status(400).json({ success: false, error: 'Lokasi panen, komoditas utama, dan NIK KTP wajib diisi.' });
     }
 
     const loc = farm_location || 'Cilacap, Jawa Tengah';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
 
-    const { data: updatedUsers, error } = await supabase
-      .from('users')
-      .update({
-        role: 'verified_farmer',
-        is_seller: true,
-        farm_location: loc,
-        primary_commodity: comm,
-        land_size: land,
-        group_name: group_name || 'Kelompok Tani Mandiri'
-      })
-      .eq('email', email)
-      .select();
-
-    const user = (updatedUsers && updatedUsers[0]) ? updatedUsers[0] : {
+    const reqId = 'REQ-' + Date.now().toString().slice(-4);
+    const newRequest = {
+      id: reqId,
       email,
-      role: 'verified_farmer',
-      is_seller: true,
+      full_name: full_name || email.split('@')[0],
+      phone: phone || '08123456789',
       farm_location: loc,
       primary_commodity: comm,
-      land_size: land
+      land_size: land,
+      land_type: land_type || 'Milik Sendiri',
+      harvest_capacity: harvest_capacity || '1 - 5 Ton',
+      nik,
+      group_name: group_name || 'Kelompok Tani Mandiri',
+      bank_name: bank_name || 'BRI',
+      account_number: account_number || '1234567890',
+      ktp_image_url: ktp_image_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
+      verification_status: 'pending',
+      submitted_at: new Date().toISOString()
     };
 
-    res.json({ success: true, message: 'Selamat! Akun Anda berhasil di-upgrade menjadi Petani Terverifikasi TaniPintar.', user });
+    // Store in memory list
+    pendingFarmerRequests.unshift(newRequest);
+
+    // Update Supabase if available
+    try {
+      await supabase
+        .from('users')
+        .update({
+          role: 'farmer_pending',
+          verification_status: 'pending',
+          farm_location: loc,
+          primary_commodity: comm,
+          land_size: land
+        })
+        .eq('email', email);
+    } catch (dbErr) {
+      console.log('[Supabase Notice] Offline update fallback active');
+    }
+
+    const user = {
+      email,
+      role: 'farmer_pending',
+      verification_status: 'pending',
+      is_seller: false,
+      farm_location: loc,
+      primary_commodity: comm,
+      land_size: land,
+      nik
+    };
+
+    res.json({
+      success: true,
+      message: 'Pengajuan verifikasi berhasil dikirim! Status akun Anda sekarang "Dalam Peninjauan Admin".',
+      user
+    });
   } catch (err) {
-    console.error('Error during seller upgrade:', err);
+    console.error('Error during seller upgrade submission:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin API - Get All Farmer Verification Requests
+app.get('/api/admin/farmers', (req, res) => {
+  res.json({ success: true, requests: pendingFarmerRequests });
+});
+
+// Admin API - Approve Farmer Verification Request
+app.post('/api/admin/approve-farmer', async (req, res) => {
+  try {
+    const { email, req_id } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
+    }
+
+    // Update in memory list
+    const found = pendingFarmerRequests.find(r => r.email === email || r.id === req_id);
+    if (found) {
+      found.verification_status = 'approved';
+    }
+
+    // Update Supabase Database
+    try {
+      await supabase
+        .from('users')
+        .update({
+          role: 'verified_farmer',
+          is_seller: true,
+          verification_status: 'approved'
+        })
+        .eq('email', email);
+    } catch (dbErr) {}
+
+    res.json({
+      success: true,
+      message: `Akun petani (${email}) berhasil DISETUJUI dan di-upgrade menjadi Petani Terverifikasi!`,
+      approved_email: email
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin API - Reject Farmer Verification Request
+app.post('/api/admin/reject-farmer', async (req, res) => {
+  try {
+    const { email, req_id, reason } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
+    }
+
+    const found = pendingFarmerRequests.find(r => r.email === email || r.id === req_id);
+    if (found) {
+      found.verification_status = 'rejected';
+      found.rejection_reason = reason || 'Dokumen KTP / Data Poktan belum sesuai.';
+    }
+
+    try {
+      await supabase
+        .from('users')
+        .update({
+          role: 'buyer',
+          is_seller: false,
+          verification_status: 'rejected'
+        })
+        .eq('email', email);
+    } catch (dbErr) {}
+
+    res.json({
+      success: true,
+      message: `Pengajuan verifikasi (${email}) telah DITOLAK.`,
+      rejected_email: email
+    });
+  } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });

@@ -71,24 +71,50 @@ export function DashboardHeader({
     setNotifications(notifications.map(n => ({ ...n, unread: false })));
   };
 
+  const isPendingFarmer = user?.role === "farmer_pending" || user?.verification_status === "pending";
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-2">
-      <div>
-        <div className="flex items-center gap-3">
-          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Halo, {displayName}! 👋
-          </h1>
-          <button
-            onClick={onOpenAuth}
-            className="px-2.5 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-xs font-bold transition-colors"
+    <div className="flex flex-col gap-4 mb-6 pb-2">
+      {/* Pending Admin Verification Alert Banner */}
+      {isPendingFarmer && (
+        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 p-3.5 rounded-2xl text-white shadow-md flex items-center justify-between text-xs sm:text-sm font-bold animate-in fade-in duration-300">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
+            <span>⏳ Status Akun: Pengajuan Verifikasi Petani Dalam Peninjauan Admin (Estimasi 1x24 jam)</span>
+          </div>
+          <a
+            href="/admin"
+            className="px-3 py-1 bg-slate-950/40 hover:bg-slate-950/60 text-white rounded-lg text-xs font-extrabold transition-colors shrink-0 ml-2"
           >
-            {user ? "Kelola Akun" : "Masuk / Daftar"}
-          </button>
+            Cek Portal Admin 🛡️
+          </a>
         </div>
-        <p className="text-slate-500 text-sm mt-1">
-          AI TaniPintar menemukan peluang terbaik untuk penjualan hasil panen Anda hari ini.
-        </p>
-      </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900">
+              Halo, {displayName}! 👋
+            </h1>
+            <button
+              onClick={onOpenAuth}
+              className="px-2.5 py-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg text-xs font-bold transition-colors"
+            >
+              {user ? "Kelola Akun" : "Masuk / Daftar"}
+            </button>
+            <a
+              href="/admin"
+              className="px-2.5 py-1 bg-slate-800 text-slate-200 hover:bg-slate-900 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
+              title="Portal Admin Konfirmasi Verifikasi"
+            >
+              <span>Portal Admin</span> 🛡️
+            </a>
+          </div>
+          <p className="text-slate-500 text-sm mt-1">
+            AI TaniPintar menemukan peluang terbaik untuk penjualan hasil panen Anda hari ini.
+          </p>
+        </div>
 
       <div className="flex items-center gap-3">
         {/* Notification Bell */}
@@ -209,6 +235,7 @@ export function DashboardHeader({
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }
