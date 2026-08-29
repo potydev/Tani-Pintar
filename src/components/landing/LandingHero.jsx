@@ -1,18 +1,27 @@
 import React, { useState } from "react";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, ChevronDown, ChevronUp, Sparkles, TrendingUp } from "lucide-react";
 
 export function LandingHero({ onLoginClick }) {
   const [query, setQuery] = useState("");
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
     <section
       id="beranda"
-      className="relative min-h-[88vh] flex flex-col justify-center overflow-hidden"
+      className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden"
       style={{
-        background: "linear-gradient(145deg, #051510 0%, #0b2e1a 40%, #0d5c3a 100%)",
+        background: "linear-gradient(145deg, #051510 0%, #0b2e1a 45%, #0d5c3a 100%)",
       }}
     >
-      {/* Grid overlay */}
+      {/* Organic Agricultural Background Image with Blend Mask */}
+      <div
+        className="absolute inset-0 opacity-15 mix-blend-overlay bg-cover bg-center pointer-events-none"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80')",
+        }}
+      />
+
+      {/* Atmospheric Grid overlay */}
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{
@@ -24,17 +33,17 @@ export function LandingHero({ onLoginClick }) {
 
       {/* Radial glow */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle, #16a34a 0%, transparent 70%)" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-15 pointer-events-none"
+        style={{ background: "radial-gradient(circle, #22c55e 0%, transparent 70%)" }}
       />
 
       <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Left */}
+        {/* Left Content Column */}
         <div className="flex flex-col gap-6">
-          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] rounded-full px-4 py-1.5 w-fit">
+          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.14] rounded-full px-4 py-1.5 w-fit backdrop-blur-md">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span
-              className="text-white/80 text-xs font-semibold tracking-wide"
+              className="text-white/90 text-xs font-semibold tracking-wide"
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
               Platform AI Penjualan Hasil Panen #1 di Indonesia
@@ -51,39 +60,41 @@ export function LandingHero({ onLoginClick }) {
           </h1>
 
           <p
-            className="text-white/60 text-base leading-relaxed max-w-md"
+            className="text-white/70 text-base leading-relaxed max-w-md"
             style={{ fontFamily: "Inter, sans-serif" }}
           >
             TaniPintar menganalisis harga, permintaan pasar, dan biaya logistik secara real-time untuk merekomendasikan keputusan penjualan paling menguntungkan bagi petani.
           </p>
 
-          {/* Search */}
+          {/* Search Input */}
           <div className="flex gap-2 max-w-md">
-            <div className="flex-1 flex items-center gap-2.5 bg-white/10 backdrop-blur-sm border border-white/[0.15] rounded-xl px-4">
-              <Search size={16} className="text-white/40 shrink-0" />
+            <div className="flex-1 flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/[0.2] rounded-xl px-4 shadow-inner">
+              <Search size={16} className="text-white/50 shrink-0" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Cari komoditas: Cabai Merah, Bawang..."
-                className="flex-1 bg-transparent text-white placeholder-white/35 text-sm py-3.5 outline-none"
+                className="flex-1 bg-transparent text-white placeholder-white/40 text-sm py-3.5 outline-none font-medium"
                 style={{ fontFamily: "Inter, sans-serif" }}
               />
             </div>
+
+            {/* Primary Accent CTA */}
             <button
               onClick={onLoginClick}
-              className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors shrink-0"
+              className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-sm px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/25 shrink-0 hover:scale-[1.02]"
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              Cek Peluang <ArrowRight size={14} />
+              Cek Peluang <ArrowRight size={15} />
             </button>
           </div>
 
           {/* Stats row */}
-          <div className="flex flex-wrap gap-6 pt-2">
+          <div className="flex flex-wrap gap-8 pt-2">
             {[
               { val: "12.450+", label: "Petani Terhubung" },
               { val: "34", label: "Kota Dipantau" },
-              { val: "9.2%", label: "Rata-rata Profit Tambahan", accent: true },
+              { val: "+9.2%", label: "Rata-rata Tambahan Margin", accent: true },
             ].map((s) => (
               <div key={s.label}>
                 <div
@@ -93,7 +104,7 @@ export function LandingHero({ onLoginClick }) {
                   {s.val}
                 </div>
                 <div
-                  className="text-white/45 text-xs mt-0.5"
+                  className="text-white/50 text-xs mt-0.5 font-medium"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
                   {s.label}
@@ -103,107 +114,80 @@ export function LandingHero({ onLoginClick }) {
           </div>
         </div>
 
-        {/* Right — AI Card */}
+        {/* Right Column — AI Recommendation Card (Progressive Disclosure) */}
         <div className="flex flex-col gap-4">
-          <div className="bg-white rounded-2xl p-6 shadow-2xl shadow-black/40">
-            <div className="flex items-start justify-between mb-5">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <span
-                      className="text-[10px] font-bold text-emerald-700"
-                      style={{ fontFamily: "JetBrains Mono, monospace" }}
-                    >
-                      #1
-                    </span>
-                  </div>
-                  <span
-                    className="text-xs text-[#6b7a6f] font-medium"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    Rekomendasi AI Hari Ini
-                  </span>
+          <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-2xl shadow-black/50 border border-slate-100/50 backdrop-blur-sm">
+            {/* Header Insight Badge */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                  <Sparkles size={16} />
                 </div>
-                <h3
-                  className="text-[#0b1f13] font-bold text-xl"
+                <span
+                  className="text-xs font-bold text-slate-500 uppercase tracking-wider"
                   style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
                 >
-                  Kirim ke Bandung
-                </h3>
+                  Rekomendasi Utama AI
+                </span>
               </div>
               <span
-                className="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200"
+                className="bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1 rounded-full border border-emerald-200"
                 style={{ fontFamily: "JetBrains Mono, monospace" }}
               >
                 +9.2% Margin
               </span>
             </div>
 
-            <div className="flex flex-col gap-3 mb-5">
-              {[
-                { label: "Harga Asal (Cilacap)", val: "Rp 38.000 /kg", bold: false },
-                { label: "Harga Tujuan (Bandung)", val: "Rp 41.500 /kg", bold: false },
-                { label: "Estimasi Profit Bersih", val: "Rp 1.250.000 /500kg", bold: true, green: true },
-              ].map((row) => (
-                <div
-                  key={row.label}
-                  className="flex justify-between items-center py-2.5 border-b border-[#f0eeea] last:border-0"
-                >
-                  <span
-                    className="text-[#6b7a6f] text-sm"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    {row.label}
-                  </span>
-                  <span
-                    className={`text-sm font-semibold ${row.green ? "text-emerald-600" : "text-[#0b1f13]"}`}
-                    style={{ fontFamily: "JetBrains Mono, monospace" }}
-                  >
-                    {row.val}
-                  </span>
-                </div>
-              ))}
+            {/* Primary Insight Highlight */}
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/70 mb-4">
+              <div className="text-xs text-slate-500 font-medium mb-1">Peluang Penjualan Hari Ini:</div>
+              <div className="text-slate-900 font-extrabold text-lg sm:text-xl flex items-center gap-2">
+                <span>Cabai Merah → Bandung</span>
+                <TrendingUp size={18} className="text-emerald-600 shrink-0" />
+              </div>
+              <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                <span className="text-slate-600 font-semibold">Estimasi Keuntungan Bersih:</span>
+                <span className="font-extrabold text-emerald-700 text-sm" style={{ fontFamily: "JetBrains Mono, monospace" }}>
+                  Rp 1.250.000 <span className="text-slate-400 font-normal text-[10px]">/ 500kg</span>
+                </span>
+              </div>
             </div>
 
+            {/* Progressive Disclosure Toggle Button */}
             <button
-              onClick={onLoginClick}
-              className="w-full flex items-center justify-center gap-2 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white font-semibold py-3.5 rounded-xl transition-colors"
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              onClick={() => setShowDetails(!showDetails)}
+              className="w-full flex items-center justify-between text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-4 py-2.5 rounded-xl transition-colors mb-4"
             >
-              Lihat Simulasi Lengkap <ArrowRight size={15} />
+              <span>{showDetails ? "Sembunyikan Detail Simulasi" : "Lihat Detail Simulasi & Rincian Harga"}</span>
+              {showDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
-          </div>
 
-          {/* Secondary cards */}
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Pasar Alternatif", val: "Surabaya", sub: "+7.1% margin" },
-              { label: "Waktu Jual Optimal", val: "3–5 hari lagi", sub: "Harga diprediksi naik" },
-            ].map((c) => (
-              <div
-                key={c.label}
-                className="bg-white/10 border border-white/[0.12] rounded-xl p-3.5 backdrop-blur-sm"
-              >
-                <div
-                  className="text-white/45 text-[10px] font-medium mb-1"
-                  style={{ fontFamily: "Inter, sans-serif" }}
-                >
-                  {c.label}
+            {/* Progressive Disclosure Hidden Content */}
+            {showDetails && (
+              <div className="flex flex-col gap-2.5 mb-4 pt-1 animate-fadeIn">
+                <div className="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Harga Asal (Cilacap)</span>
+                  <span className="font-bold text-slate-800" style={{ fontFamily: "JetBrains Mono, monospace" }}>Rp 38.000 /kg</span>
                 </div>
-                <div
-                  className="text-white font-bold text-base"
-                  style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-                >
-                  {c.val}
+                <div className="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Harga Tujuan (Bandung)</span>
+                  <span className="font-bold text-slate-800" style={{ fontFamily: "JetBrains Mono, monospace" }}>Rp 41.500 /kg</span>
                 </div>
-                <div
-                  className="text-emerald-400 text-[11px] font-medium mt-0.5"
-                  style={{ fontFamily: "JetBrains Mono, monospace" }}
-                >
-                  {c.sub}
+                <div className="flex justify-between items-center text-xs py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Pasar Alternatif</span>
+                  <span className="font-bold text-emerald-600" style={{ fontFamily: "JetBrains Mono, monospace" }}>Surabaya (+7.1%)</span>
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* CTA Action */}
+            <button
+              onClick={onLoginClick}
+              className="w-full flex items-center justify-center gap-2 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-md"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              Buka Simulasi Lengkap <ArrowRight size={15} />
+            </button>
           </div>
         </div>
       </div>

@@ -46,7 +46,7 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
           </div>
         </Link>
 
-        {/* Desktop Nav Links (Identical to Landing Page) */}
+        {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-8">
           <Link
             to="/"
@@ -83,7 +83,7 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
           </a>
         </div>
 
-        {/* Desktop Right Actions (Identical to Landing Page) */}
+        {/* Desktop Right Actions (Secondary / Outline CTA hierarchy to keep Hero Primary) */}
         <div className="hidden md:flex items-center gap-3">
           {isLoggedIn ? (
             <>
@@ -97,7 +97,7 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
               </div>
               <Link
                 to="/dashboard"
-                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Dashboard <ArrowRight size={14} />
@@ -107,17 +107,17 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
             <>
               <Link
                 to="/login"
-                className="text-sm font-semibold text-[#0d5c3a] hover:text-[#0b1f13] transition-colors"
+                className="text-xs font-bold text-slate-700 hover:text-[#0d5c3a] transition-colors px-2 py-1"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Masuk
               </Link>
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
+                className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-[#0d5c3a] border border-emerald-300 text-xs font-extrabold px-4 py-2 rounded-xl transition-all"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
-                Mulai Sekarang <ArrowRight size={14} />
+                Mulai Sekarang <ArrowRight size={13} />
               </Link>
             </>
           )}
@@ -176,7 +176,7 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
               <Link
                 to="/login"
                 onClick={() => setMenuOpen(false)}
-                className="w-full text-center py-2 bg-[#0d5c3a] text-white font-bold text-xs rounded-lg"
+                className="w-full text-center py-2 bg-emerald-50 text-[#0d5c3a] border border-emerald-300 font-bold text-xs rounded-lg"
               >
                 Masuk / Mulai Sekarang
               </Link>
