@@ -410,6 +410,315 @@ app.get('/api/recommendations', async (req, res) => {
   }
 });
 
+// ============================================================
+// MARKETPLACE API ENDPOINTS
+// ============================================================
+
+// Auto-create marketplace tables
+try {
+  queryDB(`
+    CREATE TABLE IF NOT EXISTS marketplace_products (
+      id SERIAL PRIMARY KEY,
+      seller_id INT REFERENCES users(id) ON DELETE SET NULL,
+      name VARCHAR(150) NOT NULL,
+      category VARCHAR(50) NOT NULL,
+      price NUMERIC(12,2) NOT NULL,
+      unit VARCHAR(20) DEFAULT 'kg',
+      min_order INT DEFAULT 50,
+      stock INT NOT NULL DEFAULT 0,
+      farmer_name VARCHAR(100) NOT NULL,
+      location VARCHAR(100) NOT NULL,
+      rating NUMERIC(2,1) DEFAULT 5.0,
+      reviews_count INT DEFAULT 0,
+      total_sold INT DEFAULT 0,
+      harvest_date DATE,
+      grade VARCHAR(30) DEFAULT 'Grade A',
+      freshness VARCHAR(30) DEFAULT 'Segar',
+      organic BOOLEAN DEFAULT FALSE,
+      verified_seller BOOLEAN DEFAULT TRUE,
+      image_url TEXT,
+      description TEXT,
+      tags TEXT DEFAULT '[]',
+      price_change NUMERIC(5,2) DEFAULT 0,
+      trending BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `).catch(err => console.log('[Database Notice] marketplace_products table check:', err.message));
+
+  queryDB(`
+    CREATE TABLE IF NOT EXISTS marketplace_orders (
+      id SERIAL PRIMARY KEY,
+      buyer_id INT REFERENCES users(id) ON DELETE CASCADE,
+      product_id INT REFERENCES marketplace_products(id) ON DELETE SET NULL,
+      seller_id INT REFERENCES users(id) ON DELETE SET NULL,
+      quantity INT NOT NULL,
+      total_price NUMERIC(14,2) NOT NULL,
+      shipping_address TEXT NOT NULL,
+      buyer_phone VARCHAR(20),
+      notes TEXT,
+      status VARCHAR(30) DEFAULT 'Menunggu Konfirmasi',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `).catch(err => console.log('[Database Notice] marketplace_orders table check:', err.message));
+} catch (e) {}
+
+// Marketplace Backend API powered by Supabase PostgreSQL
+
+// GET /api/marketplace/products - List all marketplace products directly from Supabase PostgreSQL
+app.get('/api/marketplace/products', async (req, res) => {
+  try {
+    const { category, search, sort, page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    let queryBuilder = supabase
+      .from('marketplace_products')
+      .select('*', { count: 'exact' });
+
+    if (category && category !== 'all') {
+      queryBuilder = queryBuilder.eq('category', category);
+    }
+    if (search) {
+      queryBuilder = queryBuilder.or(
+        `name.ilike.%${search}%,farmer_name.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%`
+      );
+    }
+
+    switch (sort) {
+      case 'price_low': queryBuilder = queryBuilder.order('price', { ascending: true }); break;
+      case 'price_high': queryBuilder = queryBuilder.order('price', { ascending: false }); break;
+      case 'newest': queryBuilder = queryBuilder.order('created_at', { ascending: false }); break;
+      case 'rating': queryBuilder = queryBuilder.order('rating', { ascending: false }); break;
+      default: queryBuilder = queryBuilder.order('created_at', { ascending: false });
+    }
+
+    queryBuilder = queryBuilder.range(offset, offset + parseInt(limit) - 1);
+
+    const { data, error, count } = await queryBuilder;
+    if (error) {
+      console.error('Supabase query error:', error);
+      throw error;
+    }
+
+    const products = (data || []).map(p => ({
+      ...p,
+      tags: typeof p.tags === 'string' ? JSON.parse(p.tags || '[]') : (p.tags || [])
+    }));
+
+    res.json({
+      success: true,
+      count: products.length,
+      total: count || products.length,
+      page: parseInt(page),
+      totalPages: Math.ceil((count || products.length) / parseInt(limit)) || 1,
+      data: products
+    });
+  } catch (err) {
+    console.error('Error fetching marketplace products:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/marketplace/products/:id - Get single product detail
+app.get('/api/marketplace/products/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('marketplace_products')
+      .select('*')
+      .eq('id', parseInt(req.params.id))
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({ success: false, error: 'Produk tidak ditemukan.' });
+    }
+
+    data.tags = typeof data.tags === 'string' ? JSON.parse(data.tags || '[]') : (data.tags || []);
+
+    // Get seller info
+    if (data.seller_id) {
+      const { data: seller } = await supabase
+        .from('users')
+        .select('id, full_name, farm_location, primary_commodity, avatar_url')
+        .eq('id', data.seller_id)
+        .single();
+      data.seller_info = seller || null;
+    }
+
+    // Get related products
+    const { data: related } = await supabase
+      .from('marketplace_products')
+      .select('id, name, price, unit, category, rating, farmer_name, location, image_url, verified_seller, tags, grade, total_sold, price_change')
+      .eq('category', data.category)
+      .neq('id', data.id)
+      .limit(4);
+
+    data.related_products = (related || []).map(p => ({
+      ...p,
+      tags: typeof p.tags === 'string' ? JSON.parse(p.tags || '[]') : (p.tags || [])
+    }));
+
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Error fetching product detail:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/marketplace/products - Create a new product listing (authenticated seller)
+app.post('/api/marketplace/products', async (req, res) => {
+  try {
+    const { seller_id, name, category, price, unit, min_order, stock, description, grade, organic, tags, harvest_date } = req.body;
+
+    if (!seller_id || !name || !category || !price || !stock) {
+      return res.status(400).json({ success: false, error: 'Data produk tidak lengkap.' });
+    }
+
+    // Get seller info
+    const { data: seller } = await supabase
+      .from('users')
+      .select('full_name, farm_location')
+      .eq('id', seller_id)
+      .single();
+
+    if (!seller) {
+      return res.status(404).json({ success: false, error: 'Akun penjual tidak ditemukan.' });
+    }
+
+    const { data, error } = await supabase
+      .from('marketplace_products')
+      .insert([{
+        seller_id,
+        name,
+        category,
+        price: parseFloat(price),
+        unit: unit || 'kg',
+        min_order: min_order || 50,
+        stock: parseInt(stock),
+        farmer_name: seller.full_name,
+        location: seller.farm_location,
+        description: description || '',
+        grade: grade || 'Grade A',
+        organic: organic || false,
+        tags: JSON.stringify(tags || []),
+        harvest_date: harvest_date || new Date().toISOString().split('T')[0],
+        verified_seller: true
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Produk berhasil ditambahkan!', data });
+  } catch (err) {
+    console.error('Error creating product:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/marketplace/orders - Place an order (authenticated buyer)
+app.post('/api/marketplace/orders', async (req, res) => {
+  try {
+    const { buyer_id, product_id, quantity, shipping_address, buyer_phone, notes } = req.body;
+
+    if (!product_id || !quantity || !shipping_address) {
+      return res.status(400).json({ success: false, error: 'Data pesanan tidak lengkap.' });
+    }
+
+    // Get product
+    const { data: product } = await supabase
+      .from('marketplace_products')
+      .select('*')
+      .eq('id', product_id)
+      .single();
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Produk tidak ditemukan.' });
+    }
+
+    if (quantity < (product.min_order || 1)) {
+      return res.status(400).json({ success: false, error: `Minimum pemesanan ${product.min_order} ${product.unit}.` });
+    }
+
+    if (quantity > product.stock) {
+      return res.status(400).json({ success: false, error: 'Stok tidak mencukupi.' });
+    }
+
+    const total_price = product.price * quantity;
+
+    let validBuyerId = null;
+    if (buyer_id) {
+      // Check if user exists to prevent FK violation
+      const { data: u } = await supabase.from('users').select('id').eq('id', buyer_id).maybeSingle();
+      if (u) validBuyerId = u.id;
+    }
+
+    const { data: order, error } = await supabase
+      .from('marketplace_orders')
+      .insert([{
+        buyer_id: validBuyerId,
+        product_id: parseInt(product_id),
+        quantity: parseInt(quantity),
+        total_price,
+        shipping_address: notes ? `${shipping_address} (HP: ${buyer_phone || '-'}, Catatan: ${notes})` : `${shipping_address} (HP: ${buyer_phone || '-'})`,
+        status: 'Menunggu Konfirmasi',
+        payment_method: 'Transfer / COD'
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Update stock in Supabase
+    await supabase
+      .from('marketplace_products')
+      .update({
+        stock: Math.max(0, product.stock - quantity)
+      })
+      .eq('id', product_id);
+
+    res.json({
+      success: true,
+      message: 'Pesanan berhasil dibuat! Penjual akan segera menghubungi Anda.',
+      data: { order, product_name: product.name, seller_name: product.farmer_name }
+    });
+  } catch (err) {
+    console.error('Error creating order:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/marketplace/stats - Get marketplace overview stats
+app.get('/api/marketplace/stats', async (req, res) => {
+  try {
+    const { count: productCount } = await supabase
+      .from('marketplace_products')
+      .select('*', { count: 'exact', head: true });
+
+    const { data: sellers } = await supabase
+      .from('marketplace_products')
+      .select('farmer_name');
+
+    const uniqueSellers = new Set((sellers || []).map(s => s.farmer_name)).size;
+
+    const { data: locations } = await supabase
+      .from('marketplace_products')
+      .select('location');
+
+    const uniqueLocations = new Set((locations || []).map(l => l.location)).size;
+
+    res.json({
+      success: true,
+      data: {
+        totalProducts: productCount || 0,
+        totalSellers: uniqueSellers || 0,
+        totalLocations: uniqueLocations || 0,
+        totalTransactions: 0
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching marketplace stats:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Serve Static Frontend Assets in Production
 const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));

@@ -1,4 +1,4 @@
-// Marketplace mock data for TaniPintar
+// Marketplace constants & API helpers for TaniPintar
 
 export const COMMODITY_CATEGORIES = [
   { id: "all", label: "Semua", icon: "🌿" },
@@ -10,273 +10,6 @@ export const COMMODITY_CATEGORIES = [
   { id: "rempah", label: "Rempah", icon: "🫚" },
 ];
 
-export const MARKETPLACE_PRODUCTS = [
-  {
-    id: 1,
-    name: "Cabai Merah Besar",
-    category: "cabai",
-    price: 42000,
-    unit: "kg",
-    minOrder: 50,
-    stock: 2500,
-    location: "Cilacap, Jawa Tengah",
-    seller: "Pak Joko Slamet",
-    sellerVerified: true,
-    rating: 4.8,
-    totalSold: 12400,
-    harvestDate: "2026-08-24",
-    freshness: "Segar",
-    grade: "Premium A",
-    description: "Cabai merah besar segar langsung dari kebun petani binaan. Kualitas premium, ukuran seragam, warna merah cerah.",
-    trending: true,
-    priceChange: +3.2,
-    image: null,
-    tags: ["Organik", "Petani Binaan", "Segar"],
-  },
-  {
-    id: 2,
-    name: "Bawang Merah Brebes",
-    category: "bawang",
-    price: 35000,
-    unit: "kg",
-    minOrder: 100,
-    stock: 5000,
-    location: "Brebes, Jawa Tengah",
-    seller: "Bu Siti Nurjanah",
-    sellerVerified: true,
-    rating: 4.9,
-    totalSold: 18200,
-    harvestDate: "2026-08-22",
-    freshness: "Segar",
-    grade: "Super",
-    description: "Bawang merah varietas Brebes unggulan. Aroma kuat, tahan simpan lama, cocok untuk industri dan retail.",
-    trending: true,
-    priceChange: -1.5,
-    image: null,
-    tags: ["Varietas Brebes", "Tahan Lama"],
-  },
-  {
-    id: 3,
-    name: "Cabai Rawit Merah",
-    category: "cabai",
-    price: 55000,
-    unit: "kg",
-    minOrder: 25,
-    stock: 800,
-    location: "Malang, Jawa Timur",
-    seller: "Pak Bambang Hermanto",
-    sellerVerified: true,
-    rating: 4.7,
-    totalSold: 8900,
-    harvestDate: "2026-08-25",
-    freshness: "Sangat Segar",
-    grade: "Premium A",
-    description: "Cabai rawit merah dari dataran tinggi Malang. Tingkat kepedasan tinggi, cocok untuk sambal dan industri makanan.",
-    trending: false,
-    priceChange: +5.8,
-    image: null,
-    tags: ["Dataran Tinggi", "Pedas Ekstra"],
-  },
-  {
-    id: 4,
-    name: "Beras IR 64 Premium",
-    category: "padi",
-    price: 14500,
-    unit: "kg",
-    minOrder: 500,
-    stock: 15000,
-    location: "Karawang, Jawa Barat",
-    seller: "Koperasi Tani Sejahtera",
-    sellerVerified: true,
-    rating: 4.6,
-    totalSold: 45000,
-    harvestDate: "2026-08-15",
-    freshness: "Segar",
-    grade: "Premium",
-    description: "Beras IR 64 premium dari persawahan Karawang. Pulen, wangi alami, dan telah melalui proses pengeringan optimal.",
-    trending: false,
-    priceChange: +0.5,
-    image: null,
-    tags: ["Pulen", "Wangi Alami", "Koperasi"],
-  },
-  {
-    id: 5,
-    name: "Tomat Segar Organik",
-    category: "sayuran",
-    price: 12000,
-    unit: "kg",
-    minOrder: 100,
-    stock: 3500,
-    location: "Garut, Jawa Barat",
-    seller: "Pak Ahmad Ridwan",
-    sellerVerified: false,
-    rating: 4.5,
-    totalSold: 6700,
-    harvestDate: "2026-08-25",
-    freshness: "Sangat Segar",
-    grade: "A",
-    description: "Tomat organik dari perkebunan Garut. Tanpa pestisida kimia, cocok untuk konsumsi langsung dan olahan.",
-    trending: false,
-    priceChange: -2.1,
-    image: null,
-    tags: ["Organik", "Tanpa Pestisida"],
-  },
-  {
-    id: 6,
-    name: "Bawang Putih Lokal",
-    category: "bawang",
-    price: 38000,
-    unit: "kg",
-    minOrder: 50,
-    stock: 2000,
-    location: "Temanggung, Jawa Tengah",
-    seller: "Pak Darmawan",
-    sellerVerified: true,
-    rating: 4.4,
-    totalSold: 5200,
-    harvestDate: "2026-08-20",
-    freshness: "Segar",
-    grade: "A",
-    description: "Bawang putih varietas lokal Temanggung. Siung besar, aroma khas, cocok untuk bumbu masakan tradisional.",
-    trending: false,
-    priceChange: +1.2,
-    image: null,
-    tags: ["Lokal", "Siung Besar"],
-  },
-  {
-    id: 7,
-    name: "Cabai Hijau Besar",
-    category: "cabai",
-    price: 28000,
-    unit: "kg",
-    minOrder: 50,
-    stock: 1800,
-    location: "Boyolali, Jawa Tengah",
-    seller: "Ibu Rina Wati",
-    sellerVerified: true,
-    rating: 4.6,
-    totalSold: 7300,
-    harvestDate: "2026-08-24",
-    freshness: "Segar",
-    grade: "A",
-    description: "Cabai hijau besar segar dari petani Boyolali. Ukuran seragam, cocok untuk sayur dan sambal hijau.",
-    trending: false,
-    priceChange: -0.8,
-    image: null,
-    tags: ["Segar", "Ukuran Besar"],
-  },
-  {
-    id: 8,
-    name: "Jahe Merah Segar",
-    category: "rempah",
-    price: 65000,
-    unit: "kg",
-    minOrder: 20,
-    stock: 600,
-    location: "Wonogiri, Jawa Tengah",
-    seller: "Kelompok Tani Makmur",
-    sellerVerified: true,
-    rating: 4.9,
-    totalSold: 3400,
-    harvestDate: "2026-08-22",
-    freshness: "Segar",
-    grade: "Super Premium",
-    description: "Jahe merah organik dari Wonogiri. Kandungan minyak atsiri tinggi, cocok untuk herbal, jamu, dan ekspor.",
-    trending: true,
-    priceChange: +8.5,
-    image: null,
-    tags: ["Organik", "Herbal", "Ekspor"],
-  },
-  {
-    id: 9,
-    name: "Kentang Dieng Premium",
-    category: "sayuran",
-    price: 16000,
-    unit: "kg",
-    minOrder: 200,
-    stock: 8000,
-    location: "Wonosobo, Jawa Tengah",
-    seller: "Pak Sugianto",
-    sellerVerified: true,
-    rating: 4.7,
-    totalSold: 21000,
-    harvestDate: "2026-08-21",
-    freshness: "Segar",
-    grade: "Premium",
-    description: "Kentang dari dataran tinggi Dieng. Tekstur padat, rasa manis alami, cocok untuk gorengan dan industri makanan.",
-    trending: false,
-    priceChange: +2.0,
-    image: null,
-    tags: ["Dataran Tinggi", "Dieng"],
-  },
-  {
-    id: 10,
-    name: "Mangga Gedong Gincu",
-    category: "buah",
-    price: 25000,
-    unit: "kg",
-    minOrder: 50,
-    stock: 4000,
-    location: "Indramayu, Jawa Barat",
-    seller: "Pak Hasan Basri",
-    sellerVerified: true,
-    rating: 4.8,
-    totalSold: 9800,
-    harvestDate: "2026-08-23",
-    freshness: "Matang Pohon",
-    grade: "Super",
-    description: "Mangga Gedong Gincu premium. Manis, wangi, warna kuning kemerahan cerah. Buah unggulan Indramayu.",
-    trending: true,
-    priceChange: +4.3,
-    image: null,
-    tags: ["Matang Pohon", "Premium", "Ekspor"],
-  },
-  {
-    id: 11,
-    name: "Kunyit Segar",
-    category: "rempah",
-    price: 22000,
-    unit: "kg",
-    minOrder: 30,
-    stock: 1200,
-    location: "Pacitan, Jawa Timur",
-    seller: "Bu Endang Susanti",
-    sellerVerified: false,
-    rating: 4.3,
-    totalSold: 2100,
-    harvestDate: "2026-08-24",
-    freshness: "Segar",
-    grade: "A",
-    description: "Kunyit segar dari Pacitan. Warna kuning cerah, cocok untuk bumbu, jamu, dan pewarna alami makanan.",
-    trending: false,
-    priceChange: +1.0,
-    image: null,
-    tags: ["Pewarna Alami", "Jamu"],
-  },
-  {
-    id: 12,
-    name: "Jeruk Siam Pontianak",
-    category: "buah",
-    price: 18000,
-    unit: "kg",
-    minOrder: 100,
-    stock: 6000,
-    location: "Pontianak, Kalimantan Barat",
-    seller: "Kelompok Tani Citrus",
-    sellerVerified: true,
-    rating: 4.5,
-    totalSold: 15600,
-    harvestDate: "2026-08-20",
-    freshness: "Segar",
-    grade: "Premium",
-    description: "Jeruk Siam khas Pontianak. Manis segar dengan kadar air tinggi, populer di seluruh Nusantara.",
-    trending: false,
-    priceChange: -0.5,
-    image: null,
-    tags: ["Kalimantan", "Manis Segar"],
-  },
-];
-
 export const SORT_OPTIONS = [
   { id: "popular", label: "Terpopuler" },
   { id: "price_low", label: "Harga Terendah" },
@@ -284,3 +17,69 @@ export const SORT_OPTIONS = [
   { id: "newest", label: "Terbaru" },
   { id: "rating", label: "Rating Tertinggi" },
 ];
+
+export const CATEGORY_ICON = (catId) => {
+  const cat = COMMODITY_CATEGORIES.find(c => c.id === catId);
+  return cat ? cat.icon : "🌿";
+};
+
+// API helpers
+const API_BASE = "/api/marketplace";
+
+export async function fetchProducts({ category, search, sort, page } = {}) {
+  const params = new URLSearchParams();
+  if (category && category !== "all") params.set("category", category);
+  if (search) params.set("search", search);
+  if (sort) params.set("sort", sort);
+  if (page) params.set("page", page);
+  try {
+    const res = await fetch(`${API_BASE}/products?${params}`);
+    return await res.json();
+  } catch {
+    return { success: false, data: [], total: 0 };
+  }
+}
+
+export async function fetchProductDetail(id) {
+  try {
+    const res = await fetch(`${API_BASE}/products/${id}`);
+    return await res.json();
+  } catch {
+    return { success: false, data: null };
+  }
+}
+
+export async function fetchMarketplaceStats() {
+  try {
+    const res = await fetch(`${API_BASE}/stats`);
+    return await res.json();
+  } catch {
+    return { success: false, data: { totalProducts: 0, totalSellers: 0, totalLocations: 0 } };
+  }
+}
+
+export async function createOrder(orderData) {
+  try {
+    const res = await fetch(`${API_BASE}/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+    return await res.json();
+  } catch {
+    return { success: false, error: "Gagal mengirim pesanan." };
+  }
+}
+
+export async function createProduct(productData) {
+  try {
+    const res = await fetch(`${API_BASE}/products`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(productData),
+    });
+    return await res.json();
+  } catch {
+    return { success: false, error: "Gagal menambahkan produk." };
+  }
+}
