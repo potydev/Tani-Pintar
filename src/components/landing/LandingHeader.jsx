@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Leaf, ArrowRight, Menu, X, ShoppingBag, User } from "lucide-react";
 
-export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }) {
+export function LandingHeader({ isLoggedIn, userName }) {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -10,13 +12,6 @@ export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
-
-  const navLinks = [
-    { label: "Beranda", action: () => {} },
-    { label: "Fitur Utama", action: () => {} },
-    { label: "Marketplace", action: () => onNavigate && onNavigate("marketplace"), highlight: true },
-    { label: "Panduan Petani", action: () => {} },
-  ];
 
   return (
     <nav
@@ -29,8 +24,8 @@ export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Brand */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#0d5c3a] rounded-lg flex items-center justify-center">
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 bg-[#0d5c3a] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
             <Leaf size={16} className="text-white" />
           </div>
           <div className="flex flex-col leading-none">
@@ -47,25 +42,31 @@ export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }
               AI Market Intelligence
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((item) => (
-            <button
-              key={item.label}
-              onClick={item.action}
-              className={`text-sm font-medium transition-colors ${
-                item.highlight
-                  ? "text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
-                  : "text-[#0b1f13]/70 hover:text-[#0d5c3a]"
-              }`}
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              {item.highlight && <ShoppingBag size={14} />}
-              {item.label}
-            </button>
-          ))}
+          <Link
+            to="/"
+            className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Beranda
+          </Link>
+          <a
+            href="#features"
+            className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            Fitur Utama
+          </a>
+          <Link
+            to="/marketplace"
+            className="text-sm font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/60 transition-colors"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            <ShoppingBag size={14} /> Marketplace
+          </Link>
         </div>
 
         {/* Desktop Actions */}
@@ -80,38 +81,38 @@ export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }
                   {userName}
                 </span>
               </div>
-              <button
-                onClick={() => onNavigate && onNavigate("dashboard")}
-                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Dashboard <ArrowRight size={14} />
-              </button>
+              </Link>
             </>
           ) : (
             <>
-              <button
-                onClick={onLoginClick}
+              <Link
+                to="/login"
                 className="text-sm font-semibold text-[#0d5c3a] hover:text-[#0b1f13] transition-colors"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Masuk
-              </button>
-              <button
-                onClick={onLoginClick}
-                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              </Link>
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
-                Daftar Gratis <ArrowRight size={14} />
-              </button>
+                Mulai Sekarang <ArrowRight size={14} />
+              </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 text-[#0b1f13]"
           onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-slate-700 p-2 focus:outline-none"
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -119,37 +120,40 @@ export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-200/50 px-6 py-4 flex flex-col gap-4">
-          {navLinks.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => { item.action(); setMenuOpen(false); }}
-              className={`text-sm font-medium text-left ${
-                item.highlight ? "text-emerald-600 flex items-center gap-1.5" : "text-[#0b1f13]/70"
-              }`}
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              {item.highlight && <ShoppingBag size={14} />}
-              {item.label}
-            </button>
-          ))}
-          {isLoggedIn ? (
-            <button
-              onClick={() => { onNavigate && onNavigate("dashboard"); setMenuOpen(false); }}
-              className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              Dashboard
-            </button>
-          ) : (
-            <button
-              onClick={() => { onLoginClick(); setMenuOpen(false); }}
-              className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              Masuk / Daftar
-            </button>
-          )}
+        <div className="md:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3">
+          <Link
+            to="/"
+            onClick={() => setMenuOpen(false)}
+            className="block text-sm font-medium text-slate-700 py-1"
+          >
+            Beranda
+          </Link>
+          <Link
+            to="/marketplace"
+            onClick={() => setMenuOpen(false)}
+            className="block text-sm font-bold text-emerald-700 py-1"
+          >
+            Marketplace Panen
+          </Link>
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+            {isLoggedIn ? (
+              <Link
+                to="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="w-full text-center py-2 bg-emerald-700 text-white font-bold text-xs rounded-lg"
+              >
+                Ke Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="w-full text-center py-2 bg-emerald-700 text-white font-bold text-xs rounded-lg"
+              >
+                Masuk / Daftar Akun
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </nav>

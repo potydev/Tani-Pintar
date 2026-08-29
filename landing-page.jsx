@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalStyles } from "./src/styles/GlobalStyles";
 import { LandingPage } from "./src/pages/LandingPage";
 import { DashboardPage } from "./src/pages/DashboardPage";
 import { MarketplacePage } from "./src/pages/MarketplacePage";
-import { LoginModal } from "./src/components/landing/LoginModal";
+import { ProductDetailPage } from "./src/pages/ProductDetailPage";
+import { CheckoutPage } from "./src/pages/CheckoutPage";
+import { LoginPage } from "./src/pages/LoginPage";
 
 export default function TaniPintarApp() {
-  // viewState: "landing" | "dashboard" | "marketplace"
-  const [viewState, setViewState] = useState("landing");
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [userName, setUserName] = useState("Koko Petani");
+  const [userName, setUserName] = useState("Pak Joko Slamet");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Check for existing session on mount
@@ -18,76 +18,86 @@ export default function TaniPintarApp() {
     if (savedUser) {
       try {
         const u = JSON.parse(savedUser);
-        setUserName(u.full_name || u.email || "Petani Pintar");
+        setUserName(u.full_name || u.email || "Pak Joko Slamet");
         setIsLoggedIn(true);
       } catch (e) {}
     }
   }, []);
 
-  const handleLoginSuccess = (name) => {
-    setUserName(name);
-    setShowLoginModal(false);
-    setIsLoggedIn(true);
-    setViewState("dashboard");
+  const handleLoginSuccess = (userObj) => {
+    if (userObj) {
+      setUserName(userObj.full_name || userObj.email || "Pak Joko Slamet");
+      setIsLoggedIn(true);
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("tanipintar_user");
     setIsLoggedIn(false);
-    setUserName("Koko Petani");
-    setViewState("landing");
-  };
-
-  const handleNavigate = (page) => {
-    if (page === "marketplace") {
-      setViewState("marketplace");
-    } else if (page === "dashboard") {
-      if (isLoggedIn) {
-        setViewState("dashboard");
-      } else {
-        setShowLoginModal(true);
-      }
-    } else {
-      setViewState("landing");
-    }
+    setUserName("Pak Joko Slamet");
   };
 
   return (
-    <div className="tp-app min-h-screen">
-      <GlobalStyles />
+    <BrowserRouter>
+      <div className="tp-app min-h-screen">
+        <GlobalStyles />
+        <Routes>
+          {/* Landing Page */}
+          <Route
+            path="/"
+            element={
+              <LandingPage
+                isLoggedIn={isLoggedIn}
+                userName={userName}
+              />
+            }
+          />
 
-      {viewState === "landing" && (
-        <LandingPage
-          onLoginClick={() => setShowLoginModal(true)}
-          onNavigate={handleNavigate}
-          isLoggedIn={isLoggedIn}
-          userName={userName}
-        />
-      )}
+          {/* Login Page */}
+          <Route
+            path="/login"
+            element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+          />
 
-      {viewState === "dashboard" && (
-        <DashboardPage
-          name={userName}
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      )}
+          {/* Marketplace Page */}
+          <Route
+            path="/marketplace"
+            element={
+              <MarketplacePage
+                isLoggedIn={isLoggedIn}
+                userName={userName}
+              />
+            }
+          />
 
-      {viewState === "marketplace" && (
-        <MarketplacePage
-          onNavigate={handleNavigate}
-          isLoggedIn={isLoggedIn}
-          userName={userName}
-          onLoginClick={() => setShowLoginModal(true)}
-        />
-      )}
+          {/* Dedicated Product Detail Page */}
+          <Route
+            path="/marketplace/product/:id"
+            element={<ProductDetailPage isLoggedIn={isLoggedIn} />}
+          />
 
-      {showLoginModal && (
-        <LoginModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={handleLoginSuccess}
-        />
-      )}
-    </div>
+          {/* Dedicated Checkout Page */}
+          <Route
+            path="/checkout/:id"
+            element={<CheckoutPage isLoggedIn={isLoggedIn} />}
+          />
+
+          {/* Dashboard Page */}
+          <Route
+            path="/dashboard"
+            element={
+              isLoggedIn ? (
+                <DashboardPage name={userName} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/login?redirect=/dashboard" replace />
+              )
+            }
+          />
+
+          {/* Catch all redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
