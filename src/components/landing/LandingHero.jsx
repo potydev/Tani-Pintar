@@ -1,9 +1,32 @@
 import React, { useState } from "react";
-import { Search, ArrowRight, ChevronDown, ChevronUp, Sparkles, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, ArrowRight, ChevronDown, ChevronUp, Sparkles, TrendingUp, Tag } from "lucide-react";
 
 export function LandingHero({ onLoginClick }) {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+
+  const quickChips = [
+    { label: "Cabai Merah", cat: "cabai" },
+    { label: "Bawang Merah", cat: "bawang" },
+    { label: "Beras Premium", cat: "beras" },
+    { label: "Tomat Fresh", cat: "sayuran" }
+  ];
+
+  const handleSearchSubmit = (searchVal) => {
+    const q = searchVal || query;
+    if (q) {
+      navigate(`/marketplace?search=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/marketplace');
+    }
+  };
+
+  const handleChipClick = (chip) => {
+    setQuery(chip.label);
+    navigate(`/marketplace?search=${encodeURIComponent(chip.label)}`);
+  };
 
   return (
     <section
@@ -66,27 +89,46 @@ export function LandingHero({ onLoginClick }) {
             TaniPintar menganalisis harga, permintaan pasar, dan biaya logistik secara real-time untuk merekomendasikan keputusan penjualan paling menguntungkan bagi petani.
           </p>
 
-          {/* Search Input */}
-          <div className="flex gap-2 max-w-md">
-            <div className="flex-1 flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/[0.2] rounded-xl px-4 shadow-inner">
-              <Search size={16} className="text-white/50 shrink-0" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Cari komoditas: Cabai Merah, Bawang..."
-                className="flex-1 bg-transparent text-white placeholder-white/40 text-sm py-3.5 outline-none font-medium"
-                style={{ fontFamily: "Inter, sans-serif" }}
-              />
-            </div>
+          {/* Prominent Search Input & Action */}
+          <div className="flex flex-col gap-2.5 max-w-lg">
+            <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(); }} className="flex gap-2">
+              <div className="flex-1 flex items-center gap-3 bg-white/15 backdrop-blur-md border border-white/[0.25] rounded-2xl px-4 py-1 shadow-lg shadow-black/20 focus-within:border-emerald-400 focus-within:bg-white/20 transition-all">
+                <Search size={18} className="text-emerald-400 shrink-0" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Cari komoditas panen: Cabai, Bawang, Beras..."
+                  className="flex-1 bg-transparent text-white placeholder-white/50 text-xs sm:text-sm py-3 outline-none font-medium"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                />
+              </div>
 
-            {/* Primary Accent CTA */}
-            <button
-              onClick={onLoginClick}
-              className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-sm px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-500/25 shrink-0 hover:scale-[1.02]"
-              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-            >
-              Cek Peluang <ArrowRight size={15} />
-            </button>
+              {/* Primary Accent CTA */}
+              <button
+                type="submit"
+                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-500/25 shrink-0 hover:scale-[1.02]"
+                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              >
+                Cek Peluang <ArrowRight size={15} />
+              </button>
+            </form>
+
+            {/* Quick Commodity Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+              <span className="text-[11px] text-white/50 font-semibold flex items-center gap-1">
+                <Tag size={11} className="text-emerald-400" /> Populer:
+              </span>
+              {quickChips.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => handleChipClick(chip)}
+                  className="text-[11px] font-bold text-white/80 hover:text-white bg-white/10 hover:bg-emerald-500/30 border border-white/15 hover:border-emerald-400/50 px-2.5 py-1 rounded-full backdrop-blur-sm transition-all"
+                  style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+                >
+                  #{chip.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Stats row */}
