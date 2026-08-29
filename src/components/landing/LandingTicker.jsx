@@ -1,6 +1,5 @@
 import React from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
-import { TICKER_DATA } from "../../data/mockData";
+import { TrendingUp, TrendingDown, Radio } from "lucide-react";
 import { getLiveTickerItems } from "../../utils/apiData";
 
 const DESIGN_COMMODITIES = [
@@ -16,10 +15,8 @@ const DESIGN_COMMODITIES = [
 ];
 
 export function LandingTicker() {
-  // Try live data first, then fallback to design data
   const liveItems = getLiveTickerItems();
 
-  // Convert live items to the design format if available
   const tickerItems = liveItems.length > 0
     ? liveItems.map(item => ({
         name: item.name,
@@ -32,39 +29,57 @@ export function LandingTicker() {
   const items = [...tickerItems, ...tickerItems];
 
   return (
-    <div className="bg-[#0b1f13] border-b border-white/[0.08] overflow-hidden py-2.5">
+    <div className="bg-[#071d12] border-b border-emerald-900/60 overflow-hidden py-3 relative flex items-center shadow-inner">
+      {/* Live Badge Fixed Left Accent */}
+      <div className="hidden sm:flex items-center gap-1.5 bg-[#0d5c3a] text-emerald-300 text-[10px] font-extrabold px-3 py-1.5 z-10 shrink-0 border-r border-emerald-800 shadow-md" style={{ fontFamily: "JetBrains Mono, monospace" }}>
+        <Radio size={12} className="text-emerald-400 animate-pulse" />
+        <span className="tracking-widest uppercase">LIVE HARGA</span>
+      </div>
+
+      {/* Infinite Ticker Track */}
       <div
-        className="flex gap-10 whitespace-nowrap tp-ticker-track"
+        className="flex gap-8 whitespace-nowrap tp-ticker-track"
         style={{
           willChange: "transform",
         }}
       >
         {items.map((c, i) => (
-          <div key={i} className="flex items-center gap-2.5 shrink-0">
+          <div key={i} className="flex items-center gap-3 shrink-0">
+            {/* High Contrast Commodity Name */}
             <span
-              className="text-white/50 text-xs font-medium tracking-wide uppercase"
-              style={{ fontFamily: "JetBrains Mono, monospace" }}
+              className="text-slate-200 text-xs font-bold tracking-wide uppercase"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
               {c.name}
             </span>
+
+            {/* High Contrast Price */}
             <span
-              className="text-white text-xs font-semibold"
+              className="text-emerald-300 text-xs font-extrabold"
               style={{ fontFamily: "JetBrains Mono, monospace" }}
             >
-              {c.price}{c.unit}
+              {c.price}<span className="text-white/60 text-[10px] font-medium">{c.unit}</span>
             </span>
-            {c.change !== 0 && (
+
+            {/* High Contrast Change Pill */}
+            {c.change !== 0 ? (
               <span
-                className={`flex items-center gap-0.5 text-xs font-semibold ${
-                  c.change > 0 ? "text-emerald-400" : "text-red-400"
+                className={`flex items-center gap-0.5 text-[11px] font-extrabold px-1.5 py-0.5 rounded ${
+                  c.change > 0
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                    : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
                 }`}
                 style={{ fontFamily: "JetBrains Mono, monospace" }}
               >
-                {c.change > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                {Math.abs(c.change)}%
+                {c.change > 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                {c.change > 0 ? `+${c.change}%` : `${c.change}%`}
+              </span>
+            ) : (
+              <span className="text-slate-400 text-[10px] font-semibold bg-slate-800/60 px-1.5 py-0.5 rounded border border-slate-700/50">
+                Stabil
               </span>
             )}
-            <span className="text-white/15 text-xs">|</span>
+            <span className="text-white/20 text-xs">|</span>
           </div>
         ))}
       </div>
