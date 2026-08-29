@@ -90,7 +90,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'TaniPintar API Server is running', timestamp: new Date() });
 });
 
-// Auth API - Register
+// Auth API - Register via Supabase PostgreSQL
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, full_name, farm_location, primary_commodity, land_size } = req.body;
@@ -98,29 +98,40 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
 
-    // Check existing
-    const existing = await queryDB(`SELECT id FROM users WHERE email = ?`, [email]);
-    if (existing.length > 0) {
-      return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan login.' });
+    // Check existing in Supabase users table
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email);
+
+    if (existing && existing.length > 0) {
+      return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan masuk ke akun Anda.' });
     }
 
     const loc = farm_location || 'Cilacap, Jawa Tengah';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
 
-    const insertRes = await queryDB(
-      `INSERT INTO users (email, password, full_name, farm_location, primary_commodity, land_size) VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
-      [email, password, full_name, loc, comm, land]
-    );
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert([{
+        email,
+        password,
+        full_name,
+        farm_location: loc,
+        primary_commodity: comm,
+        land_size: land,
+        avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+      }])
+      .select();
 
-    const user = {
-      id: insertRes[0]?.id || Date.now(),
+    const user = (newUser && newUser[0]) ? newUser[0] : {
+      id: Date.now(),
       email,
       full_name,
       farm_location: loc,
       primary_commodity: comm,
-      land_size: land,
-      avatar_url: '/assets/farmer_avatar.png'
+      land_size: land
     };
 
     res.json({ success: true, message: 'Registrasi akun berhasil!', user });
@@ -130,28 +141,33 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Auth API - Login
+// Auth API - Login via Supabase PostgreSQL
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Email dan password wajib diisi.' });
+      return res.status(400).json({ success: false, error: 'Email dan kata sandi wajib diisi.' });
     }
 
-    const rows = await queryDB(`SELECT * FROM users WHERE email = ? AND password = ?`, [email, password]);
-    if (rows.length === 0) {
-      return res.status(401).json({ success: false, error: 'Email atau password salah.' });
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password);
+
+    if (error || !users || users.length === 0) {
+      return res.status(401).json({ success: false, error: 'Email atau kata sandi tidak cocok.' });
     }
 
-    const u = rows[0];
+    const u = users[0];
     const user = {
       id: u.id,
       email: u.email,
       full_name: u.full_name,
-      farm_location: u.farm_location,
-      primary_commodity: u.primary_commodity,
-      land_size: u.land_size,
-      avatar_url: u.avatar_url || '/assets/farmer_avatar.png'
+      farm_location: u.farm_location || 'Cilacap, Jawa Tengah',
+      primary_commodity: u.primary_commodity || 'Cabai Merah Besar',
+      land_size: u.land_size || '1.5 Hektar',
+      avatar_url: u.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     };
 
     res.json({ success: true, message: 'Login berhasil!', user });

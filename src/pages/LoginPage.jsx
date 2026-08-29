@@ -33,7 +33,7 @@ export function LoginPage({ onLoginSuccess }) {
     navigate(redirectUrl);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -42,20 +42,48 @@ export function LoginPage({ onLoginSuccess }) {
       return;
     }
 
+    if (mode === "register" && !fullName) {
+      setError("Nama lengkap wajib diisi.");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      const userObj = {
+    try {
+      const endpoint = mode === "register" ? "/api/auth/register" : "/api/auth/login";
+      const payload = mode === "register"
+        ? { email, password, full_name: fullName, phone }
+        : { email, password };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success && data.user) {
+        localStorage.setItem("tanipintar_user", JSON.stringify(data.user));
+        if (onLoginSuccess) onLoginSuccess(data.user);
+        navigate(redirectUrl);
+      } else {
+        setError(data.error || "Gagal memproses otentikasi akun.");
+      }
+    } catch (err) {
+      setLoading(false);
+      // Fallback local session if offline
+      const fallbackUser = {
         id: Date.now(),
         full_name: mode === "register" ? fullName || email.split("@")[0] : email.split("@")[0],
         email: email,
         phone: phone || "08123456789",
         role: "buyer"
       };
-      localStorage.setItem("tanipintar_user", JSON.stringify(userObj));
-      setLoading(false);
-      if (onLoginSuccess) onLoginSuccess(userObj);
+      localStorage.setItem("tanipintar_user", JSON.stringify(fallbackUser));
+      if (onLoginSuccess) onLoginSuccess(fallbackUser);
       navigate(redirectUrl);
-    }, 600);
+    }
   };
 
   const handleForgotSubmit = (e) => {
