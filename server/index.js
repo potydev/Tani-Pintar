@@ -90,10 +90,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'TaniPintar API Server is running', timestamp: new Date() });
 });
 
-// Auth API - Register via Supabase PostgreSQL
+// Auth API - Register via Supabase PostgreSQL (Basic Account Signup)
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, full_name, farm_location, primary_commodity, land_size } = req.body;
+    const { email, password, full_name, phone } = req.body;
     if (!email || !password || !full_name) {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
@@ -108,19 +108,15 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan masuk ke akun Anda.' });
     }
 
-    const loc = farm_location || 'Cilacap, Jawa Tengah';
-    const comm = primary_commodity || 'Cabai Merah Besar';
-    const land = land_size || '1.5 Hektar';
-
     const { data: newUser, error } = await supabase
       .from('users')
       .insert([{
         email,
         password,
         full_name,
-        farm_location: loc,
-        primary_commodity: comm,
-        land_size: land,
+        phone: phone || '',
+        role: 'buyer',
+        is_seller: false,
         avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
       }])
       .select();
@@ -129,14 +125,56 @@ app.post('/api/auth/register', async (req, res) => {
       id: Date.now(),
       email,
       full_name,
+      phone: phone || '',
+      role: 'buyer',
+      is_seller: false,
+      avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+    };
+
+    res.json({ success: true, message: 'Registrasi akun dasar berhasil!', user });
+  } catch (err) {
+    console.error('Error during registration:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Auth API - Upgrade to Seller / Verified Farmer
+app.post('/api/auth/upgrade-seller', async (req, res) => {
+  try {
+    const { email, farm_location, primary_commodity, land_size, group_name } = req.body;
+    if (!email || !farm_location || !primary_commodity) {
+      return res.status(400).json({ success: false, error: 'Lokasi panen dan komoditas utama wajib diisi.' });
+    }
+
+    const loc = farm_location || 'Cilacap, Jawa Tengah';
+    const comm = primary_commodity || 'Cabai Merah Besar';
+    const land = land_size || '1.5 Hektar';
+
+    const { data: updatedUsers, error } = await supabase
+      .from('users')
+      .update({
+        role: 'verified_farmer',
+        is_seller: true,
+        farm_location: loc,
+        primary_commodity: comm,
+        land_size: land,
+        group_name: group_name || 'Kelompok Tani Mandiri'
+      })
+      .eq('email', email)
+      .select();
+
+    const user = (updatedUsers && updatedUsers[0]) ? updatedUsers[0] : {
+      email,
+      role: 'verified_farmer',
+      is_seller: true,
       farm_location: loc,
       primary_commodity: comm,
       land_size: land
     };
 
-    res.json({ success: true, message: 'Registrasi akun berhasil!', user });
+    res.json({ success: true, message: 'Selamat! Akun Anda berhasil di-upgrade menjadi Petani Terverifikasi TaniPintar.', user });
   } catch (err) {
-    console.error('Error during registration:', err);
+    console.error('Error during seller upgrade:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -164,6 +202,8 @@ app.post('/api/auth/login', async (req, res) => {
       id: u.id,
       email: u.email,
       full_name: u.full_name,
+      role: u.role || (u.is_seller ? 'verified_farmer' : 'buyer'),
+      is_seller: u.is_seller || u.role === 'verified_farmer',
       farm_location: u.farm_location || 'Cilacap, Jawa Tengah',
       primary_commodity: u.primary_commodity || 'Cabai Merah Besar',
       land_size: u.land_size || '1.5 Hektar',

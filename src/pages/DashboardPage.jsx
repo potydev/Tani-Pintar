@@ -12,6 +12,7 @@ import { RecentOrdersPanel } from "../components/dashboard/RecentOrdersPanel";
 import { BottomBannerPanel } from "../components/dashboard/BottomBannerPanel";
 import { AuthModal } from "../components/auth/AuthModal";
 import { UserProfileModal } from "../components/auth/UserProfileModal";
+import { SellerOnboardingModal } from "../components/auth/SellerOnboardingModal";
 
 // Import Sub-Pages
 import { SalesOpportunitiesPage } from "./SalesOpportunitiesPage";
@@ -26,6 +27,7 @@ export function DashboardPage({ name, onLogout }) {
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
 
@@ -43,6 +45,11 @@ export function DashboardPage({ name, onLogout }) {
   const handleAuthSuccess = (userData) => {
     setUser(userData);
     if (userData.farm_location) setSelectedLocation(userData.farm_location);
+  };
+
+  const handleUpgradeSuccess = (updatedUserData) => {
+    setUser(updatedUserData);
+    if (updatedUserData.farm_location) setSelectedLocation(updatedUserData.farm_location);
   };
 
   const handleLogoutUser = () => {
@@ -136,6 +143,7 @@ export function DashboardPage({ name, onLogout }) {
         user={user}
         onLogout={handleLogoutUser}
         onOpenAuth={handleOpenAccount}
+        onOpenUpgrade={() => setIsUpgradeOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
@@ -170,6 +178,15 @@ export function DashboardPage({ name, onLogout }) {
         onClose={() => setIsProfileOpen(false)}
         user={user}
         onLogout={handleLogoutUser}
+        onOpenUpgrade={() => setIsUpgradeOpen(true)}
+      />
+
+      {/* Progressive Onboarding Seller Upgrade Modal */}
+      <SellerOnboardingModal
+        isOpen={isUpgradeOpen}
+        onClose={() => setIsUpgradeOpen(false)}
+        user={user}
+        onUpgradeSuccess={handleUpgradeSuccess}
       />
     </div>
   );
