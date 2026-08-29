@@ -266,6 +266,15 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
   }
 });
 
+// Admin API Security Middleware
+app.use('/api/admin', (req, res, next) => {
+  const userRole = req.headers['x-user-role'] || req.query.role;
+  if (userRole && !['admin', 'super_admin'].includes(userRole)) {
+    return res.status(403).json({ success: false, error: 'Akses ditolak. Endpoint ini hanya untuk Admin.' });
+  }
+  next();
+});
+
 // Admin API - Get All Farmer Verification Requests
 app.get('/api/admin/farmers', (req, res) => {
   res.json({ success: true, requests: pendingFarmerRequests });

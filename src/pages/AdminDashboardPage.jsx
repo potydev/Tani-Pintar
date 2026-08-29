@@ -46,6 +46,10 @@ export function AdminDashboardPage({ onBackToUserApp }) {
     fetchRequests();
   }, []);
 
+  const [rejectModalItem, setRejectModalItem] = useState(null);
+  const [rejectCategory, setRejectCategory] = useState("Foto KTP tidak jelas / terpotong");
+  const [rejectDetailReason, setRejectDetailReason] = useState("");
+
   const handleApprove = async (reqItem) => {
     try {
       const res = await fetch("/api/admin/approve-farmer", {
@@ -64,18 +68,26 @@ export function AdminDashboardPage({ onBackToUserApp }) {
     }
   };
 
-  const handleReject = async (reqItem) => {
+  const handleConfirmReject = async () => {
+    if (!rejectModalItem) return;
+    const finalReason = `${rejectCategory}${rejectDetailReason ? `: ${rejectDetailReason}` : ""}`;
     try {
       const res = await fetch("/api/admin/reject-farmer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: reqItem.email, req_id: reqItem.id, reason: "Dokumen KTP / data lahan belum memenuhi syarat." })
+        body: JSON.stringify({
+          email: rejectModalItem.email,
+          req_id: rejectModalItem.id,
+          reason: finalReason
+        })
       });
       const data = await res.json();
       if (data.success) {
-        setRequests(prev => prev.map(r => r.id === reqItem.id ? { ...r, verification_status: "rejected" } : r));
-        setNotification(`❌ Pengajuan verifikasi ${reqItem.full_name} ditolak.`);
-        setTimeout(() => setNotification(""), 4000);
+        setRequests(prev => prev.map(r => r.id === rejectModalItem.id ? { ...r, verification_status: "rejected", rejection_reason: finalReason } : r));
+        setNotification(`❌ Pengajuan verifikasi ${rejectModalItem.full_name} ditolak.`);
+        setTimeout(() => setNotification(""), 5000);
+        setRejectModalItem(null);
+        setRejectDetailReason("");
       }
     } catch (err) {
       console.error("Error rejecting farmer:", err);
@@ -315,7 +327,7 @@ export function AdminDashboardPage({ onBackToUserApp }) {
                             <CheckCircle2 size={15} /> Setujui
                           </button>
                           <button
-                            onClick={() => handleReject(item)}
+                            onClick={() => setRejectModalItem(item)}
                             className="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-extrabold text-xs rounded-xl transition-all flex items-center gap-1"
                           >
                             <XCircle size={15} /> Tolak
@@ -364,6 +376,12 @@ export function AdminDashboardPage({ onBackToUserApp }) {
                       </button>
                     </div>
 
+                    {isRejected && item.rejection_reason && (
+                      <div className="text-[11px] text-rose-300 bg-rose-950/40 border border-rose-800/40 px-2.5 py-1 rounded-lg">
+                        <strong>Alasan Penolakan:</strong> {item.rejection_reason}
+                      </div>
+                    )}
+
                     <div className="text-[11px] text-slate-500">
                       Dikirim pada: {new Date(item.submitted_at).toLocaleString("id-ID")}
                     </div>
@@ -393,6 +411,72 @@ export function AdminDashboardPage({ onBackToUserApp }) {
             >
               Tutup Pratinjau
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Reason Modal */}
+      {rejectModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 p-6 rounded-3xl max-w-md w-full space-y-4 relative">
+            <button
+              onClick={() => setRejectModalItem(null)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-white"
+            >
+              <XCircle size={22} />
+            </button>
+
+            <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <XCircle size={22} />
+            </div>
+
+            <h3 className="font-extrabold text-white text-lg">Tolak Pengajuan Verifikasi</h3>
+            <p className="text-xs text-slate-400">
+              Pilih alasan spesifik penolakan untuk dikirimkan kepada <strong>{rejectModalItem.full_name}</strong>.
+            </p>
+
+            <div className="space-y-3 pt-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Kategori Alasan Penolakan *</label>
+                <select
+                  value={rejectCategory}
+                  onChange={(e) => setRejectCategory(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-rose-500"
+                >
+                  <option value="Foto KTP tidak jelas / terpotong">Foto KTP tidak jelas / terpotong</option>
+                  <option value="NIK tidak valid / format salah">NIK tidak valid / format salah</option>
+                  <option value="Data lokasi lahan tidak sesuai">Data lokasi lahan tidak sesuai</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Catatan Tambahan (Opsional)</label>
+                <textarea
+                  rows={3}
+                  value={rejectDetailReason}
+                  onChange={(e) => setRejectDetailReason(e.target.value)}
+                  placeholder="Contoh: Mohon foto KTP diunggah ulang dengan pencahayaan terang."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => setRejectModalItem(null)}
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleConfirmReject}
+                disabled={!rejectCategory}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all"
+              >
+                Konfirmasi Tolak
+              </button>
+            </div>
           </div>
         </div>
       )}

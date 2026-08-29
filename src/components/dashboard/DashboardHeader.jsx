@@ -72,6 +72,7 @@ export function DashboardHeader({
   };
 
   const isPendingFarmer = user?.role === "farmer_pending" || user?.verification_status === "pending";
+  const isRejectedFarmer = user?.verification_status === "rejected";
 
   return (
     <div className="flex flex-col gap-4 mb-6 pb-2">
@@ -82,12 +83,25 @@ export function DashboardHeader({
             <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
             <span>⏳ Status Akun: Pengajuan Verifikasi Petani Dalam Peninjauan Admin (Estimasi 1x24 jam)</span>
           </div>
-          <a
-            href="/admin"
-            className="px-3 py-1 bg-slate-950/40 hover:bg-slate-950/60 text-white rounded-lg text-xs font-extrabold transition-colors shrink-0 ml-2"
+        </div>
+      )}
+
+      {/* Rejected Admin Verification Alert Banner */}
+      {isRejectedFarmer && (
+        <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-700 p-4 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm font-bold animate-in fade-in duration-300">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-white shrink-0" />
+            <div>
+              <span className="font-extrabold block sm:inline">❌ Pengajuan Verifikasi Petani Ditolak: </span>
+              <span className="font-medium text-rose-100">&ldquo;{user?.rejection_reason || "Foto KTP / data lahan belum memenuhi syarat."}&rdquo;</span>
+            </div>
+          </div>
+          <button
+            onClick={onOpenUpgrade}
+            className="px-3.5 py-1.5 bg-white text-rose-900 hover:bg-rose-50 rounded-xl text-xs font-extrabold transition-colors shrink-0 shadow-sm"
           >
-            Cek Portal Admin 🛡️
-          </a>
+            Ajukan Ulang Verifikasi &rarr;
+          </button>
         </div>
       )}
 
@@ -103,13 +117,6 @@ export function DashboardHeader({
             >
               {user ? "Kelola Akun" : "Masuk / Daftar"}
             </button>
-            <a
-              href="/admin"
-              className="px-2.5 py-1 bg-slate-800 text-slate-200 hover:bg-slate-900 rounded-lg text-xs font-bold transition-colors flex items-center gap-1"
-              title="Portal Admin Konfirmasi Verifikasi"
-            >
-              <span>Portal Admin</span> 🛡️
-            </a>
           </div>
           <p className="text-slate-500 text-sm mt-1">
             AI TaniPintar menemukan peluang terbaik untuk penjualan hasil panen Anda hari ini.

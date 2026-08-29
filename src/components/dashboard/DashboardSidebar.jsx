@@ -105,8 +105,15 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
           {/* Dynamic Menu Groups */}
           {menuGroups.map((group, gIdx) => (
             <div key={gIdx}>
-              <div className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase px-3 mb-2">
-                {group.title}
+              <div className="flex items-center justify-between px-3 mb-2">
+                <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                  {group.title}
+                </span>
+                {gIdx === 0 && !isVerifiedFarmer && (
+                  <span className="text-[9px] text-slate-400 font-medium italic">
+                    Publik &amp; Personal
+                  </span>
+                )}
               </div>
               <div className="space-y-1">
                 {group.items.map((item) => {
@@ -118,7 +125,8 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                     <button
                       key={item.id}
                       onClick={() => handleTabClick(item)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                      title={isLocked ? "Fitur ini personal untuk petani terverifikasi (berdasarkan lokasi & komoditas Anda)" : item.label}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors relative group/item ${isActive
                         ? "bg-emerald-50 text-emerald-800 font-bold border-r-2 border-emerald-600"
                         : isLocked
                         ? "text-slate-400 hover:bg-slate-50"
@@ -129,12 +137,22 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                         <Icon size={16} className={isActive ? "text-emerald-700" : "text-slate-400"} />
                         <span>{item.label}</span>
                       </div>
-                      {isLocked && (
-                        <div className="flex items-center gap-1 bg-slate-100 text-slate-500 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                          <Lock size={10} />
-                          <span>Upgrade</span>
+                      {isLocked ? (
+                        <div className="relative group/tooltip flex items-center">
+                          <div className="flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                            <Lock size={10} />
+                            <span>Upgrade</span>
+                          </div>
+                          {/* Hover Tooltip explaining gating rationale */}
+                          <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover/tooltip:block group-hover/item:block w-48 p-2 bg-slate-900 text-white text-[10px] font-normal rounded-lg shadow-xl z-50 leading-tight text-left">
+                            🔒 <strong>Fitur Personal Petani</strong>: Memerlukan lokasi panen &amp; komoditas terverifikasi.
+                          </div>
                         </div>
-                      )}
+                      ) : !item.requiresFarmer && !isVerifiedFarmer ? (
+                        <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                          Publik
+                        </span>
+                      ) : null}
                     </button>
                   );
                 })}

@@ -67,6 +67,7 @@ export function DashboardPage({ name, onLogout }) {
   };
 
   const displayName = user?.full_name || name || "Pak Joko Slamet";
+  const isVerifiedFarmer = user?.role === "verified_farmer" || Boolean(user?.is_seller);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -87,7 +88,7 @@ export function DashboardPage({ name, onLogout }) {
         return (
           <>
             {/* Horizontal Metric Cards (5 Cards) */}
-            <MetricCardsGrid originLocation={selectedLocation} />
+            <MetricCardsGrid originLocation={selectedLocation} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
             {/* Main Content Grid: Left Analysis & Right Assistant */}
             <div className="grid lg:grid-cols-12 gap-6">
@@ -106,15 +107,15 @@ export function DashboardPage({ name, onLogout }) {
                 </div>
 
                 {/* Featured AI Recommendation */}
-                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} />
+                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
                 {/* Compact AI Recommendations */}
-                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} />
+                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
                 {/* 3 Panels Analytics Row */}
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} />
-                  <DemandRegionPanel originLocation={selectedLocation} selectedDate={selectedDate} />
+                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                  <DemandRegionPanel isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
                 </div>
 
                 {/* Supply Status Card */}

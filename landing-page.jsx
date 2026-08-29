@@ -9,6 +9,23 @@ import { CheckoutPage } from "./src/pages/CheckoutPage";
 import { LoginPage } from "./src/pages/LoginPage";
 import { AdminDashboardPage } from "./src/pages/AdminDashboardPage";
 
+function AdminRouteGuard({ onBack }) {
+  const savedUser = localStorage.getItem("tanipintar_user");
+  let user = null;
+  if (savedUser) {
+    try {
+      user = JSON.parse(savedUser);
+    } catch (e) {}
+  }
+  const isAdmin = user && (user.role === "admin" || user.role === "super_admin");
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <AdminDashboardPage onBackToUserApp={onBack} />;
+}
+
 export default function TaniPintarApp() {
   const [userName, setUserName] = useState("Pak Joko Slamet");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -98,7 +115,7 @@ export default function TaniPintarApp() {
           {/* Admin Verification Portal */}
           <Route
             path="/admin"
-            element={<AdminDashboardPage onBackToUserApp={() => window.location.href = "/dashboard"} />}
+            element={<AdminRouteGuard onBack={() => window.location.href = "/dashboard"} />}
           />
 
           {/* Catch all redirect to home */}

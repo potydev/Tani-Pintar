@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { PRICE_TREND_DATA } from "../../data/mockData";
 import { fetchPriceHistory } from "../../utils/apiData";
+import { TeaserCardOverlay } from "./TeaserCardOverlay";
 
-export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDate }) {
+export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDate, isVerifiedFarmer, onOpenUpgrade }) {
   const [commodity, setCommodity] = useState("Cabai Merah");
   const [chartData, setChartData] = useState(PRICE_TREND_DATA);
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDa
   }, [commodity, originLocation, selectedDate]);
 
   return (
-    <div className="tp-card p-5">
+    <div className="tp-card p-5 relative overflow-hidden flex flex-col justify-between">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
           <h4 className="font-heading font-bold text-slate-900 text-sm">Tren Harga Pasar Real-Time</h4>
@@ -39,6 +40,7 @@ export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDa
           <select
             value={commodity}
             onChange={(e) => setCommodity(e.target.value)}
+            disabled={!isVerifiedFarmer}
             className="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-slate-700 focus:outline-none"
           >
             <option value="Cabai Merah">Cabai Merah</option>
@@ -58,30 +60,42 @@ export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDa
             Memuat Data...
           </div>
         )}
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
-            <Tooltip
-              contentStyle={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 11 }}
-              formatter={(val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '-'}
-            />
-            {chartData[0] && chartData[0]["Cilacap (Asal)"] !== undefined ? (
-              <>
-                <Line type="monotone" dataKey="Cilacap (Asal)" name={`${originCity} (Asal)`} stroke="#00875A" strokeWidth={2.5} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="Bandung" name="Bandung" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="Jakarta" name="Jakarta" stroke="#D97706" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="RataNasional" name="Rata-rata Nasional" stroke="#7C3AED" strokeWidth={2} strokeDasharray="3 3" dot={false} />
-              </>
-            ) : (
-              <>
-                <Line type="monotone" dataKey="aktual" name="Harga Aktual" stroke="#00875A" strokeWidth={2.5} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="prediksi" name="Prediksi AI" stroke="#7C3AED" strokeWidth={2.5} strokeDasharray="4 4" dot={{ r: 4 }} />
-              </>
-            )}
-          </LineChart>
-        </ResponsiveContainer>
+        <div className={`h-full w-full transition-all ${
+          !isVerifiedFarmer ? "select-none blur-[5px] opacity-40 pointer-events-none" : ""
+        }`}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+              <Tooltip
+                contentStyle={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 11 }}
+                formatter={(val) => isVerifiedFarmer ? (val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '-') : 'Rp •••••'}
+              />
+              {chartData[0] && chartData[0]["Cilacap (Asal)"] !== undefined ? (
+                <>
+                  <Line type="monotone" dataKey="Cilacap (Asal)" name={`${originCity} (Asal)`} stroke="#00875A" strokeWidth={2.5} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Bandung" name="Bandung" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Jakarta" name="Jakarta" stroke="#D97706" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="RataNasional" name="Rata-rata Nasional" stroke="#7C3AED" strokeWidth={2} strokeDasharray="3 3" dot={false} />
+                </>
+              ) : (
+                <>
+                  <Line type="monotone" dataKey="aktual" name="Harga Aktual" stroke="#00875A" strokeWidth={2.5} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="prediksi" name="Prediksi AI" stroke="#7C3AED" strokeWidth={2.5} strokeDasharray="4 4" dot={{ r: 4 }} />
+                </>
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {!isVerifiedFarmer && (
+          <TeaserCardOverlay
+            onOpenUpgrade={onOpenUpgrade}
+            title="Grafik Tren Harga Terkunci"
+            description="Buka akses tren pergerakan harga BI PIHPS realtime antar wilayah."
+          />
+        )}
       </div>
 
       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
@@ -91,11 +105,15 @@ export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDa
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-600" /> Jakarta</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-600" /> Nasional</span>
         </div>
-        <button className="font-bold text-emerald-700 hover:text-emerald-800 text-[11px] flex items-center gap-1">
+        <button
+          onClick={() => !isVerifiedFarmer && onOpenUpgrade && onOpenUpgrade()}
+          className="font-bold text-emerald-700 hover:text-emerald-800 text-[11px] flex items-center gap-1"
+        >
           Analisis Lengkap &rarr;
         </button>
       </div>
     </div>
   );
 }
+
 

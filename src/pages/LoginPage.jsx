@@ -66,7 +66,11 @@ export function LoginPage({ onLoginSuccess }) {
       if (res.ok && data.success && data.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(data.user));
         if (onLoginSuccess) onLoginSuccess(data.user);
-        navigate(redirectUrl);
+        if (data.user.role === "admin" || data.user.role === "super_admin") {
+          navigate("/admin");
+        } else {
+          navigate(redirectUrl);
+        }
       } else {
         setError(data.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
       }

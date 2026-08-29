@@ -3,7 +3,7 @@ import { Target, TrendingUp, Globe, Wallet, Building2, Loader2 } from "lucide-re
 
 const ICON_MAP = { Target, TrendingUp, Globe, Wallet, Building2 };
 
-export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
+export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerifiedFarmer, onOpenUpgrade }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -58,9 +58,9 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
           },
           {
             title: "Estimasi Keuntungan",
-            value: "Rp 12.450.000",
+            value: isVerifiedFarmer ? "Rp 12.450.000" : "Rp ••••••",
             unit: "",
-            change: `Jika jual dari ${originLocation.split(',')[0]}`,
+            change: isVerifiedFarmer ? `Jika jual dari ${originLocation.split(',')[0]}` : "🔒 Khusus Petani",
             iconName: "Wallet",
             iconBg: "#DBEAFE",
             iconColor: "#2563EB"
@@ -83,14 +83,14 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
       }
     }
     fetchMetrics();
-  }, [originLocation]);
+  }, [originLocation, isVerifiedFarmer]);
 
   // Default static fallback
   const defaultMetrics = [
     { title: "Peluang Aktif Hari Ini", value: "3", unit: "peluang", change: "↑ 2 dari kemarin", iconName: "Target", iconBg: "#DCFCE7", iconColor: "#16A34A" },
     { title: "Prediksi Harga (5 Hari)", value: "↑ 6.2%", unit: "", change: "Cabai Merah", iconName: "TrendingUp", iconBg: "#F3E8FF", iconColor: "#7C3AED" },
     { title: "Permintaan Tinggi", value: "Bandung", unit: "", change: "↑ 18% dari kemarin", iconName: "Globe", iconBg: "#FFEDD5", iconColor: "#EA580C" },
-    { title: "Estimasi Keuntungan", value: "Rp 12.450.000", unit: "", change: "Jika jual ke Bandung", iconName: "Wallet", iconBg: "#DBEAFE", iconColor: "#2563EB" },
+    { title: "Estimasi Keuntungan", value: isVerifiedFarmer ? "Rp 12.450.000" : "Rp ••••••", unit: "", change: isVerifiedFarmer ? "Jika jual ke Bandung" : "🔒 Khusus Petani", iconName: "Wallet", iconBg: "#DBEAFE", iconColor: "#2563EB" },
     { title: "Pasar Terpantau", value: "38", unit: "provinsi", change: "Live Data BI PIHPS", iconName: "Building2", iconBg: "#DCFCE7", iconColor: "#16A34A" }
   ];
 
@@ -113,7 +113,17 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
       {displayMetrics.map((item, idx) => {
         const IconComp = ICON_MAP[item.iconName] || Target;
         return (
-          <div key={idx} className="tp-card p-4 flex flex-col justify-between">
+          <div
+            key={idx}
+            onClick={() => {
+              if (item.title.includes("Estimasi Keuntungan") && !isVerifiedFarmer && onOpenUpgrade) {
+                onOpenUpgrade();
+              }
+            }}
+            className={`tp-card p-4 flex flex-col justify-between ${
+              item.title.includes("Estimasi Keuntungan") && !isVerifiedFarmer ? "cursor-pointer hover:border-emerald-300" : ""
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-slate-500">{item.title}</span>

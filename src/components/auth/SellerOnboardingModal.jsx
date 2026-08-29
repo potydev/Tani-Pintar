@@ -255,7 +255,29 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [nikError, setNikError] = useState("");
+  const [ktpError, setKtpError] = useState("");
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+
+  // Pre-fill form from existing user state (re-submission after rejection or existing profile)
+  React.useEffect(() => {
+    if (user) {
+      if (user.province) setProvince(user.province);
+      if (user.regency) setRegency(user.regency);
+      if (user.district) setDistrict(user.district);
+      if (user.land_address) setLandAddress(user.land_address);
+      if (user.primary_commodity) setPrimaryCommodity(user.primary_commodity);
+      if (user.land_size) setLandSize(user.land_size);
+      if (user.harvest_capacity) setHarvestCapacity(user.harvest_capacity);
+      if (user.nik) {
+        setNik(user.nik);
+        validateNik(user.nik);
+      }
+      if (user.group_name) setGroupName(user.group_name);
+      if (user.bank_name) setBankName(user.bank_name);
+      if (user.account_number) setAccountNumber(user.account_number);
+    }
+  }, [user]);
 
   if (!isOpen || !user) return null;
 
@@ -288,6 +310,25 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
     "DANA / OVO / GoPay"
   ];
 
+  const validateNik = (val) => {
+    if (!val) {
+      setNikError("NIK KTP wajib diisi.");
+      return false;
+    }
+    if (val.length !== 16) {
+      setNikError(`NIK KTP harus tepat 16 digit angka (saat ini ${val.length} digit).`);
+      return false;
+    }
+    const provCode = val.substring(0, 2);
+    const validCodes = ["11","12","13","14","15","16","17","18","19","21","31","32","33","34","35","36","51","52","53","61","62","63","64","65","71","72","73","74","75","76","81","82","91","92","93","94","95","96"];
+    if (!validCodes.includes(provCode)) {
+      setNikError(`Kode wilayah provinsi NIK (${provCode}) tidak terdaftar di Indonesia.`);
+      return false;
+    }
+    setNikError("");
+    return true;
+  };
+
   // Cascading Handler 1: Province Change -> Update Regencies & District
   const handleProvinceChange = (e) => {
     const selectedProv = e.target.value;
@@ -313,8 +354,22 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
   };
 
   const handleKtpUpload = (e) => {
+    setKtpError("");
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file size limit <= 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        setKtpError(`Ukuran file terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maksimal 5MB.`);
+        e.target.value = "";
+        return;
+      }
+      // Validate file format (images or pdf)
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"];
+      if (!validTypes.includes(file.type)) {
+        setKtpError("Format file tidak sesuai. Gunakan format foto JPG, PNG, WEBP, atau PDF.");
+        e.target.value = "";
+        return;
+      }
       const url = URL.createObjectURL(file);
       setKtpPreview(url);
     }
@@ -348,8 +403,13 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
     if (e) e.preventDefault();
     setErrorMsg("");
 
-    if (!nik || nik.length < 16) {
-      setErrorMsg("NIK KTP wajib diisi 16 digit angka.");
+    if (!validateNik(nik)) {
+      setErrorMsg("Mohon perbaiki format NIK KTP Anda.");
+      return;
+    }
+
+    if (ktpError) {
+      setErrorMsg("Mohon perbaiki dokumen KTP yang Anda unggah.");
       return;
     }
 
@@ -706,9 +766,20 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
                           maxLength={16}
                           placeholder="3301xxxxxxxxxxxx"
                           value={nik}
-                          onChange={(e) => setNik(e.target.value.replace(/\D/g, ""))}
-                          className="w-full bg-[#141416] border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono tracking-wider transition-colors"
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, "");
+                            setNik(val);
+                            validateNik(val);
+                          }}
+                          className={`w-full bg-[#141416] border ${
+                            nikError ? "border-rose-500" : "border-slate-700/80"
+                          } rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono tracking-wider transition-colors`}
                         />
+                        {nikError && (
+                          <span className="text-[11px] text-rose-400 font-semibold mt-1.5 block">
+                            ⚠️ {nikError}
+                          </span>
+                        )}
                       </div>
 
                       <div>
@@ -752,11 +823,13 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
 
                     {/* Upload Foto KTP */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-2">Foto KTP / Kartu Poktan (Opsional)</label>
-                      <div className="border border-dashed border-slate-700 hover:border-emerald-500 rounded-2xl p-4 bg-[#141416] transition-colors text-center cursor-pointer relative">
+                      <label className="block text-xs font-semibold text-slate-300 mb-2">Foto KTP / Kartu Poktan (Opsional, Maks 5MB)</label>
+                      <div className={`border border-dashed ${
+                        ktpError ? "border-rose-500 bg-rose-500/5" : "border-slate-700 hover:border-emerald-500 bg-[#141416]"
+                      } rounded-2xl p-4 transition-colors text-center cursor-pointer relative`}>
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
                           onChange={handleKtpUpload}
                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                         />
@@ -768,10 +841,15 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
                         ) : (
                           <div className="flex items-center justify-center gap-2 text-slate-400 text-xs py-1">
                             <Upload size={16} className="text-emerald-400" />
-                            <span>Unggah Foto KTP / Kartu Anggota Poktan</span>
+                            <span>Unggah Foto KTP / Kartu Poktan (JPG/PNG/PDF, max 5MB)</span>
                           </div>
                         )}
                       </div>
+                      {ktpError && (
+                        <span className="text-[11px] text-rose-400 font-semibold mt-1.5 block">
+                          ⚠️ {ktpError}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -796,11 +874,6 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
               >
                 Kembali
               </button>
-
-              {/* Circular Arrow Button (Visual Indicator) */}
-              <div className="w-10 h-10 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
-                <ArrowDown size={16} />
-              </div>
 
               {/* Right Action Button */}
               {currentStep < 3 ? (
