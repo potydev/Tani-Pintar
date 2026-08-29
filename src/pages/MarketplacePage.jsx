@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { COMMODITY_CATEGORIES, SORT_OPTIONS, fetchProducts, fetchMarketplaceStats } from "../data/marketplaceData";
 import { ProductCard } from "../components/marketplace/ProductCard";
+import { LandingHeader } from "../components/landing/LandingHeader";
 
 export function MarketplacePage({ isLoggedIn, userName }) {
   const navigate = useNavigate();
@@ -76,44 +77,9 @@ export function MarketplacePage({ isLoggedIn, userName }) {
 
   return (
     <div className="min-h-screen bg-[#f7f6f2]" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-      {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
-                <Leaf size={16} className="text-white" />
-              </div>
-              <span className="font-extrabold text-base text-slate-900">TaniPintar</span>
-            </Link>
-            <div className="w-px h-5 bg-slate-200" />
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60">
-              <Store size={14} className="text-emerald-700" />
-              <span>Marketplace Panen</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {isLoggedIn ? (
-              <>
-                <Link to="/dashboard" className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl transition-colors">
-                  <LayoutDashboard size={14} /> <span className="hidden sm:inline">Dashboard</span>
-                </Link>
-                <div className="flex items-center gap-2 pl-1">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold text-xs border border-emerald-200">
-                    <User size={14} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-700 hidden sm:block">{userName}</span>
-                </div>
-              </>
-            ) : (
-              <Link to="/login?redirect=/marketplace" className="flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm">
-                Masuk <ArrowRight size={14} />
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      
+      {/* Full Universal Header Bar */}
+      <LandingHeader isLoggedIn={isLoggedIn} userName={userName} bgSolid={true} />
 
       {/* Hero Banner */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #051510 0%, #0d5c3a 60%, #16a34a 120%)" }}>
