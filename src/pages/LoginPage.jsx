@@ -72,16 +72,8 @@ export function LoginPage({ onLoginSuccess }) {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#121212]" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
       
-      {/* Left Column — Dark Green Branding & Impact Panel */}
-      <div className="bg-[#072415] p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
-        {/* Background Subtle Gradient Mask */}
-        <div
-          className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80')",
-          }}
-        />
-
+      {/* Left Column — Dark Green Branding & Impact Panel (Exact Photo 2 Match) */}
+      <div className="bg-[#081f13] p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
         {/* Brand Logo */}
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center gap-2.5 group">
@@ -92,30 +84,30 @@ export function LoginPage({ onLoginSuccess }) {
           </Link>
         </div>
 
-        {/* Middle Main Message & Stats */}
-        <div className="relative z-10 my-10 max-w-lg">
-          <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight mb-4">
+        {/* Middle Main Headline & Stats */}
+        <div className="relative z-10 my-10 max-w-md">
+          <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4">
             Jual panen di waktu dan tempat yang tepat
           </h1>
-          <p className="text-emerald-100/70 text-sm sm:text-base leading-relaxed mb-10">
+          <p className="text-emerald-100/70 text-sm sm:text-base leading-relaxed mb-12">
             AI kami memantau harga dan permintaan di 34 kota setiap hari untuk petani binaan.
           </p>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-8">
             <div>
-              <div className="text-white font-extrabold text-2xl sm:text-3xl tracking-tight">12.450+</div>
-              <div className="text-emerald-200/60 text-xs sm:text-sm mt-0.5 font-medium">Petani terhubung</div>
+              <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">12.450+</div>
+              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Petani terhubung</div>
             </div>
             <div>
-              <div className="text-white font-extrabold text-2xl sm:text-3xl tracking-tight">9.2%</div>
-              <div className="text-emerald-200/60 text-xs sm:text-sm mt-0.5 font-medium">Rata-rata profit tambahan</div>
+              <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">9.2%</div>
+              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Rata-rata profit tambahan</div>
             </div>
           </div>
         </div>
 
         {/* Bottom Social Proof / Farmer Quote */}
         <div className="relative z-10 pt-6 border-t border-emerald-800/40">
-          <p className="text-emerald-100/90 text-sm leading-relaxed mb-2 font-medium">
+          <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed mb-2 font-medium">
             &ldquo;Sejak pakai TaniPintar, saya jadi tahu kapan harga cabai lagi bagus di kota lain.&rdquo;
           </p>
           <div className="text-emerald-400 text-xs font-semibold">
@@ -124,7 +116,7 @@ export function LoginPage({ onLoginSuccess }) {
         </div>
       </div>
 
-      {/* Right Column — Clean Form Panel */}
+      {/* Right Column — Form Panel (Exact Photo 2 Match) */}
       <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center max-w-md mx-auto w-full">
         
         {/* Header Title */}
@@ -155,7 +147,7 @@ export function LoginPage({ onLoginSuccess }) {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Masukkan nama lengkap"
-                className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
           )}
@@ -168,7 +160,7 @@ export function LoginPage({ onLoginSuccess }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com"
-              className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
             />
           </div>
 
@@ -180,7 +172,7 @@ export function LoginPage({ onLoginSuccess }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Masukkan kata sandi"
-              className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
             />
             {mode === "login" && (
               <div className="text-right mt-2">
@@ -203,7 +195,7 @@ export function LoginPage({ onLoginSuccess }) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="081234567890"
-                className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
           )}
@@ -212,7 +204,7 @@ export function LoginPage({ onLoginSuccess }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#10b981] hover:bg-[#059669] text-slate-950 font-bold text-sm py-3.5 rounded-xl transition-all shadow-md mt-2"
+            className="w-full bg-[#10b981] hover:bg-[#059669] text-slate-950 font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-md mt-2"
           >
             {loading ? "Memproses..." : mode === "login" ? "Masuk sekarang" : "Daftar sekarang"}
           </button>
