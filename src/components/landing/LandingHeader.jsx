@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Leaf, ArrowRight, Menu, X } from "lucide-react";
+import { Leaf, ArrowRight, Menu, X, ShoppingBag, User } from "lucide-react";
 
-export function LandingHeader({ onLoginClick }) {
+export function LandingHeader({ onLoginClick, onNavigate, isLoggedIn, userName }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -11,7 +11,12 @@ export function LandingHeader({ onLoginClick }) {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const navLinks = ["Beranda", "Fitur Utama", "Analitik AI", "Panduan Petani"];
+  const navLinks = [
+    { label: "Beranda", action: () => {} },
+    { label: "Fitur Utama", action: () => {} },
+    { label: "Marketplace", action: () => onNavigate && onNavigate("marketplace"), highlight: true },
+    { label: "Panduan Petani", action: () => {} },
+  ];
 
   return (
     <nav
@@ -47,33 +52,60 @@ export function LandingHeader({ onLoginClick }) {
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+            <button
+              key={item.label}
+              onClick={item.action}
+              className={`text-sm font-medium transition-colors ${
+                item.highlight
+                  ? "text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                  : "text-[#0b1f13]/70 hover:text-[#0d5c3a]"
+              }`}
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              {item}
-            </a>
+              {item.highlight && <ShoppingBag size={14} />}
+              {item.label}
+            </button>
           ))}
         </div>
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <button
-            onClick={onLoginClick}
-            className="text-sm font-semibold text-[#0d5c3a] hover:text-[#0b1f13] transition-colors"
-            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-          >
-            Masuk
-          </button>
-          <button
-            onClick={onLoginClick}
-            className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-          >
-            Masuk ke Dashboard <ArrowRight size={14} />
-          </button>
+          {isLoggedIn ? (
+            <>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <User size={14} className="text-emerald-700" />
+                </div>
+                <span className="font-medium text-xs text-slate-700" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                  {userName}
+                </span>
+              </div>
+              <button
+                onClick={() => onNavigate && onNavigate("dashboard")}
+                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              >
+                Dashboard <ArrowRight size={14} />
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onLoginClick}
+                className="text-sm font-semibold text-[#0d5c3a] hover:text-[#0b1f13] transition-colors"
+                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              >
+                Masuk
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="flex items-center gap-1.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              >
+                Daftar Gratis <ArrowRight size={14} />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -89,22 +121,35 @@ export function LandingHeader({ onLoginClick }) {
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-slate-200/50 px-6 py-4 flex flex-col gap-4">
           {navLinks.map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-sm font-medium text-[#0b1f13]/70"
+            <button
+              key={item.label}
+              onClick={() => { item.action(); setMenuOpen(false); }}
+              className={`text-sm font-medium text-left ${
+                item.highlight ? "text-emerald-600 flex items-center gap-1.5" : "text-[#0b1f13]/70"
+              }`}
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              {item}
-            </a>
+              {item.highlight && <ShoppingBag size={14} />}
+              {item.label}
+            </button>
           ))}
-          <button
-            onClick={onLoginClick}
-            className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
-            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-          >
-            Masuk ke Dashboard
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={() => { onNavigate && onNavigate("dashboard"); setMenuOpen(false); }}
+              className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              Dashboard
+            </button>
+          ) : (
+            <button
+              onClick={() => { onLoginClick(); setMenuOpen(false); }}
+              className="w-full bg-[#0d5c3a] text-white text-sm font-semibold py-2.5 rounded-lg"
+              style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+            >
+              Masuk / Daftar
+            </button>
+          )}
         </div>
       )}
     </nav>

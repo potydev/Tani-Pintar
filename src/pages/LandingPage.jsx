@@ -8,16 +8,21 @@ import { LandingTestimonials } from "../components/landing/LandingTestimonials";
 import { LandingCta } from "../components/landing/LandingCta";
 import { LandingFooter } from "../components/landing/LandingFooter";
 
-export function LandingPage({ onLoginClick }) {
+export function LandingPage({ onLoginClick, onNavigate, isLoggedIn, userName }) {
   return (
     <div
       className="min-h-screen"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       <LandingTicker />
-      <LandingHeader onLoginClick={onLoginClick} />
+      <LandingHeader
+        onLoginClick={onLoginClick}
+        onNavigate={onNavigate}
+        isLoggedIn={isLoggedIn}
+        userName={userName}
+      />
       <main>
-        <LandingHero onLoginClick={onLoginClick} />
+        <LandingHero onLoginClick={onLoginClick} onNavigate={onNavigate} />
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingTestimonials />
