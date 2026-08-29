@@ -1,20 +1,57 @@
 import React, { useState } from "react";
-import { X, ArrowRight, ArrowLeft, ArrowDown, Check, ShieldCheck, Leaf, Upload, AlertCircle, Loader2 } from "lucide-react";
+import { X, ArrowRight, ArrowLeft, ArrowDown, Check, ShieldCheck, Leaf, Upload, AlertCircle, Loader2, MapPin } from "lucide-react";
 
 export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess }) {
   const [currentStep, setCurrentStep] = useState(1); // 1: Lokasi, 2: Komoditas, 3: Verifikasi
 
-  // Step 1 State: Lokasi
+  // Comprehensive 3-tier Indonesian Regional Data (Provinsi -> Kabupaten/Kota -> Kecamatan)
+  const regionalHierarchy = {
+    "Jawa Tengah": {
+      "Cilacap": ["Sidareja", "Cipari", "Gandrungmangu", "Kedungreja", "Majenang", "Patimuan", "Karangpucung", "Kroya", "Adipala", "Jeruklegi"],
+      "Brebes": ["Brebes", "Bulakamba", "Larangan", "Ketanggungan", "Tanjung", "Jatibarang", "Wanasari", "Songgom", "Sirampog", "Paguyangan"],
+      "Semarang": ["Ungaran Barat", "Ungaran Timur", "Bandungan", "Ambarawa", "Bawen", "Getasan", "Tuntang", "Bergas"],
+      "Banyumas": ["Purwokerto Timur", "Purwokerto Selatan", "Sumbang", "Baturraden", "Ajibarang", "Wangon", "Sokaraja", "Kembaran"],
+      "Grobogan": ["Purwodadi", "Toroh", "Geyer", "Pulokulon", "Kradenan", "Grobogan", "Wirosari", "Tawangharjo"],
+      "Boyolali": ["Boyolali", "Ampel", "Cepogo", "Selo", "Musuk", "Mojosongo", "Teras", "Banyudono"]
+    },
+    "Jawa Barat": {
+      "Bandung": ["Cileunyi", "Baleendah", "Dayeuhkolot", "Ciwidey", "Pangalengan", "Soreang", "Banjarwangi", "Kertasari"],
+      "Garut": ["Tarogong Kaler", "Tarogong Kidul", "Cisurupan", "Cikajang", "Bayongbong", "Leles", "Kadungora", "Wanaraja"],
+      "Cianjur": ["Cianjur", "Cugenang", "Pacet", "Cipanas", "Cibeber", "Warungkondang", "Campaka", "Sukanagara"],
+      "Sukabumi": ["Cisaat", "Cibadak", "Cicurug", "Parungkuda", "Cikidang", "Pelabuhanratu", "Jampangtengah", "Surade"],
+      "Subang": ["Subang", "Kalijati", "Ciater", "Jalanforka", "Cipunagara", "Pamanukan", "Pagaden", "Cijambe"]
+    },
+    "Jawa Timur": {
+      "Malang": ["Kepanjen", "Batu", "Singosari", "Lawang", "Poncokusumo", "Pujon", "Ngantang", "Turen", "Dampit"],
+      "Nganjuk": ["Nganjuk", "Kertosono", "Loceret", "Berbek", "Pace", "Baron", "Tanjunganom", "Bagor"],
+      "Banyuwangi": ["Banyuwangi", "Genteng", "Rogojampi", "Srono", "Muncar", "Kabat", "Glenmore", "Kalibaru"],
+      "Kediri": ["Pare", "Ngasem", "Gurah", "Plosoklaten", "Kandangan", "Kras", "Wates", "Kapar"],
+      "Jember": ["Patrang", "Sumbersari", "Kaliwates", "Ambulu", "Tanggul", "Rambipuji", "Puger", "Semboro"]
+    },
+    "Sumatera Utara": {
+      "Karo": ["Berastagi", "Kabanjahe", "Tigapanah", "Simpang Empat", "Merek", "Payung", "Laubaleng"],
+      "Simalungun": ["Raya", "Siantar", "Tanah Jawa", "Sidamanik", "Perbaungan", "Bosar Maligas", "Girsang Sipangan Bolon"],
+      "Deli Serdang": ["Lubuk Pakam", "Tanjung Morawa", "Percut Sei Tuan", "Sunggal", "Pancasurba", "Hamparan Perak"]
+    },
+    "Sulawesi Selatan": {
+      "Gowa": ["Sungguminasa", "Malino / Tinggimoncong", "Pallangga", "Bajeng", "Parangloe", "Bontomarannu", "Manuju"],
+      "Bantaeng": ["Bantaeng", "Bissappu", "Erekang", "Pajukukang", "Sinoa", "Uluere", "Tompobulu"],
+      "Jeneponto": ["Bontosunggu", "Tamalatea", "Binamu", "Kelara", "Banggakala", "Arungkeke", "Tarowang"]
+    }
+  };
+
+  // Step 1 State: 3-Tier Regional Cascading Dropdowns
   const [province, setProvince] = useState("Jawa Tengah");
   const [regency, setRegency] = useState("Cilacap");
-  const [landAddress, setLandAddress] = useState("Sidareja");
+  const [district, setDistrict] = useState("Sidareja");
+  const [landAddress, setLandAddress] = useState("Desa Sukamaju, RT 02/05");
 
   // Step 2 State: Komoditas
   const [primaryCommodity, setPrimaryCommodity] = useState("Cabai Merah Besar");
   const [landSize, setLandSize] = useState("1.5 Hektar");
   const [harvestCapacity, setHarvestCapacity] = useState("1 - 5 Ton");
 
-  // Step 3 State: Verifikasi
+  // Step 3 State: Verifikasi Identitas
   const [nik, setNik] = useState("");
   const [groupName, setGroupName] = useState("");
   const [bankName, setBankName] = useState("BRI (Bank Rakyat Indonesia)");
@@ -26,15 +63,6 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
   if (!isOpen || !user) return null;
-
-  // Province -> Regency mapping data
-  const provinceRegencyMap = {
-    "Jawa Tengah": ["Cilacap", "Brebes", "Semarang", "Banyumas", "Grobogan", "Boyolali", "Kendal", "Magelang"],
-    "Jawa Barat": ["Bandung", "Garut", "Cianjur", "Sukabumi", "Subang", "Majalengka", "Tasikmalaya"],
-    "Jawa Timur": ["Malang", "Nganjuk", "Banyuwangi", "Kediri", "Probolinggo", "Jember", "Blitar"],
-    "Sumatera Utara": ["Medan", "Karo", "Simalungun", "Deli Serdang", "Dairi"],
-    "Sulawesi Selatan": ["Makassar", "Gowa", "Bantaeng", "Jeneponto", "Bone"]
-  };
 
   const commoditiesList = [
     "Cabai Merah Besar",
@@ -65,12 +93,28 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
     "DANA / OVO / GoPay"
   ];
 
+  // Cascading Handler 1: Province Change -> Update Regencies & District
   const handleProvinceChange = (e) => {
-    const p = e.target.value;
-    setProvince(p);
-    if (provinceRegencyMap[p]) {
-      setRegency(provinceRegencyMap[p][0]);
+    const selectedProv = e.target.value;
+    setProvince(selectedProv);
+
+    const availableRegencies = Object.keys(regionalHierarchy[selectedProv] || {});
+    if (availableRegencies.length > 0) {
+      const firstRegency = availableRegencies[0];
+      setRegency(firstRegency);
+
+      const availableDistricts = regionalHierarchy[selectedProv][firstRegency] || [];
+      setDistrict(availableDistricts[0] || "");
     }
+  };
+
+  // Cascading Handler 2: Regency Change -> Update District
+  const handleRegencyChange = (e) => {
+    const selectedReg = e.target.value;
+    setRegency(selectedReg);
+
+    const availableDistricts = regionalHierarchy[province]?.[selectedReg] || [];
+    setDistrict(availableDistricts[0] || "");
   };
 
   const handleKtpUpload = (e) => {
@@ -84,8 +128,8 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
   const handleNextStep = () => {
     setErrorMsg("");
     if (currentStep === 1) {
-      if (!province || !regency) {
-        setErrorMsg("Silakan pilih provinsi dan kabupaten / kota lahan Anda.");
+      if (!province || !regency || !district) {
+        setErrorMsg("Silakan pilih provinsi, kabupaten/kota, dan kecamatan lahan Anda.");
         return;
       }
       setCurrentStep(2);
@@ -120,13 +164,16 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
     }
 
     setLoading(true);
-    const farmLoc = `${regency}, ${province}`;
+    const fullFarmLoc = `Kec. ${district}, ${regency}, ${province}`;
     try {
       const payload = {
         email: user.email,
         full_name: user.full_name,
         phone: user.phone,
-        farm_location: farmLoc,
+        farm_location: fullFarmLoc,
+        province,
+        regency,
+        district,
         land_address: landAddress,
         primary_commodity: primaryCommodity,
         land_size: landSize,
@@ -153,7 +200,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
           role: "farmer_pending",
           verification_status: "pending",
           is_seller: false,
-          farm_location: farmLoc,
+          farm_location: fullFarmLoc,
           primary_commodity: primaryCommodity,
           land_size: landSize,
           nik
@@ -171,7 +218,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
         role: "farmer_pending",
         verification_status: "pending",
         is_seller: false,
-        farm_location: `${regency}, ${province}`,
+        farm_location: `Kec. ${district}, ${regency}, ${province}`,
         primary_commodity: primaryCommodity,
         land_size: landSize,
         nik
@@ -293,7 +340,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
               <div className="space-y-1">
                 <h3 className="text-xl font-black text-white">Pengajuan Verifikasi Terkirim! ⏳</h3>
                 <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                  Data lokasi panen, komoditas, dan KTP Anda telah diterima. Tim Admin TaniPintar akan meninjau verifikasi Anda dalam estimasi <strong className="text-white">1x24 jam</strong>.
+                  Data lokasi panen (<strong className="text-white">Kec. {district}, {regency}, {province}</strong>), komoditas, dan KTP Anda telah diterima. Tim Admin TaniPintar akan meninjau verifikasi Anda dalam estimasi <strong className="text-white">1x24 jam</strong>.
                 </p>
               </div>
 
@@ -317,7 +364,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
             /* Wizard Steps Cards Container */
             <div className="bg-[#1c1c1f] rounded-3xl p-6 sm:p-8 border border-slate-800/80 shadow-inner">
               
-              {/* STEP 1: LOKASI */}
+              {/* STEP 1: LOKASI (3-TIER DROPDOWNS: PROVINSI -> KABUPATEN/KOTA -> KECAMATAN) */}
               {currentStep === 1 && (
                 <div className="space-y-5 animate-in fade-in duration-200">
                   <div>
@@ -330,6 +377,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
                   </div>
 
                   <div className="space-y-4 pt-2">
+                    {/* 1. Provinsi Dropdown */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-300 mb-2">Provinsi</label>
                       <select
@@ -337,30 +385,46 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
                         onChange={handleProvinceChange}
                         className="w-full bg-[#141416] border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
                       >
-                        {Object.keys(provinceRegencyMap).map((p, i) => (
+                        {Object.keys(regionalHierarchy).map((p, i) => (
                           <option key={i} value={p}>{p}</option>
                         ))}
                       </select>
                     </div>
 
+                    {/* 2. Kabupaten / Kota Dropdown */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-300 mb-2">Kabupaten / kota</label>
                       <select
                         value={regency}
-                        onChange={(e) => setRegency(e.target.value)}
+                        onChange={handleRegencyChange}
                         className="w-full bg-[#141416] border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
                       >
-                        {(provinceRegencyMap[province] || []).map((r, i) => (
+                        {Object.keys(regionalHierarchy[province] || {}).map((r, i) => (
                           <option key={i} value={r}>{r}</option>
                         ))}
                       </select>
                     </div>
 
+                    {/* 3. Kecamatan Dropdown */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-2">Alamat lahan (opsional)</label>
+                      <label className="block text-xs font-semibold text-slate-300 mb-2">Kecamatan</label>
+                      <select
+                        value={district}
+                        onChange={(e) => setDistrict(e.target.value)}
+                        className="w-full bg-[#141416] border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                      >
+                        {(regionalHierarchy[province]?.[regency] || []).map((d, i) => (
+                          <option key={i} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* 4. Alamat Detail / Desa (opsional) */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-2">Alamat detail / desa (opsional)</label>
                       <input
                         type="text"
-                        placeholder="Contoh: Sidareja, Desa Sukamaju"
+                        placeholder="Contoh: Desa Sukamaju, RT 02/05"
                         value={landAddress}
                         onChange={(e) => setLandAddress(e.target.value)}
                         className="w-full bg-[#141416] border border-slate-700/80 rounded-2xl px-4 py-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
@@ -521,7 +585,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
             </div>
           )}
 
-          {/* Bottom Control Navigation Bar (Matching Screenshot UI) */}
+          {/* Bottom Control Navigation Bar */}
           {!submittedSuccess && (
             <div className="mt-8 flex items-center justify-between gap-4">
               {/* Back Button */}
