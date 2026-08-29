@@ -33,39 +33,15 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }) {
 
       const json = await res.json();
 
-      if (json.success && json.user) {
+      if (res.ok && json.success && json.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(json.user));
         if (onAuthSuccess) onAuthSuccess(json.user);
         onClose();
       } else {
-        // Fallback local auth if server API returns error
-        const mockUser = {
-          id: Date.now(),
-          email: email || "petani@tanipintar.id",
-          full_name: fullName || (isRegister ? "Petani Pintar" : "Pak Joko Slamet"),
-          farm_location: farmLocation,
-          primary_commodity: primaryCommodity,
-          land_size: landSize,
-          avatar_url: "/assets/farmer_avatar.png"
-        };
-        localStorage.setItem("tanipintar_user", JSON.stringify(mockUser));
-        if (onAuthSuccess) onAuthSuccess(mockUser);
-        onClose();
+        setErrorMsg(json.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
       }
     } catch (err) {
-      // Local fallback state
-      const mockUser = {
-        id: Date.now(),
-        email: email || "petani@tanipintar.id",
-        full_name: fullName || "Pak Joko Slamet",
-        farm_location: farmLocation,
-        primary_commodity: primaryCommodity,
-        land_size: landSize,
-        avatar_url: "/assets/farmer_avatar.png"
-      };
-      localStorage.setItem("tanipintar_user", JSON.stringify(mockUser));
-      if (onAuthSuccess) onAuthSuccess(mockUser);
-      onClose();
+      setErrorMsg("Terjadi kesalahan koneksi server. Silakan coba beberapa saat lagi.");
     } finally {
       setLoading(false);
     }

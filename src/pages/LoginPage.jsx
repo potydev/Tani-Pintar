@@ -63,26 +63,16 @@ export function LoginPage({ onLoginSuccess }) {
       const data = await res.json();
       setLoading(false);
 
-      if (data.success && data.user) {
+      if (res.ok && data.success && data.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(data.user));
         if (onLoginSuccess) onLoginSuccess(data.user);
         navigate(redirectUrl);
       } else {
-        setError(data.error || "Gagal memproses otentikasi akun.");
+        setError(data.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
       }
     } catch (err) {
       setLoading(false);
-      // Fallback local session if offline
-      const fallbackUser = {
-        id: Date.now(),
-        full_name: mode === "register" ? fullName || email.split("@")[0] : email.split("@")[0],
-        email: email,
-        phone: phone || "08123456789",
-        role: "buyer"
-      };
-      localStorage.setItem("tanipintar_user", JSON.stringify(fallbackUser));
-      if (onLoginSuccess) onLoginSuccess(fallbackUser);
-      navigate(redirectUrl);
+      setError("Terjadi kesalahan koneksi server. Silakan coba beberapa saat lagi.");
     }
   };
 

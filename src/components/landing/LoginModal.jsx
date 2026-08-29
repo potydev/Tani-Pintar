@@ -56,20 +56,14 @@ export function LoginModal({ onClose, onLogin }) {
       });
       const json = await res.json();
 
-      if (json.success && json.user) {
+      if (res.ok && json.success && json.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(json.user));
         if (onLogin) onLogin(json.user.full_name || json.user.email);
       } else {
-        // Fallback local auth for demo/offline
-        const mockUser = buildMockUser();
-        localStorage.setItem("tanipintar_user", JSON.stringify(mockUser));
-        if (onLogin) onLogin(mockUser.full_name);
+        setErrorMsg(json.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
       }
     } catch (err) {
-      // Local fallback for development
-      const mockUser = buildMockUser();
-      localStorage.setItem("tanipintar_user", JSON.stringify(mockUser));
-      if (onLogin) onLogin(mockUser.full_name);
+      setErrorMsg("Terjadi kesalahan koneksi server. Silakan coba beberapa saat lagi.");
     } finally {
       setLoading(false);
     }
