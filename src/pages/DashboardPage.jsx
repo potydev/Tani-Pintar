@@ -11,6 +11,7 @@ import { AIAssistantChatPanel } from "../components/dashboard/AIAssistantChatPan
 import { RecentOrdersPanel } from "../components/dashboard/RecentOrdersPanel";
 import { BottomBannerPanel } from "../components/dashboard/BottomBannerPanel";
 import { AuthModal } from "../components/auth/AuthModal";
+import { UserProfileModal } from "../components/auth/UserProfileModal";
 
 // Import Sub-Pages
 import { SalesOpportunitiesPage } from "./SalesOpportunitiesPage";
@@ -24,6 +25,7 @@ export function DashboardPage({ name, onLogout }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
 
@@ -47,6 +49,14 @@ export function DashboardPage({ name, onLogout }) {
     localStorage.removeItem("tanipintar_user");
     setUser(null);
     if (onLogout) onLogout();
+  };
+
+  const handleOpenAccount = () => {
+    if (user) {
+      setIsProfileOpen(true);
+    } else {
+      setIsAuthOpen(true);
+    }
   };
 
   const displayName = user?.full_name || name || "Pak Joko Slamet";
@@ -125,7 +135,7 @@ export function DashboardPage({ name, onLogout }) {
         name={displayName}
         user={user}
         onLogout={handleLogoutUser}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={handleOpenAccount}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
@@ -136,7 +146,7 @@ export function DashboardPage({ name, onLogout }) {
         <DashboardHeader
           name={displayName}
           user={user}
-          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenAuth={handleOpenAccount}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           selectedLocation={selectedLocation}
@@ -152,6 +162,14 @@ export function DashboardPage({ name, onLogout }) {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
+      />
+
+      {/* Logged in User Profile Detail Modal */}
+      <UserProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        user={user}
+        onLogout={handleLogoutUser}
       />
     </div>
   );
