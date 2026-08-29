@@ -84,7 +84,7 @@ export function MarketplacePage({ isLoggedIn, userName }) {
       {/* Hero Banner */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #051510 0%, #0d5c3a 60%, #16a34a 120%)" }}>
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.12] rounded-full px-4 py-1.5 mb-4">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -135,7 +135,7 @@ export function MarketplacePage({ isLoggedIn, userName }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-6">
         {/* Categories Pills */}
         <div className="bg-white rounded-2xl border border-slate-200 p-2 flex gap-1.5 overflow-x-auto mb-6 shadow-sm">
           {COMMODITY_CATEGORIES.map(cat => (
