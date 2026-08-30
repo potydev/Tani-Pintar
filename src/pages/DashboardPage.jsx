@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { MetricCardsGrid } from "../components/dashboard/MetricCardsGrid";
@@ -13,6 +14,8 @@ import { BottomBannerPanel } from "../components/dashboard/BottomBannerPanel";
 import { AuthModal } from "../components/auth/AuthModal";
 import { UserProfileModal } from "../components/auth/UserProfileModal";
 import { SellerOnboardingModal } from "../components/auth/SellerOnboardingModal";
+import { OnboardingWizardModal } from "../components/auth/OnboardingWizardModal";
+import { SellProductModal } from "../components/dashboard/SellProductModal";
 
 // Import Sub-Pages
 import { SalesOpportunitiesPage } from "./SalesOpportunitiesPage";
@@ -21,15 +24,23 @@ import { TopBuyersPage } from "./TopBuyersPage";
 import { PriceRecommendationPage } from "./PriceRecommendationPage";
 import { ProfitCalculatorPage } from "./ProfitCalculatorPage";
 import { MarketAnalyticsPage } from "./MarketAnalyticsPage";
+import { OrdersManagementPage } from "./OrdersManagementPage";
+import { MarketplacePage } from "./MarketplacePage";
 
 export function DashboardPage({ name, onLogout }) {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTarget = searchParams.get("redirect");
+
   const [activeTab, setActiveTab] = useState("dashboard");
   const [user, setUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("Cilacap, Jateng");
+  const [selectedLocation, setSelectedLocation] = useState("Surabaya, Jatim");
 
   useEffect(() => {
     const savedUser = localStorage.getItem("tanipintar_user");
@@ -38,6 +49,9 @@ export function DashboardPage({ name, onLogout }) {
         const u = JSON.parse(savedUser);
         setUser(u);
         if (u.farm_location) setSelectedLocation(u.farm_location);
+        if (u.needsOnboarding) {
+          setIsOnboardingOpen(true);
+        }
       } catch (e) {}
     }
   }, []);
@@ -45,6 +59,18 @@ export function DashboardPage({ name, onLogout }) {
   const handleAuthSuccess = (userData) => {
     setUser(userData);
     if (userData.farm_location) setSelectedLocation(userData.farm_location);
+    if (userData.needsOnboarding) {
+      setIsOnboardingOpen(true);
+    }
+  };
+
+  const handleOnboardingComplete = (updatedUser, redirectUrl) => {
+    setUser(updatedUser);
+    if (updatedUser.farm_location) setSelectedLocation(updatedUser.farm_location);
+    setIsOnboardingOpen(false);
+    if (redirectUrl && redirectUrl !== "/dashboard") {
+      navigate(redirectUrl);
+    }
   };
 
   const handleUpgradeSuccess = (updatedUserData) => {
@@ -66,8 +92,15 @@ export function DashboardPage({ name, onLogout }) {
     }
   };
 
+  const handleTabChange = (tabId) => {
+    if (tabId === "sell_product") {
+      setIsSellModalOpen(true);
+    } else {
+      setActiveTab(tabId);
+    }
+  };
+
   const displayName = user?.full_name || name || "Pak Joko Slamet";
-  const isVerifiedFarmer = true; // Full access for all registered and exploring farmers
 
   const renderContent = () => {
     switch (activeTab) {
@@ -83,6 +116,26 @@ export function DashboardPage({ name, onLogout }) {
         return <ProfitCalculatorPage />;
       case "analytics":
         return <MarketAnalyticsPage />;
+      case "orders":
+        return <OrdersManagementPage user={user} />;
+      case "marketplace_view":
+        return (
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <h3 className="font-extrabold text-slate-900 text-sm">Katalog Belanja Marketplace</h3>
+                <p className="text-xs text-slate-500">Jelajahi komoditas panen langsung dari petani binaan TaniPintar.</p>
+              </div>
+              <button
+                onClick={() => navigate('/marketplace')}
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm"
+              >
+                Buka Tampilan Penuh Marketplace &rarr;
+              </button>
+            </div>
+            <MarketplacePage isLoggedIn={true} userName={displayName} />
+          </div>
+        );
       case "dashboard":
       default:
         return (
@@ -145,8 +198,9 @@ export function DashboardPage({ name, onLogout }) {
         onLogout={handleLogoutUser}
         onOpenAuth={handleOpenAccount}
         onOpenUpgrade={() => setIsUpgradeOpen(true)}
+        onOpenSellProduct={() => setIsSellModalOpen(true)}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
       />
 
       {/* Scrollable Main Workspace */}
@@ -165,6 +219,24 @@ export function DashboardPage({ name, onLogout }) {
         {/* Dynamic Workspace Render */}
         {renderContent()}
       </main>
+
+      {/* Fiverr-style Onboarding Wizard Modal */}
+      <OnboardingWizardModal
+        isOpen={isOnboardingOpen}
+        user={user}
+        redirectUrl={redirectTarget}
+        onComplete={handleOnboardingComplete}
+      />
+
+      {/* Modal Mulai Menjual (Pasang Panen) */}
+      <SellProductModal
+        isOpen={isSellModalOpen}
+        onClose={() => setIsSellModalOpen(false)}
+        user={user}
+        onSuccess={() => {
+          setActiveTab("orders");
+        }}
+      />
 
       {/* Real User Auth Modal (Login / Register) */}
       <AuthModal

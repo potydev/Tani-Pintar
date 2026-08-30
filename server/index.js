@@ -199,10 +199,10 @@ Gaya Komunikasi:
   }
 });
 
-// Auth API - Register via Supabase PostgreSQL (Full Farmer Account)
+// Auth API - Register via Supabase PostgreSQL
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, full_name, farm_location, primary_commodity, land_size } = req.body;
+    const { email, password, full_name, role, farm_location, primary_commodity, land_size } = req.body;
     if (!email || !password || !full_name) {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
@@ -217,9 +217,10 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan masuk ke akun Anda.' });
     }
 
-    const loc = farm_location || 'Cilacap, Jawa Tengah';
+    const loc = farm_location || 'Surabaya, Jawa Timur';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
+    const userRole = role || 'farmer';
 
     const { data: newUser, error } = await supabase
       .from('users')
@@ -227,6 +228,8 @@ app.post('/api/auth/register', async (req, res) => {
         email,
         password,
         full_name,
+        role: userRole,
+        is_seller: userRole !== 'buyer',
         farm_location: loc,
         primary_commodity: comm,
         land_size: land,
@@ -244,17 +247,68 @@ app.post('/api/auth/register', async (req, res) => {
       id: created.id || Date.now(),
       email: created.email || email,
       full_name: created.full_name || full_name,
-      role: 'farmer',
-      is_seller: true,
+      role: created.role || userRole,
+      is_seller: created.is_seller !== undefined ? created.is_seller : (userRole !== 'buyer'),
       farm_location: created.farm_location || loc,
       primary_commodity: created.primary_commodity || comm,
       land_size: created.land_size || land,
-      avatar_url: created.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+      avatar_url: created.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+      needsOnboarding: true
     };
 
     res.json({ success: true, message: 'Pendaftaran berhasil! Selamat datang di TaniPintar.', user });
   } catch (err) {
     console.error('Error during registration:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Auth API - Onboarding Setup (Fiverr style post-register preference)
+app.post('/api/auth/onboarding', async (req, res) => {
+  try {
+    const { email, id, role, farm_location, primary_commodity, land_size } = req.body;
+    if (!email && !id) {
+      return res.status(400).json({ success: false, error: 'User ID atau Email wajib disertakan.' });
+    }
+
+    const updatePayload = {
+      role: role || 'farmer',
+      is_seller: role !== 'buyer',
+      farm_location: farm_location || 'Surabaya, Jawa Timur',
+      primary_commodity: primary_commodity || 'Cabai Merah Besar',
+      land_size: land_size || '1.5 Hektar'
+    };
+
+    let query = supabase.from('users').update(updatePayload);
+    if (id) {
+      query = query.eq('id', id);
+    } else {
+      query = query.eq('email', email);
+    }
+
+    const { data: updated, error } = await query.select();
+
+    if (error) {
+      console.warn("Supabase onboarding update warning:", error.message);
+    }
+
+    const userObj = updated && updated[0] ? updated[0] : {
+      id: id || Date.now(),
+      email,
+      ...updatePayload
+    };
+
+    res.json({
+      success: true,
+      message: 'Preferensi dan wilayah panen berhasil disimpan!',
+      user: {
+        ...userObj,
+        needsOnboarding: false,
+        onboarded: true
+      }
+    });
+  } catch (err) {
+    console.error('Error during onboarding:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -1144,38 +1198,55 @@ app.get('/api/marketplace/products/:id', async (req, res) => {
 // POST /api/marketplace/products - Create a new product listing (authenticated seller)
 app.post('/api/marketplace/products', async (req, res) => {
   try {
-    const { seller_id, name, category, price, unit, min_order, stock, description, grade, organic, tags, harvest_date } = req.body;
+    const { seller_id, name, category, price, unit, min_order, stock, description, grade, organic, tags, harvest_date, image_url, location } = req.body;
 
-    if (!seller_id || !name || !category || !price || !stock) {
+    if (!name || !category || !price || !stock) {
       return res.status(400).json({ success: false, error: 'Data produk tidak lengkap.' });
     }
 
-    // Get seller info
-    const { data: seller } = await supabase
-      .from('users')
-      .select('full_name, farm_location')
-      .eq('id', seller_id)
-      .single();
+    let sellerName = 'Petani Mitra TaniPintar';
+    let sellerLocation = location || 'Surabaya, Jawa Timur';
 
-    if (!seller) {
-      return res.status(404).json({ success: false, error: 'Akun penjual tidak ditemukan.' });
+    if (seller_id) {
+      const { data: seller } = await supabase
+        .from('users')
+        .select('full_name, farm_location')
+        .eq('id', seller_id)
+        .maybeSingle();
+
+      if (seller) {
+        sellerName = seller.full_name || sellerName;
+        sellerLocation = seller.farm_location || sellerLocation;
+      }
     }
+
+    const defaultImages = {
+      cabai: 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=800&q=80',
+      bawang: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80',
+      sayuran: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+      buah: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80',
+      padi: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+      rempah: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=80'
+    };
+
+    const finalImage = image_url || defaultImages[category] || defaultImages.cabai;
 
     const { data, error } = await supabase
       .from('marketplace_products')
       .insert([{
-        seller_id,
+        seller_id: seller_id || null,
         name,
         category,
         price: parseFloat(price),
         unit: unit || 'kg',
-        min_order: min_order || 50,
+        min_order: parseInt(min_order) || 50,
         stock: parseInt(stock),
-        farmer_name: seller.full_name,
-        location: seller.farm_location,
-        description: description || '',
+        farmer_name: sellerName,
+        location: sellerLocation,
+        image_url: finalImage,
+        description: description || 'Komoditas hasil panen segar langsung dari perkebunan binaan TaniPintar.',
         grade: grade || 'Grade A',
-        organic: organic || false,
+        organic: Boolean(organic),
         tags: JSON.stringify(tags || []),
         harvest_date: harvest_date || new Date().toISOString().split('T')[0],
         verified_seller: true
@@ -1184,7 +1255,7 @@ app.post('/api/marketplace/products', async (req, res) => {
       .single();
 
     if (error) throw error;
-    res.json({ success: true, message: 'Produk berhasil ditambahkan!', data });
+    res.json({ success: true, message: 'Komoditas berhasil dipasang di Marketplace!', data });
   } catch (err) {
     console.error('Error creating product:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -1194,7 +1265,7 @@ app.post('/api/marketplace/products', async (req, res) => {
 // POST /api/marketplace/orders - Place an order (authenticated buyer)
 app.post('/api/marketplace/orders', async (req, res) => {
   try {
-    const { buyer_id, product_id, quantity, shipping_address, buyer_phone, notes } = req.body;
+    const { buyer_id, product_id, quantity, shipping_address, buyer_phone, notes, payment_method } = req.body;
 
     if (!product_id || !quantity || !shipping_address) {
       return res.status(400).json({ success: false, error: 'Data pesanan tidak lengkap.' });
@@ -1223,7 +1294,6 @@ app.post('/api/marketplace/orders', async (req, res) => {
 
     let validBuyerId = null;
     if (buyer_id) {
-      // Check if user exists to prevent FK violation
       const { data: u } = await supabase.from('users').select('id').eq('id', buyer_id).maybeSingle();
       if (u) validBuyerId = u.id;
     }
@@ -1237,7 +1307,7 @@ app.post('/api/marketplace/orders', async (req, res) => {
         total_price,
         shipping_address: notes ? `${shipping_address} (HP: ${buyer_phone || '-'}, Catatan: ${notes})` : `${shipping_address} (HP: ${buyer_phone || '-'})`,
         status: 'Menunggu Konfirmasi',
-        payment_method: 'Transfer / COD'
+        payment_method: payment_method === 'cod' ? 'COD (Bayar di Tempat)' : 'Transfer Bank / QRIS'
       }])
       .select()
       .single();
@@ -1259,6 +1329,95 @@ app.post('/api/marketplace/orders', async (req, res) => {
     });
   } catch (err) {
     console.error('Error creating order:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/marketplace/orders/my-orders - Get orders for current user (both as buyer and seller)
+app.get('/api/marketplace/orders/my-orders', async (req, res) => {
+  try {
+    const { buyer_id, seller_name } = req.query;
+
+    let buyerOrders = [];
+    let sellerOrders = [];
+
+    // 1. Fetch all orders with product details
+    const { data: allOrders, error: orderErr } = await supabase
+      .from('marketplace_orders')
+      .select(`
+        *,
+        marketplace_products (
+          id, name, price, unit, category, image_url, farmer_name, location
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (orderErr) {
+      console.warn("Supabase join warning, fallback to direct query:", orderErr.message);
+      const { data: directOrders } = await supabase
+        .from('marketplace_orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      const { data: allProds } = await supabase.from('marketplace_products').select('*');
+      const prodMap = new Map((allProds || []).map(p => [p.id, p]));
+
+      const mapped = (directOrders || []).map(o => ({
+        ...o,
+        product: prodMap.get(o.product_id) || { name: 'Komoditas Panen', price: o.total_price / o.quantity, unit: 'kg' }
+      }));
+
+      buyerOrders = buyer_id ? mapped.filter(o => String(o.buyer_id) === String(buyer_id)) : mapped;
+      sellerOrders = mapped;
+    } else {
+      const mapped = (allOrders || []).map(o => ({
+        ...o,
+        product: o.marketplace_products || { name: 'Komoditas Panen', price: o.total_price / o.quantity, unit: 'kg' }
+      }));
+
+      buyerOrders = buyer_id ? mapped.filter(o => String(o.buyer_id) === String(buyer_id)) : mapped;
+      sellerOrders = mapped;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        buyerOrders: buyerOrders || [],
+        sellerOrders: sellerOrders || []
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching my orders:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// PATCH /api/marketplace/orders/:id/status - Update order fulfillment status
+app.patch('/api/marketplace/orders/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, error: 'Status pesanan wajib disertakan.' });
+    }
+
+    const { data, error } = await supabase
+      .from('marketplace_orders')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      message: `Status pesanan #${id} berhasil diubah menjadi: ${status}`,
+      data
+    });
+  } catch (err) {
+    console.error('Error updating order status:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });

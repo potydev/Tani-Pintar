@@ -139,12 +139,20 @@ export function CheckoutPage({ isLoggedIn }) {
             </div>
           </div>
 
-          <Link
-            to="/marketplace"
-            className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl transition-all shadow-md block text-center"
-          >
-            Kembali ke Marketplace
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2.5">
+            <Link
+              to="/dashboard"
+              className="flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl transition-all shadow-md block text-center"
+            >
+              📦 Lacak di Pesanan Saya
+            </Link>
+            <Link
+              to="/marketplace"
+              className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all block text-center"
+            >
+              Belanja Lagi
+            </Link>
+          </div>
         </div>
       </div>
     );

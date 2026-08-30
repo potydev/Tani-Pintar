@@ -99,7 +99,7 @@ export function LoginPage({ onLoginSuccess }) {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#121212]" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
       
-      {/* Left Column — Dark Green Branding & Impact Panel (Exact Photo 2 Match) */}
+      {/* Left Column — Dark Green Branding & Impact Panel */}
       <div className="bg-[#081f13] p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
         {/* Brand Logo */}
         <div className="relative z-10">
@@ -113,37 +113,40 @@ export function LoginPage({ onLoginSuccess }) {
 
         {/* Middle Main Headline & Stats */}
         <div className="relative z-10 my-10 max-w-md">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 border border-emerald-500/30">
+            <span>✨ AI Intelligence &amp; Marketplace Tani</span>
+          </div>
           <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4">
-            Jual panen di waktu dan tempat yang tepat
+            Ekosistem Cerdas Jual-Beli Hasil Panen
           </h1>
           <p className="text-emerald-100/70 text-sm sm:text-base leading-relaxed mb-12">
-            AI kami memantau harga dan permintaan di 34 kota setiap hari untuk petani binaan.
+            Pantau pergerakan harga komoditas di seluruh Indonesia, prediksi tren panen dengan AI, dan beli komoditas langsung dari petani binaan.
           </p>
 
           <div className="grid grid-cols-2 gap-8">
             <div>
               <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">12.450+</div>
-              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Petani terhubung</div>
+              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Petani &amp; Pembeli Terhubung</div>
             </div>
             <div>
-              <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">9.2%</div>
-              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Rata-rata profit tambahan</div>
+              <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">38</div>
+              <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Provinsi Terpantau BI PIHPS</div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Social Proof / Farmer Quote */}
+        {/* Bottom Social Proof */}
         <div className="relative z-10 pt-6 border-t border-emerald-800/40">
-          <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed mb-2 font-medium">
-            &ldquo;Sejak pakai TaniPintar, saya jadi tahu kapan harga cabai lagi bagus di kota lain.&rdquo;
+          <p className="text-emerald-100/90 text-sm leading-relaxed mb-2 font-medium">
+            &ldquo;Satu akun untuk semua: pantau harga AI, jual panen ke luar kota, atau belanja hasil tani berkualitas.&rdquo;
           </p>
           <div className="text-emerald-400 text-xs font-semibold">
-            Pak Slamet, petani cabai, Cianjur
+            TaniPintar Integrated Hub
           </div>
         </div>
       </div>
 
-      {/* Right Column — Form Panel (Exact Photo 2 Match) */}
+      {/* Right Column — Form Panel */}
       <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center max-w-md mx-auto w-full">
         
         {/* Header Title */}
@@ -153,8 +156,8 @@ export function LoginPage({ onLoginSuccess }) {
           </h2>
           <p className="text-slate-400 text-sm">
             {mode === "login"
-              ? "Masuk untuk lihat rekomendasi jual panen terbaru."
-              : "Buat akun baru untuk mulai mengakses platform TaniPintar."}
+              ? "Masuk untuk akses Dashboard Analisis AI & Marketplace."
+              : "Daftar cepat dalam 1 langkah untuk mulai bertransaksi atau menganalisis pasar."}
           </p>
         </div>
 
@@ -165,15 +168,16 @@ export function LoginPage({ onLoginSuccess }) {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "register" && (
             <div>
               <label className="block text-slate-300 text-xs font-semibold mb-2">Nama Lengkap</label>
               <input
                 type="text"
+                required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Masukkan nama lengkap"
+                placeholder="Contoh: Budi Santoso"
                 className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
@@ -192,13 +196,13 @@ export function LoginPage({ onLoginSuccess }) {
           </div>
 
           <div>
-            <label className="block text-slate-300 text-xs font-semibold mb-2">Kata sandi</label>
+            <label className="block text-slate-300 text-xs font-semibold mb-2">Kata Sandi</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan kata sandi"
+              placeholder="Minimal 6 karakter"
               className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
             />
             {mode === "login" && (
@@ -214,52 +218,13 @@ export function LoginPage({ onLoginSuccess }) {
             )}
           </div>
 
-          {mode === "register" && (
-            <>
-              <div>
-                <label className="block text-slate-300 text-xs font-semibold mb-2">Wilayah Panen (Lokasi Asal)</label>
-                <select
-                  value={farmLocation}
-                  onChange={(e) => setFarmLocation(e.target.value)}
-                  className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
-                >
-                  <option value="Cilacap, Jateng">Cilacap, Jawa Tengah</option>
-                  <option value="Brebes, Jateng">Brebes, Jawa Tengah</option>
-                  <option value="Bandung, Jabar">Bandung, Jawa Barat</option>
-                  <option value="Garut, Jabar">Garut, Jawa Barat</option>
-                  <option value="Surabaya, Jatim">Surabaya, Jawa Timur</option>
-                  <option value="Malang, Jatim">Malang, Jawa Timur</option>
-                  <option value="Medan, Sumut">Medan, Sumatera Utara</option>
-                  <option value="Bandar Lampung, Lampung">Bandar Lampung, Lampung</option>
-                  <option value="Makassar, Sulsel">Makassar, Sulawesi Selatan</option>
-                  <option value="Denpasar, Bali">Denpasar, Bali</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-xs font-semibold mb-2">Komoditas Panen Utama</label>
-                <select
-                  value={primaryCommodity}
-                  onChange={(e) => setPrimaryCommodity(e.target.value)}
-                  className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
-                >
-                  <option value="Cabai Merah Besar">Cabai Merah Besar</option>
-                  <option value="Cabai Rawit Merah">Cabai Rawit Merah</option>
-                  <option value="Bawang Merah">Bawang Merah</option>
-                  <option value="Beras Kualitas Medium">Beras Kualitas Medium</option>
-                  <option value="Minyak Goreng Curah">Minyak Goreng Curah</option>
-                </select>
-              </div>
-            </>
-          )}
-
           {/* Primary Submit Button */}
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-[#10b981] hover:bg-[#059669] text-slate-950 font-extrabold text-sm py-3.5 rounded-xl transition-all shadow-md mt-2"
           >
-            {loading ? "Memproses..." : mode === "login" ? "Masuk sekarang" : "Daftar sekarang"}
+            {loading ? "Memproses..." : mode === "login" ? "Masuk sekarang" : "Daftar Akun Sekarang"}
           </button>
         </form>
 

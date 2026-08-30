@@ -13,10 +13,13 @@ import {
   LogOut,
   Sparkles,
   ShieldCheck,
-  TrendingUp
+  TrendingUp,
+  ShoppingBag,
+  PlusCircle,
+  Package
 } from "lucide-react";
 
-export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, user }) {
+export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, onOpenSellProduct, user }) {
   const menuGroups = [
     {
       title: "Keputusan Penjualan AI",
@@ -26,6 +29,14 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
         { id: "pembeli", label: "Pasar Induk", icon: Building2 },
         { id: "rekomendasi", label: "Rekomendasi Batas Harga", icon: Tag },
         { id: "hitung", label: "Hitung Keuntungan", icon: Calculator },
+      ]
+    },
+    {
+      title: "Marketplace & Toko",
+      items: [
+        { id: "marketplace_view", label: "Jelajah Marketplace", icon: ShoppingBag, badge: "Beli" },
+        { id: "sell_product", label: "Mulai Menjual (Pasang Panen)", icon: PlusCircle, badge: "Jual" },
+        { id: "orders", label: "Kelola Pesanan", icon: Package }
       ]
     },
     {
