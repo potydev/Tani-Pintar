@@ -202,7 +202,7 @@ Gaya Komunikasi:
 // Auth API - Register via Supabase PostgreSQL (Full Farmer Account)
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, full_name, phone, farm_location, primary_commodity, land_size } = req.body;
+    const { email, password, full_name, farm_location, primary_commodity, land_size } = req.body;
     if (!email || !password || !full_name) {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
@@ -227,9 +227,6 @@ app.post('/api/auth/register', async (req, res) => {
         email,
         password,
         full_name,
-        phone: phone || '',
-        role: 'farmer',
-        is_seller: true,
         farm_location: loc,
         primary_commodity: comm,
         land_size: land,
@@ -237,20 +234,25 @@ app.post('/api/auth/register', async (req, res) => {
       }])
       .select();
 
-    const user = (newUser && newUser[0]) ? newUser[0] : {
-      id: Date.now(),
-      email,
-      full_name,
-      phone: phone || '',
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+
+    const created = newUser && newUser[0] ? newUser[0] : {};
+    const user = {
+      id: created.id || Date.now(),
+      email: created.email || email,
+      full_name: created.full_name || full_name,
       role: 'farmer',
       is_seller: true,
-      farm_location: loc,
-      primary_commodity: comm,
-      land_size: land,
-      avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
+      farm_location: created.farm_location || loc,
+      primary_commodity: created.primary_commodity || comm,
+      land_size: created.land_size || land,
+      avatar_url: created.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     };
 
-    res.json({ success: true, message: 'Pendaftaran akun petani TaniPintar berhasil!', user });
+    res.json({ success: true, message: 'Pendaftaran berhasil! Selamat datang di TaniPintar.', user });
   } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).json({ success: false, error: err.message });

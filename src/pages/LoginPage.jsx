@@ -12,6 +12,8 @@ export function LoginPage({ onLoginSuccess }) {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [farmLocation, setFarmLocation] = useState("Cilacap, Jateng");
+  const [primaryCommodity, setPrimaryCommodity] = useState("Cabai Merah Besar");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +56,7 @@ export function LoginPage({ onLoginSuccess }) {
     try {
       const endpoint = mode === "register" ? "/api/auth/register" : "/api/auth/login";
       const payload = mode === "register"
-        ? { email, password, full_name: fullName, phone }
+        ? { email, password, full_name: fullName, farm_location: farmLocation, primary_commodity: primaryCommodity, land_size: "1.5 Hektar" }
         : { email, password };
 
       const res = await fetch(endpoint, {
@@ -213,16 +215,42 @@ export function LoginPage({ onLoginSuccess }) {
           </div>
 
           {mode === "register" && (
-            <div>
-              <label className="block text-slate-300 text-xs font-semibold mb-2">Nomor HP / WhatsApp</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="081234567890"
-                className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-slate-300 text-xs font-semibold mb-2">Wilayah Panen (Lokasi Asal)</label>
+                <select
+                  value={farmLocation}
+                  onChange={(e) => setFarmLocation(e.target.value)}
+                  className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+                >
+                  <option value="Cilacap, Jateng">Cilacap, Jawa Tengah</option>
+                  <option value="Brebes, Jateng">Brebes, Jawa Tengah</option>
+                  <option value="Bandung, Jabar">Bandung, Jawa Barat</option>
+                  <option value="Garut, Jabar">Garut, Jawa Barat</option>
+                  <option value="Surabaya, Jatim">Surabaya, Jawa Timur</option>
+                  <option value="Malang, Jatim">Malang, Jawa Timur</option>
+                  <option value="Medan, Sumut">Medan, Sumatera Utara</option>
+                  <option value="Bandar Lampung, Lampung">Bandar Lampung, Lampung</option>
+                  <option value="Makassar, Sulsel">Makassar, Sulawesi Selatan</option>
+                  <option value="Denpasar, Bali">Denpasar, Bali</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-xs font-semibold mb-2">Komoditas Panen Utama</label>
+                <select
+                  value={primaryCommodity}
+                  onChange={(e) => setPrimaryCommodity(e.target.value)}
+                  className="w-full bg-[#1c1c1c] border border-slate-700/80 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+                >
+                  <option value="Cabai Merah Besar">Cabai Merah Besar</option>
+                  <option value="Cabai Rawit Merah">Cabai Rawit Merah</option>
+                  <option value="Bawang Merah">Bawang Merah</option>
+                  <option value="Beras Kualitas Medium">Beras Kualitas Medium</option>
+                  <option value="Minyak Goreng Curah">Minyak Goreng Curah</option>
+                </select>
+              </div>
+            </>
           )}
 
           {/* Primary Submit Button */}
