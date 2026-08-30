@@ -67,7 +67,7 @@ export function DashboardPage({ name, onLogout }) {
   };
 
   const displayName = user?.full_name || name || "Pak Joko Slamet";
-  const isVerifiedFarmer = user?.role === "verified_farmer" || Boolean(user?.is_seller);
+  const isVerifiedFarmer = true; // Full access for all registered and exploring farmers
 
   const renderContent = () => {
     switch (activeTab) {
@@ -88,7 +88,7 @@ export function DashboardPage({ name, onLogout }) {
         return (
           <>
             {/* Horizontal Metric Cards (5 Cards) */}
-            <MetricCardsGrid originLocation={selectedLocation} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+            <MetricCardsGrid originLocation={selectedLocation} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
             {/* Main Content Grid: Left Analysis & Right Assistant */}
             <div className="grid lg:grid-cols-12 gap-6">
@@ -107,15 +107,15 @@ export function DashboardPage({ name, onLogout }) {
                 </div>
 
                 {/* Featured AI Recommendation */}
-                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
                 {/* Compact AI Recommendations */}
-                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
                 {/* 3 Panels Analytics Row */}
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
-                  <DemandRegionPanel isVerifiedFarmer={isVerifiedFarmer} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                  <DemandRegionPanel isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
                 </div>
 
                 {/* Supply Status Card */}
@@ -124,7 +124,7 @@ export function DashboardPage({ name, onLogout }) {
 
               {/* Right Column (4 Cols): AI Chat Assistant & Recent Orders */}
               <div className="lg:col-span-4 flex flex-col justify-between">
-                <AIAssistantChatPanel name={displayName} />
+                <AIAssistantChatPanel name={displayName} user={user} location={selectedLocation} />
                 <RecentOrdersPanel />
               </div>
             </div>

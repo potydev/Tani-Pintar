@@ -11,40 +11,30 @@ import {
   Database,
   MapPin,
   LogOut,
-  Lock,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  TrendingUp
 } from "lucide-react";
 
-export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, onOpenUpgrade, user }) {
-  const isVerifiedFarmer = user?.role === "verified_farmer" || user?.is_seller;
-
+export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, user }) {
   const menuGroups = [
     {
       title: "Keputusan Penjualan AI",
       items: [
-        { id: "peluang", label: "Peluang Penjualan", icon: Target, requiresFarmer: true },
-        { id: "prediksi", label: "Prediksi Harga", icon: LineChartIcon, requiresFarmer: true },
-        { id: "pembeli", label: "Pasar Induk", icon: Building2, requiresFarmer: false },
-        { id: "rekomendasi", label: "Rekomendasi Harga", icon: Tag, requiresFarmer: true },
-        { id: "hitung", label: "Hitung Keuntungan", icon: Calculator, requiresFarmer: false },
+        { id: "peluang", label: "Peluang Penjualan", icon: Target },
+        { id: "prediksi", label: "Prediksi Harga", icon: LineChartIcon },
+        { id: "pembeli", label: "Pasar Induk", icon: Building2 },
+        { id: "rekomendasi", label: "Rekomendasi Batas Harga", icon: Tag },
+        { id: "hitung", label: "Hitung Keuntungan", icon: Calculator },
       ]
     },
     {
       title: "Data & Analytics",
       items: [
-        { id: "analytics", label: "Market Analytics", icon: BarChart3, requiresFarmer: false }
+        { id: "analytics", label: "Market Analytics", icon: BarChart3 }
       ]
     }
   ];
-
-  const handleTabClick = (item) => {
-    if (item.requiresFarmer && !isVerifiedFarmer) {
-      if (onOpenUpgrade) onOpenUpgrade();
-      return;
-    }
-    setActiveTab(item.id);
-  };
 
   return (
     <aside className="w-72 shrink-0 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 overflow-y-auto tp-scrollbar">
@@ -83,24 +73,16 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
             <div className="pl-9 text-[11px] text-slate-400 font-medium mt-1">Ringkasan &amp; Peluang</div>
           </div>
 
-          {/* Progressive Upgrade Banner for Buyer Roles */}
-          {!isVerifiedFarmer && user && (
-            <div className="p-3 bg-gradient-to-br from-emerald-900 to-slate-900 rounded-2xl text-white space-y-2 border border-emerald-800 shadow-md">
-              <div className="flex items-center justify-between text-xs font-bold text-emerald-300">
-                <span className="flex items-center gap-1.5"><Sparkles size={14} /> Progressive Onboarding</span>
-                <span className="text-[9px] bg-emerald-500/30 border border-emerald-400/30 px-1.5 py-0.5 rounded">GRATIS</span>
-              </div>
-              <p className="text-[11px] text-slate-200 leading-snug">
-                Daftarkan komoditas Anda untuk membuka analitik AI TaniPintar &amp; badge Petani Terverifikasi.
-              </p>
-              <button
-                onClick={onOpenUpgrade}
-                className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-1"
-              >
-                <span>Daftar Jadi Petani</span> &rarr;
-              </button>
+          {/* Active AI Status Card */}
+          <div className="p-3.5 bg-gradient-to-br from-emerald-800 to-teal-900 rounded-2xl text-white space-y-2 shadow-sm border border-emerald-700/50">
+            <div className="flex items-center justify-between text-xs font-bold text-emerald-200">
+              <span className="flex items-center gap-1.5"><Sparkles size={14} className="text-yellow-400" /> AI Engine Aktif</span>
+              <span className="text-[9px] bg-emerald-500/30 border border-emerald-400/40 px-1.5 py-0.5 rounded font-extrabold text-emerald-100">LIVE</span>
             </div>
-          )}
+            <p className="text-[11px] text-emerald-100/90 leading-snug">
+              Analisis harga real-time &amp; proyeksi panen aktif untuk wilayah Anda.
+            </p>
+          </div>
 
           {/* Dynamic Menu Groups */}
           {menuGroups.map((group, gIdx) => (
@@ -109,27 +91,18 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                 <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                   {group.title}
                 </span>
-                {gIdx === 0 && !isVerifiedFarmer && (
-                  <span className="text-[9px] text-slate-400 font-medium italic">
-                    Publik &amp; Personal
-                  </span>
-                )}
               </div>
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
-                  const isLocked = item.requiresFarmer && !isVerifiedFarmer;
 
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleTabClick(item)}
-                      title={isLocked ? "Fitur ini personal untuk petani terverifikasi (berdasarkan lokasi & komoditas Anda)" : item.label}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors relative group/item ${isActive
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
                         ? "bg-emerald-50 text-emerald-800 font-bold border-r-2 border-emerald-600"
-                        : isLocked
-                        ? "text-slate-400 hover:bg-slate-50"
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                     >
@@ -137,22 +110,6 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                         <Icon size={16} className={isActive ? "text-emerald-700" : "text-slate-400"} />
                         <span>{item.label}</span>
                       </div>
-                      {isLocked ? (
-                        <div className="relative group/tooltip flex items-center">
-                          <div className="flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                            <Lock size={10} />
-                            <span>Upgrade</span>
-                          </div>
-                          {/* Hover Tooltip explaining gating rationale */}
-                          <div className="absolute right-0 bottom-full mb-1.5 hidden group-hover/tooltip:block group-hover/item:block w-48 p-2 bg-slate-900 text-white text-[10px] font-normal rounded-lg shadow-xl z-50 leading-tight text-left">
-                            🔒 <strong>Fitur Personal Petani</strong>: Memerlukan lokasi panen &amp; komoditas terverifikasi.
-                          </div>
-                        </div>
-                      ) : !item.requiresFarmer && !isVerifiedFarmer ? (
-                        <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                          Publik
-                        </span>
-                      ) : null}
                     </button>
                   );
                 })}
@@ -176,7 +133,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                 <span className="text-emerald-700 font-medium">Update bulanan</span>
               </div>
               <div className="flex justify-between">
-                <span>Data Transaksi TaniPintar</span>
+                <span>Gemini AI Predictive</span>
                 <span className="text-emerald-700 font-medium">Real-time</span>
               </div>
             </div>
@@ -202,14 +159,8 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                 {user?.full_name || name}
               </div>
               <div className="text-[11px] font-semibold text-emerald-800 flex items-center gap-1">
-                {isVerifiedFarmer ? (
-                  <>
-                    <ShieldCheck size={12} className="text-emerald-600" />
-                    <span>{user?.primary_commodity || "Petani Cabai"}</span>
-                  </>
-                ) : (
-                  <span className="text-slate-500 font-normal">Akun Pembeli</span>
-                )}
+                <ShieldCheck size={12} className="text-emerald-600" />
+                <span>{user?.primary_commodity || "Petani Cabai"}</span>
               </div>
               <div className="text-[10px] text-slate-400 flex items-center gap-0.5 mt-0.5">
                 <MapPin size={10} /> {user?.farm_location || "Cilacap, Jawa Tengah"}
@@ -228,4 +179,5 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
     </aside>
   );
 }
+
 

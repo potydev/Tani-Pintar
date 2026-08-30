@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { DEMAND_REGION_DATA } from "../../data/mockData";
 import { fetchRegionalDemand } from "../../utils/apiData";
-import { TeaserCardOverlay } from "./TeaserCardOverlay";
 
-export function DemandRegionPanel({ isVerifiedFarmer, onOpenUpgrade }) {
+export function DemandRegionPanel() {
   const [demandData, setDemandData] = useState(DEMAND_REGION_DATA);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +12,6 @@ export function DemandRegionPanel({ isVerifiedFarmer, onOpenUpgrade }) {
       setLoading(true);
       const data = await fetchRegionalDemand();
       if (isMounted && data && data.length > 0) {
-        // Show top 5 and compute relative bar width
         const top5 = data.slice(0, 5);
         const maxPrice = Math.max(...top5.map(d => d.price));
         const normalized = top5.map(d => ({
@@ -29,21 +27,19 @@ export function DemandRegionPanel({ isVerifiedFarmer, onOpenUpgrade }) {
   }, []);
 
   return (
-    <div className="tp-card p-5 relative overflow-hidden flex flex-col justify-between">
+    <div className="tp-card p-5 relative overflow-hidden flex flex-col justify-between shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h4 className="font-heading font-bold text-slate-900 text-sm">Permintaan per Wilayah</h4>
           <div className="text-[11px] text-slate-400">Harga & tren real-time dari Supabase</div>
         </div>
-        <span className="text-[11px] font-medium text-emerald-800 bg-emerald-100 px-2 py-1 rounded">
+        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
           Live
         </span>
       </div>
 
       <div className="relative min-h-[160px] flex-1">
-        <div className={`space-y-3 transition-all ${
-          !isVerifiedFarmer ? "select-none blur-[5px] opacity-40 pointer-events-none" : ""
-        }`}>
+        <div className="space-y-3">
           {loading ? (
             <div className="text-xs text-slate-400 text-center py-4">Memuat data pasar...</div>
           ) : (
@@ -52,11 +48,13 @@ export function DemandRegionPanel({ isVerifiedFarmer, onOpenUpgrade }) {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-800">{item.city}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-700">
-                      {isVerifiedFarmer ? `Rp ${Number(item.price).toLocaleString('id-ID')}` : 'Rp •••••'}
+                    <span className="text-[11px] font-bold text-slate-700">
+                      Rp {Number(item.price).toLocaleString('id-ID')}
                     </span>
-                    <span className={`font-semibold text-[10px] ${item.status === 'Tinggi' ? 'text-emerald-700' : item.status === 'Sedang' ? 'text-amber-700' : 'text-rose-600'}`}>
-                      {isVerifiedFarmer ? item.percent : '+••%'}
+                    <span className={`font-bold text-[10px] px-1.5 py-0.5 rounded ${
+                      item.status === 'Tinggi' ? 'text-emerald-800 bg-emerald-100' : item.status === 'Sedang' ? 'text-amber-800 bg-amber-100' : 'text-rose-800 bg-rose-100'
+                    }`}>
+                      {item.percent}
                     </span>
                   </div>
                 </div>
@@ -70,26 +68,10 @@ export function DemandRegionPanel({ isVerifiedFarmer, onOpenUpgrade }) {
             ))
           )}
         </div>
-
-        {!isVerifiedFarmer && (
-          <TeaserCardOverlay
-            onOpenUpgrade={onOpenUpgrade}
-            title="Data Permintaan Wilayah Terkunci"
-            description="Buka indikator permintaan & harga komoditas per provinsi."
-          />
-        )}
-      </div>
-
-      <div className="mt-4 pt-3 border-t border-slate-100 text-right">
-        <button
-          onClick={() => !isVerifiedFarmer && onOpenUpgrade && onOpenUpgrade()}
-          className="font-bold text-emerald-700 hover:text-emerald-800 text-xs inline-flex items-center gap-1"
-        >
-          Lihat Semua Wilayah &rarr;
-        </button>
       </div>
     </div>
   );
 }
+
 
 

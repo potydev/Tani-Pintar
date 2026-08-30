@@ -90,10 +90,119 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'TaniPintar API Server is running', timestamp: new Date() });
 });
 
-// Auth API - Register via Supabase PostgreSQL (Basic Account Signup)
+// Google Gemini AI Assistant Integration
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBo4EfCgLjH5EDbRFkpxOJUm9sqDNDyBZQ';
+
+async function generateGeminiAIResponse(prompt, systemInstruction = '', history = []) {
+  const models = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+  
+  const contents = [];
+  
+  // Add conversation history if available
+  if (Array.isArray(history) && history.length > 0) {
+    for (const h of history.slice(-6)) {
+      contents.push({
+        role: h.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: h.text }]
+      });
+    }
+  }
+  
+  // Add current user prompt
+  contents.push({
+    role: 'user',
+    parts: [{ text: prompt }]
+  });
+
+  const payload = {
+    contents,
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.95,
+      maxOutputTokens: 1200
+    }
+  };
+
+  if (systemInstruction) {
+    payload.systemInstruction = {
+      parts: [{ text: systemInstruction }]
+    };
+  }
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        return {
+          text: data.candidates[0].content.parts[0].text,
+          model: model
+        };
+      }
+      console.log(`[Gemini API Warning] Model ${model} returned:`, data.error?.message || 'Empty response');
+    } catch (err) {
+      console.error(`[Gemini API Error] Model ${model} failed:`, err.message);
+    }
+  }
+
+  throw new Error('Semua model Gemini sedang sibuk. Silakan coba kembali sesaat lagi.');
+}
+
+// AI Chatbot Assistant Endpoint
+app.post('/api/ai/chat', async (req, res) => {
+  try {
+    const { message, history = [], userContext = {} } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ success: false, error: 'Pesan pertanyaan tidak boleh kosong.' });
+    }
+
+    const commodity = userContext.commodity || 'Cabai Merah';
+    const location = userContext.location || 'Cilacap, Jawa Tengah';
+    const userName = userContext.userName || 'Petani Hebat';
+
+    // System instruction enriched with domain expertise
+    const systemPrompt = `Anda adalah "TaniBot", asisten AI pintar dari platform TaniPintar (AI Market Intelligence untuk Petani & Agribisnis Indonesia).
+Tujuan utama Anda: Membantu petani mengambil keputusan terbaik tentang:
+1. Kapan waktu panen/jual terbaik (prediksi tren harga pasar BI PIHPS).
+2. Ke mana lokasi/kota pasar tujuan pengiriman terbaik dengan selisih margin keuntungan tertinggi (arbitrase pasar antar provinsi).
+3. Berapa estimasi batas harga jual yang wajar dan strategi tawar-menawar dengan pedagang/pasar induk.
+4. Tips logistik, penanganan pasca-panen (grading, packing cabai/bawang/sayur), dan manajemen biaya operasional.
+
+Profil Pengguna saat ini:
+- Nama: ${userName}
+- Lokasi Panen Asal: ${location}
+- Komoditas Utama: ${commodity}
+
+Gaya Komunikasi:
+- Ramah, praktis, empatik, berbahasa Indonesia yang santun dan mudah dipahami petani.
+- Berikan angka estimasi konkret (dalam Rupiah) jika relevan.
+- Gunakan format markdown bersih (bullet points, bold) agar nyaman dibaca.`;
+
+    const aiResult = await generateGeminiAIResponse(message, systemPrompt, history);
+    res.json({
+      success: true,
+      reply: aiResult.text,
+      model: aiResult.model
+    });
+  } catch (err) {
+    console.error('Error in /api/ai/chat:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Terjadi kesalahan pada layanan AI TaniBot.'
+    });
+  }
+});
+
+// Auth API - Register via Supabase PostgreSQL (Full Farmer Account)
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, full_name, phone } = req.body;
+    const { email, password, full_name, phone, farm_location, primary_commodity, land_size } = req.body;
     if (!email || !password || !full_name) {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
@@ -108,6 +217,10 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan masuk ke akun Anda.' });
     }
 
+    const loc = farm_location || 'Cilacap, Jawa Tengah';
+    const comm = primary_commodity || 'Cabai Merah Besar';
+    const land = land_size || '1.5 Hektar';
+
     const { data: newUser, error } = await supabase
       .from('users')
       .insert([{
@@ -115,8 +228,11 @@ app.post('/api/auth/register', async (req, res) => {
         password,
         full_name,
         phone: phone || '',
-        role: 'buyer',
-        is_seller: false,
+        role: 'farmer',
+        is_seller: true,
+        farm_location: loc,
+        primary_commodity: comm,
+        land_size: land,
         avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
       }])
       .select();
@@ -126,12 +242,15 @@ app.post('/api/auth/register', async (req, res) => {
       email,
       full_name,
       phone: phone || '',
-      role: 'buyer',
-      is_seller: false,
+      role: 'farmer',
+      is_seller: true,
+      farm_location: loc,
+      primary_commodity: comm,
+      land_size: land,
       avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     };
 
-    res.json({ success: true, message: 'Registrasi akun dasar berhasil!', user });
+    res.json({ success: true, message: 'Pendaftaran akun petani TaniPintar berhasil!', user });
   } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -374,8 +493,8 @@ app.post('/api/auth/login', async (req, res) => {
       id: u.id,
       email: u.email,
       full_name: u.full_name,
-      role: u.role || (u.is_seller ? 'verified_farmer' : 'buyer'),
-      is_seller: u.is_seller || u.role === 'verified_farmer',
+      role: u.role || 'farmer',
+      is_seller: u.is_seller !== undefined ? u.is_seller : true,
       farm_location: u.farm_location || 'Cilacap, Jawa Tengah',
       primary_commodity: u.primary_commodity || 'Cabai Merah Besar',
       land_size: u.land_size || '1.5 Hektar',

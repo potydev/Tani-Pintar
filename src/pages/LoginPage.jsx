@@ -25,8 +25,11 @@ export function LoginPage({ onLoginSuccess }) {
       id: 1,
       full_name: "Pak Joko Slamet",
       email: "joko.slamet@tanipintar.id",
-      role: "buyer",
-      phone: "081234567890"
+      role: "farmer",
+      phone: "081234567890",
+      farm_location: "Cilacap, Jawa Tengah",
+      primary_commodity: "Cabai Merah Besar",
+      land_size: "1.5 Hektar"
     };
     localStorage.setItem("tanipintar_user", JSON.stringify(demoUser));
     if (onLoginSuccess) onLoginSuccess(demoUser);

@@ -3,7 +3,7 @@ import { Target, TrendingUp, Globe, Wallet, Building2, Loader2 } from "lucide-re
 
 const ICON_MAP = { Target, TrendingUp, Globe, Wallet, Building2 };
 
-export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerifiedFarmer, onOpenUpgrade }) {
+export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,23 +51,23 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerified
             title: "Permintaan Tertinggi",
             value: topDemand?.city || "Kalimantan Selatan",
             unit: "",
-            change: topDemand ? `${topDemand.percent} vs kemarin` : "Data real-time",
+            change: topDemand ? `${topDemand.percent} vs kemarin` : "Permintaan Pasar Tinggi",
             iconName: "Globe",
             iconBg: "#FFEDD5",
             iconColor: "#EA580C"
           },
           {
             title: "Estimasi Keuntungan",
-            value: isVerifiedFarmer ? "Rp 12.450.000" : "Rp ••••••",
+            value: "Rp 14.850.000",
             unit: "",
-            change: isVerifiedFarmer ? `Jika jual dari ${originLocation.split(',')[0]}` : "🔒 Khusus Petani",
+            change: `Rute dari ${originLocation.split(',')[0]} (500kg)`,
             iconName: "Wallet",
             iconBg: "#DBEAFE",
             iconColor: "#2563EB"
           },
           {
             title: "Tanggal Data Terbaru",
-            value: datesData?.data?.[0]?.date || "2026-08-23",
+            value: datesData?.data?.[0]?.date || "2026-08-28",
             unit: "",
             change: latestDate,
             iconName: "Target",
@@ -83,15 +83,15 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerified
       }
     }
     fetchMetrics();
-  }, [originLocation, isVerifiedFarmer]);
+  }, [originLocation]);
 
   // Default static fallback
   const defaultMetrics = [
-    { title: "Peluang Aktif Hari Ini", value: "3", unit: "peluang", change: "↑ 2 dari kemarin", iconName: "Target", iconBg: "#DCFCE7", iconColor: "#16A34A" },
-    { title: "Prediksi Harga (5 Hari)", value: "↑ 6.2%", unit: "", change: "Cabai Merah", iconName: "TrendingUp", iconBg: "#F3E8FF", iconColor: "#7C3AED" },
-    { title: "Permintaan Tinggi", value: "Bandung", unit: "", change: "↑ 18% dari kemarin", iconName: "Globe", iconBg: "#FFEDD5", iconColor: "#EA580C" },
-    { title: "Estimasi Keuntungan", value: isVerifiedFarmer ? "Rp 12.450.000" : "Rp ••••••", unit: "", change: isVerifiedFarmer ? "Jika jual ke Bandung" : "🔒 Khusus Petani", iconName: "Wallet", iconBg: "#DBEAFE", iconColor: "#2563EB" },
-    { title: "Pasar Terpantau", value: "38", unit: "provinsi", change: "Live Data BI PIHPS", iconName: "Building2", iconBg: "#DCFCE7", iconColor: "#16A34A" }
+    { title: "Pasar Terpantau", value: "38", unit: "provinsi", change: "Live Data BI PIHPS", iconName: "Building2", iconBg: "#DCFCE7", iconColor: "#16A34A" },
+    { title: "Harga Rata-rata Nasional", value: "Rp 50.900", unit: "", change: "Cabai Merah", iconName: "TrendingUp", iconBg: "#F3E8FF", iconColor: "#7C3AED" },
+    { title: "Permintaan Tertinggi", value: "Kalimantan Selatan", unit: "", change: "↑ 18% dari kemarin", iconName: "Globe", iconBg: "#FFEDD5", iconColor: "#EA580C" },
+    { title: "Estimasi Keuntungan", value: "Rp 14.850.000", unit: "", change: `Rute dari ${originLocation.split(',')[0]}`, iconName: "Wallet", iconBg: "#DBEAFE", iconColor: "#2563EB" },
+    { title: "Tanggal Data Terbaru", value: "2026-08-28", unit: "", change: "Data Terupdate", iconName: "Target", iconBg: "#DCFCE7", iconColor: "#16A34A" }
   ];
 
   const displayMetrics = metrics || defaultMetrics;
@@ -115,14 +115,7 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerified
         return (
           <div
             key={idx}
-            onClick={() => {
-              if (item.title.includes("Estimasi Keuntungan") && !isVerifiedFarmer && onOpenUpgrade) {
-                onOpenUpgrade();
-              }
-            }}
-            className={`tp-card p-4 flex flex-col justify-between ${
-              item.title.includes("Estimasi Keuntungan") && !isVerifiedFarmer ? "cursor-pointer hover:border-emerald-300" : ""
-            }`}
+            className="tp-card p-4 flex flex-col justify-between hover:shadow-sm hover:border-emerald-300 transition-all"
           >
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -147,3 +140,4 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng", isVerified
     </div>
   );
 }
+

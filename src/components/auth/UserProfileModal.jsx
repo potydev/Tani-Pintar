@@ -65,49 +65,26 @@ export function UserProfileModal({ isOpen, onClose, user, onLogout, onOpenUpgrad
               <span className="font-bold text-slate-800">{user.email || "-"}</span>
             </div>
 
-            {isVerifiedFarmer ? (
-              <>
-                <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium">
-                    <MapPin size={14} className="text-emerald-600" /> Wilayah Panen
-                  </span>
-                  <span className="font-bold text-slate-800">{user.farm_location || "Cilacap, Jawa Tengah"}</span>
-                </div>
+            <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60">
+              <span className="text-slate-500 flex items-center gap-2 font-medium">
+                <MapPin size={14} className="text-emerald-600" /> Wilayah Panen
+              </span>
+              <span className="font-bold text-slate-800">{user.farm_location || "Cilacap, Jawa Tengah"}</span>
+            </div>
 
-                <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium">
-                    <Sprout size={14} className="text-emerald-600" /> Komoditas Utama
-                  </span>
-                  <span className="font-bold text-slate-800">{user.primary_commodity || "Cabai Merah Besar"}</span>
-                </div>
+            <div className="flex items-center justify-between text-xs py-1 border-b border-slate-200/60">
+              <span className="text-slate-500 flex items-center gap-2 font-medium">
+                <Sprout size={14} className="text-emerald-600" /> Komoditas Utama
+              </span>
+              <span className="font-bold text-slate-800">{user.primary_commodity || "Cabai Merah Besar"}</span>
+            </div>
 
-                <div className="flex items-center justify-between text-xs py-1">
-                  <span className="text-slate-500 flex items-center gap-2 font-medium">
-                    <ShieldCheck size={14} className="text-emerald-600" /> Luas Lahan
-                  </span>
-                  <span className="font-bold text-slate-800">{user.land_size || "1.5 Hektar"}</span>
-                </div>
-              </>
-            ) : (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
-                <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                  <Sprout size={14} className="text-emerald-700" /> Ingin Menjual Hasil Panen?
-                </div>
-                <p className="text-[11px] text-slate-600 leading-snug">
-                  Daftarkan lokasi panen dan komoditas utama Anda untuk membuka analitik AI TaniPintar &amp; rekomendasi harga.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    if (onOpenUpgrade) onOpenUpgrade();
-                  }}
-                  className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-lg transition-colors shadow-sm mt-1"
-                >
-                  Daftar Jadi Petani / Penjual (Gratis)
-                </button>
-              </div>
-            )}
+            <div className="flex items-center justify-between text-xs py-1">
+              <span className="text-slate-500 flex items-center gap-2 font-medium">
+                <ShieldCheck size={14} className="text-emerald-600" /> Luas Lahan
+              </span>
+              <span className="font-bold text-slate-800">{user.land_size || "1.5 Hektar"}</span>
+            </div>
           </div>
 
           {/* Action Buttons */}
