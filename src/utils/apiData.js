@@ -60,9 +60,9 @@ export function getRegionalDemandData() {
 
 // ASYNC BACKEND API FETCHERS (MySQL Integration)
 
-export async function fetchPriceHistory(commodity = 'Cabai Merah') {
+export async function fetchPriceHistory(commodity = 'Cabai Merah', origin = 'Cilacap, Jateng') {
   try {
-    const res = await fetch(`${API_BASE_URL}/prices/history?commodity=${encodeURIComponent(commodity)}`);
+    const res = await fetch(`${API_BASE_URL}/prices/history?commodity=${encodeURIComponent(commodity)}&origin=${encodeURIComponent(origin)}`);
     if (!res.ok) throw new Error("API Network response was not ok");
     const json = await res.json();
     return json.data;

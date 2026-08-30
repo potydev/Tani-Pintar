@@ -7,18 +7,26 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
   const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    let isMounted = true;
     async function loadData() {
+      setLoading(true);
       const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
-      if (liveRecs && liveRecs.length > 1) {
-        setItems(liveRecs.slice(1, 3));
+      if (isMounted) {
+        if (liveRecs && liveRecs.length > 1) {
+          setItems(liveRecs.slice(1, 3));
+        }
+        setLoading(false);
       }
     }
     loadData();
+    return () => { isMounted = false; };
   }, [originLocation, selectedDate]);
 
   return (
-    <div className="space-y-3 mb-6 relative">
+    <div className={`space-y-3 mb-6 relative transition-opacity ${loading ? 'opacity-70' : 'opacity-100'}`}>
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.rank} className="tp-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-300 transition-colors shadow-sm">
@@ -28,7 +36,9 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-heading font-bold text-slate-900 text-base">Kirim ke {item.city}</h4>
+                  <h4 className="font-heading font-bold text-slate-900 text-base">
+                    Kirim ke {item.city} {item.province ? `(${item.province})` : ''}
+                  </h4>
                   <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
                     {item.badge}
                   </span>

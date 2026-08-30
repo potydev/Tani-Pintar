@@ -536,15 +536,197 @@ app.get('/api/prices/latest', async (req, res) => {
   }
 });
 
-// GET /api/prices/history - Get historical price trends for chart
+// Mapping of Indonesian cities/keywords to exact Supabase province_name
+const PROVINCE_MAPPING = {
+  // Jawa Tengah
+  'cilacap': 'Jawa Tengah',
+  'brebes': 'Jawa Tengah',
+  'semarang': 'Jawa Tengah',
+  'solo': 'Jawa Tengah',
+  'surakarta': 'Jawa Tengah',
+  'banyumas': 'Jawa Tengah',
+  'kudus': 'Jawa Tengah',
+  'magelang': 'Jawa Tengah',
+  'pekalongan': 'Jawa Tengah',
+  'jateng': 'Jawa Tengah',
+  'jawa tengah': 'Jawa Tengah',
+
+  // Jawa Barat
+  'bandung': 'Jawa Barat',
+  'garut': 'Jawa Barat',
+  'bogor': 'Jawa Barat',
+  'bekasi': 'Jawa Barat',
+  'cirebon': 'Jawa Barat',
+  'cianjur': 'Jawa Barat',
+  'sukabumi': 'Jawa Barat',
+  'tasikmalaya': 'Jawa Barat',
+  'karawang': 'Jawa Barat',
+  'jabar': 'Jawa Barat',
+  'jawa barat': 'Jawa Barat',
+
+  // DKI Jakarta
+  'jakarta': 'DKI Jakarta',
+  'dki': 'DKI Jakarta',
+  'cipinang': 'DKI Jakarta',
+
+  // Jawa Timur
+  'surabaya': 'Jawa Timur',
+  'malang': 'Jawa Timur',
+  'kediri': 'Jawa Timur',
+  'banyuwangi': 'Jawa Timur',
+  'jember': 'Jawa Timur',
+  'madiun': 'Jawa Timur',
+  'probolinggo': 'Jawa Timur',
+  'jatim': 'Jawa Timur',
+  'jawa timur': 'Jawa Timur',
+
+  // DI Yogyakarta
+  'yogyakarta': 'DI Yogyakarta',
+  'jogja': 'DI Yogyakarta',
+  'sleman': 'DI Yogyakarta',
+  'bantul': 'DI Yogyakarta',
+  'diy': 'DI Yogyakarta',
+
+  // Banten
+  'serang': 'Banten',
+  'tangerang': 'Banten',
+  'cilegon': 'Banten',
+  'lebak': 'Banten',
+  'banten': 'Banten',
+
+  // Sumatera Utara
+  'medan': 'Sumatera Utara',
+  'karo': 'Sumatera Utara',
+  'berastagi': 'Sumatera Utara',
+  'pematang siantar': 'Sumatera Utara',
+  'sumut': 'Sumatera Utara',
+  'sumatera utara': 'Sumatera Utara',
+
+  // Lampung
+  'lampung': 'Lampung',
+  'bandar lampung': 'Lampung',
+
+  // Sumatera Barat
+  'padang': 'Sumatera Barat',
+  'bukittinggi': 'Sumatera Barat',
+  'sumbar': 'Sumatera Barat',
+
+  // Riau & Kepri
+  'pekanbaru': 'Riau',
+  'riau': 'Riau',
+  'batam': 'Kepulauan Riau',
+
+  // Kalimantan
+  'banjarmasin': 'Kalimantan Selatan',
+  'kalsel': 'Kalimantan Selatan',
+  'pontianak': 'Kalimantan Barat',
+  'kalbar': 'Kalimantan Barat',
+  'samarinda': 'Kalimantan Timur',
+  'balikpapan': 'Kalimantan Timur',
+  'kaltim': 'Kalimantan Timur',
+
+  // Sulawesi
+  'makassar': 'Sulawesi Selatan',
+  'sulsel': 'Sulawesi Selatan',
+  'manado': 'Sulawesi Utara',
+  'sulut': 'Sulawesi Utara',
+
+  // Bali & Nusa Tenggara
+  'denpasar': 'Bali',
+  'bali': 'Bali',
+  'mataram': 'Nusa Tenggara Barat',
+  'lombok': 'Nusa Tenggara Barat',
+  'ntb': 'Nusa Tenggara Barat',
+  'kupang': 'Nusa Tenggara Timur',
+  'ntt': 'Nusa Tenggara Timur',
+
+  // Maluku & Papua
+  'ambon': 'Maluku',
+  'jayapura': 'Papua',
+  'sorong': 'Papua Barat'
+};
+
+function resolveProvince(rawInput) {
+  if (!rawInput) return 'Jawa Tengah';
+  const clean = rawInput.toLowerCase().trim();
+  for (const [key, prov] of Object.entries(PROVINCE_MAPPING)) {
+    if (clean.includes(key)) return prov;
+  }
+  return 'Jawa Tengah';
+}
+
+const PROVINCE_HUBS = {
+  'Jawa Tengah': { city: 'Semarang', island: 'Jawa', lat: -7.0, lon: 110.4 },
+  'Jawa Barat': { city: 'Bandung', island: 'Jawa', lat: -6.9, lon: 107.6 },
+  'DKI Jakarta': { city: 'Jakarta (Pasar Cipinang)', island: 'Jawa', lat: -6.2, lon: 106.8 },
+  'Jawa Timur': { city: 'Surabaya (Osowilangun)', island: 'Jawa', lat: -7.2, lon: 112.7 },
+  'DI Yogyakarta': { city: 'Yogyakarta', island: 'Jawa', lat: -7.8, lon: 110.3 },
+  'Banten': { city: 'Tangerang / Serang', island: 'Jawa', lat: -6.1, lon: 106.1 },
+  'Lampung': { city: 'Bandar Lampung', island: 'Sumatera', lat: -5.4, lon: 105.2 },
+  'Sumatera Selatan': { city: 'Palembang', island: 'Sumatera', lat: -2.9, lon: 104.7 },
+  'Sumatera Utara': { city: 'Medan (Lau Cih)', island: 'Sumatera', lat: 3.5, lon: 98.6 },
+  'Sumatera Barat': { city: 'Padang', island: 'Sumatera', lat: -0.9, lon: 100.3 },
+  'Riau': { city: 'Pekanbaru', island: 'Sumatera', lat: 0.5, lon: 101.4 },
+  'Kepulauan Riau': { city: 'Batam', island: 'Sumatera', lat: 1.1, lon: 104.0 },
+  'Kalimantan Selatan': { city: 'Banjarmasin', island: 'Kalimantan', lat: -3.3, lon: 114.5 },
+  'Kalimantan Timur': { city: 'Balikpapan', island: 'Kalimantan', lat: -1.2, lon: 116.8 },
+  'Kalimantan Barat': { city: 'Pontianak', island: 'Kalimantan', lat: -0.0, lon: 109.3 },
+  'Sulawesi Selatan': { city: 'Makassar', island: 'Sulawesi', lat: -5.1, lon: 119.4 },
+  'Sulawesi Utara': { city: 'Manado', island: 'Sulawesi', lat: 1.4, lon: 124.8 },
+  'Bali': { city: 'Denpasar', island: 'Bali', lat: -8.6, lon: 115.2 },
+  'Nusa Tenggara Barat': { city: 'Mataram (Lombok)', island: 'Nusa Tenggara', lat: -8.5, lon: 116.1 },
+  'Nusa Tenggara Timur': { city: 'Kupang', island: 'Nusa Tenggara', lat: -10.1, lon: 123.5 },
+  'Maluku': { city: 'Ambon', island: 'Maluku', lat: -3.6, lon: 128.1 },
+  'Papua': { city: 'Jayapura', island: 'Papua', lat: -2.5, lon: 140.7 },
+  'Papua Barat': { city: 'Sorong', island: 'Papua', lat: -0.8, lon: 131.2 }
+};
+
+function calculateLogistics(originProv, destProv) {
+  const originHub = PROVINCE_HUBS[originProv] || { city: originProv, island: 'Jawa', lat: -7.0, lon: 110.0 };
+  const destHub = PROVINCE_HUBS[destProv] || { city: destProv, island: 'Lainnya', lat: -5.0, lon: 115.0 };
+
+  const dLat = (destHub.lat - originHub.lat) * 111;
+  const dLon = (destHub.lon - originHub.lon) * 111;
+  const approxKm = Math.max(60, Math.round(Math.sqrt(dLat * dLat + dLon * dLon) * 1.3));
+
+  let cost = 0;
+  let duration = '';
+
+  if (originHub.island === destHub.island) {
+    cost = Math.max(300000, Math.round(approxKm * 1800));
+    const hours = Math.max(3, Math.round(approxKm / 40));
+    duration = `${hours}-${hours + 2} jam (Darat)`;
+  } else {
+    cost = Math.max(850000, Math.round(approxKm * 2800 + 400000));
+    const days = Math.max(1, Math.round(approxKm / 350));
+    duration = `${days}-${days + 1} hari (Kargo Laut/Udara)`;
+  }
+
+  return {
+    city: destHub.city,
+    province: destProv,
+    distance: `${approxKm} km`,
+    cost: cost,
+    duration: duration
+  };
+}
+
+// GET /api/prices/history - Get historical price trends for chart matching the origin location
 app.get('/api/prices/history', async (req, res) => {
   try {
-    const commodity = req.query.commodity || 'Cabai Merah Besar';
+    const commodity = req.query.commodity || 'Cabai Merah';
+    const rawOrigin = req.query.origin || 'Cilacap, Jateng';
+    const originProv = resolveProvince(rawOrigin);
+    const originCity = rawOrigin.split(',')[0].trim();
+
+    // Select origin province + benchmark destination provinces
+    const targetProvinces = [originProv, 'DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Sumatera Utara'].filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
+
     const { data: rows, error } = await supabase
       .from('harga_pangan')
       .select('tanggal_bi, province_name, price, national_avg, commodity_name')
-      .or(`commodity_name.ilike.%${commodity}%`)
-      .in('province_name', ['DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'DI Yogyakarta'])
+      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+      .in('province_name', targetProvinces)
       .order('tanggal_bi', { ascending: true });
 
     if (error) throw error;
@@ -556,12 +738,16 @@ app.get('/api/prices/history', async (req, res) => {
       if (!dateMap[dateStr]) {
         dateMap[dateStr] = { date: dateStr, RataNasional: Math.round(r.national_avg || 0) };
       }
-      const provKey = r.province_name.replace('Jawa Tengah', 'Cilacap (Asal)').replace('Jawa Barat', 'Bandung').replace('DKI Jakarta', 'Jakarta').replace('Jawa Timur', 'Surabaya');
-      dateMap[dateStr][provKey] = Math.round(r.price);
+      if (r.province_name === originProv) {
+        dateMap[dateStr][`${originCity} (Asal)`] = Math.round(r.price);
+      } else {
+        const shortName = r.province_name.replace('DKI Jakarta', 'Jakarta').replace('Jawa Barat', 'Bandung').replace('Jawa Timur', 'Surabaya').replace('Sumatera Utara', 'Medan');
+        dateMap[dateStr][shortName] = Math.round(r.price);
+      }
     });
 
     const chartData = Object.values(dateMap);
-    res.json({ success: true, commodity, count: chartData.length, data: chartData });
+    res.json({ success: true, commodity, origin: originProv, originCity, count: chartData.length, data: chartData });
   } catch (err) {
     console.error('Error fetching price history:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -583,7 +769,7 @@ app.get('/api/demand/regional', async (req, res) => {
     let queryBuilder = supabase
       .from('harga_pangan')
       .select('province_name, price, percentage_change, price_diff, commodity_name')
-      .or(`commodity_name.ilike.%${commodity}%`);
+      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`);
 
     if (latestDate) {
       queryBuilder = queryBuilder.eq('tanggal_bi', latestDate);
@@ -596,8 +782,8 @@ app.get('/api/demand/regional', async (req, res) => {
       city: r.province_name,
       price: Math.round(r.price),
       status: r.percentage_change > 2 ? "Tinggi" : r.percentage_change >= 0 ? "Sedang" : "Rendah",
-      percent: `${r.percentage_change >= 0 ? '↑' : '↓'} ${Math.abs(r.percentage_change)}%`,
-      val: Math.min(100, Math.max(25, Math.round((r.price / 70000) * 100))),
+      percent: `${r.percentage_change >= 0 ? '↑' : '↓'} ${Math.abs(r.percentage_change || 1.5)}%`,
+      val: Math.min(100, Math.max(25, Math.round((r.price / 80000) * 100))),
       color: r.percentage_change > 2 ? "#16A34A" : r.percentage_change >= 0 ? "#EAB308" : "#EF4444"
     }));
 
@@ -608,10 +794,9 @@ app.get('/api/demand/regional', async (req, res) => {
   }
 });
 
-// GET /api/dates - Get available scraped dates from Supabase (via JS client)
+// GET /api/dates - Get available scraped dates from Supabase
 app.get('/api/dates', async (req, res) => {
   try {
-    // Query Supabase JS client directly to always read from the correct DB
     let allDates = [];
     let page = 0;
     const pageSize = 1000;
@@ -626,9 +811,7 @@ app.get('/api/dates', async (req, res) => {
       page++;
     }
 
-    // Get unique sorted dates (newest first)
     const uniqueSorted = [...new Set(allDates)].sort().reverse().slice(0, 15);
-
     const monthsMap = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
     const dates = uniqueSorted.map((tanggal_bi, idx) => {
       const d = new Date(tanggal_bi + 'T00:00:00');
@@ -650,26 +833,21 @@ app.get('/api/dates', async (req, res) => {
   }
 });
 
-// GET /api/recommendations - Get AI calculated selling recommendations
+// GET /api/recommendations - Get Dynamic AI calculated selling recommendations based on Origin & Supabase Prices
 app.get('/api/recommendations', async (req, res) => {
   try {
     const rawOrigin = req.query.origin || 'Cilacap, Jateng';
-    const commodity = req.query.commodity || 'Cabai Merah Besar';
+    const commodity = req.query.commodity || 'Cabai Merah';
     let dateParam = req.query.date;
 
-    let originProv = 'Jawa Tengah';
-    if (rawOrigin.includes('Jabar') || rawOrigin.includes('Jawa Barat')) originProv = 'Jawa Barat';
-    else if (rawOrigin.includes('Jatim') || rawOrigin.includes('Jawa Timur')) originProv = 'Jawa Timur';
-    else if (rawOrigin.includes('Sumut') || rawOrigin.includes('Sumatera Utara')) originProv = 'Sumatera Utara';
-    else if (rawOrigin.includes('Jakarta') || rawOrigin.includes('DKI')) originProv = 'DKI Jakarta';
-
+    const originProv = resolveProvince(rawOrigin);
     const originCity = rawOrigin.split(',')[0].trim();
 
+    // Parse date parameter
     let targetDate = dateParam;
     if (targetDate && targetDate.includes('(')) {
       targetDate = targetDate.split('(')[0].trim();
     }
-
     if (targetDate && !targetDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const monthsIndo = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', Mei: '05', Jun: '06', Jul: '07', Agt: '08', Sep: '09', Okt: '10', Nov: '11', Des: '12' };
       const parts = targetDate.split(' ');
@@ -681,76 +859,127 @@ app.get('/api/recommendations', async (req, res) => {
       }
     }
 
+    // Query latest available date in Supabase if not specified
     if (!targetDate || targetDate === 'latest' || targetDate === 'terbaru') {
       const { data: latestDateData } = await supabase
         .from('harga_pangan')
         .select('tanggal_bi')
         .order('tanggal_bi', { ascending: false })
         .limit(1);
-      targetDate = latestDateData && latestDateData[0] ? latestDateData[0].tanggal_bi : '2026-08-23';
+      targetDate = latestDateData && latestDateData[0] ? latestDateData[0].tanggal_bi : '2026-08-28';
     }
 
-    const { data: originData } = await supabase
+    // Fetch prices for all provinces on targetDate for the chosen commodity
+    let { data: allProvRows, error } = await supabase
       .from('harga_pangan')
-      .select('price')
-      .eq('province_name', originProv)
-      .eq('tanggal_bi', targetDate)
-      .limit(1);
+      .select('province_name, price, percentage_change, tanggal_bi, commodity_name')
+      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+      .eq('tanggal_bi', targetDate);
 
-    const originPrice = originData && originData[0] ? parseFloat(originData[0].price) : 38000;
+    // Fallback if targetDate has no rows for this commodity
+    if (!allProvRows || allProvRows.length === 0) {
+      const { data: fallbackRows } = await supabase
+        .from('harga_pangan')
+        .select('province_name, price, percentage_change, tanggal_bi, commodity_name')
+        .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+        .order('tanggal_bi', { ascending: false })
+        .limit(150);
+      
+      if (fallbackRows && fallbackRows.length > 0) {
+        const fallbackDate = fallbackRows[0].tanggal_bi;
+        allProvRows = fallbackRows.filter(r => r.tanggal_bi === fallbackDate);
+      }
+    }
 
-    const { data: destRows } = await supabase
-      .from('harga_pangan')
-      .select('province_name, price, percentage_change')
-      .neq('province_name', originProv)
-      .eq('tanggal_bi', targetDate)
-      .order('price', { ascending: false })
-      .limit(5);
+    // Group and calculate average price per province
+    const provPrices = {};
+    for (const r of (allProvRows || [])) {
+      if (!provPrices[r.province_name]) provPrices[r.province_name] = [];
+      provPrices[r.province_name].push(Number(r.price));
+    }
+    const provAvg = {};
+    for (const [p, prices] of Object.entries(provPrices)) {
+      provAvg[p] = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+    }
 
-    const distanceMap = {
-      'Jawa Barat': { city: 'Bandung', dist: '312 km', cost: 500000, time: '8-10 jam' },
-      'DKI Jakarta': { city: 'Jakarta', dist: '390 km', cost: 650000, time: '10-12 jam' },
-      'Jawa Timur': { city: 'Surabaya', dist: '340 km', cost: 550000, time: '9-11 jam' },
-      'DI Yogyakarta': { city: 'Yogyakarta', dist: '120 km', cost: 250000, time: '3-4 jam' },
-      'Banten': { city: 'Serang', dist: '480 km', cost: 750000, time: '12-14 jam' },
-      'Jawa Tengah': { city: 'Semarang', dist: '150 km', cost: 300000, time: '4-5 jam' }
-    };
+    // Fallback realistic origin price if not found
+    const originPrice = provAvg[originProv] || 38000;
 
-    const recommendations = (destRows || []).map((r, idx) => {
-      const destInfo = distanceMap[r.province_name] || { city: r.province_name, dist: '250 km', cost: 400000, time: '6-8 jam' };
+    // Calculate arbitrage profit across all other provinces
+    const destinations = [];
+    for (const [destProv, destPrice] of Object.entries(provAvg)) {
+      if (destProv === originProv) continue;
+
+      const logistics = calculateLogistics(originProv, destProv);
       const qty = 500; // 500 kg batch
-      const marginDiffTotal = (r.price - originPrice) * qty;
-      const netProfitVal = Math.max(0, marginDiffTotal - destInfo.cost);
-      const diffPct = (((r.price - originPrice) / originPrice) * 100).toFixed(1);
+      const marginPerKg = destPrice - originPrice;
+      const grossMarginTotal = marginPerKg * qty;
+      const netProfitVal = grossMarginTotal - logistics.cost;
+      const diffPct = (((destPrice - originPrice) / originPrice) * 100).toFixed(1);
+
+      destinations.push({
+        destProv,
+        city: logistics.city,
+        destPrice,
+        marginPerKg,
+        grossMarginTotal,
+        netProfitVal,
+        diffPct,
+        logistics
+      });
+    }
+
+    // Sort by net profit descending
+    destinations.sort((a, b) => b.netProfitVal - a.netProfitVal);
+
+    // If all destinations are lower (origin has highest price), fall back to top consumption hubs
+    let finalDestinations = destinations.filter(d => d.netProfitVal > 0);
+    if (finalDestinations.length === 0) {
+      finalDestinations = destinations.slice(0, 3);
+    }
+
+    const qty = 500;
+    const recommendations = finalDestinations.slice(0, 3).map((item, idx) => {
+      const isPositive = Number(item.diffPct) >= 0;
+      const diffStr = isPositive ? `+${item.diffPct}%` : `${item.diffPct}%`;
+      const netProfitDisplay = item.netProfitVal > 0 ? `Rp ${Math.round(item.netProfitVal).toLocaleString('id-ID')}` : `Rp ${Math.round(Math.abs(item.netProfitVal)).toLocaleString('id-ID')}`;
 
       return {
         rank: idx + 1,
-        city: destInfo.city,
-        province: r.province_name,
+        city: item.city,
+        province: item.destProv,
         originCity: originCity,
         originLocation: rawOrigin,
         badge: idx === 0 ? "Sangat Direkomendasikan" : "Direkomendasikan",
         originPrice: `Rp ${Math.round(originPrice).toLocaleString('id-ID')}`,
-        destPrice: `Rp ${Math.round(r.price).toLocaleString('id-ID')}`,
-        diffPercent: `+${diffPct}% Lebih tinggi`,
-        marginDiff: `Rp ${Math.round(marginDiffTotal).toLocaleString('id-ID')}`,
-        shippingCost: `Rp ${destInfo.cost.toLocaleString('id-ID')}`,
-        netProfit: `Rp ${Math.round(netProfitVal).toLocaleString('id-ID')}`,
-        netProfitQty: `per ${qty} kg`,
+        destPrice: `Rp ${Math.round(item.destPrice).toLocaleString('id-ID')}`,
+        diffPercent: `${diffStr} ${isPositive ? 'Lebih tinggi' : 'Tingkat serapan'}`,
+        marginDiff: `Rp ${Math.round(Math.max(0, item.grossMarginTotal)).toLocaleString('id-ID')}`,
+        shippingCost: `Rp ${item.logistics.cost.toLocaleString('id-ID')}`,
+        netProfit: netProfitDisplay,
+        netProfitQty: `per ${qty} kg muatan`,
         aiReasons: [
-          `Harga ${diffPct}% lebih tinggi dari lokasi Anda (${originCity})`,
-          `Permintaan tinggi di wilayah ${destInfo.city}`,
-          `Margin keuntungan bersih paling optimal`
+          `Harga jual ${diffStr} dibanding lokasi panen Anda (${originCity})`,
+          `Tujuan pasar utama di ${item.city} (${item.destProv})`,
+          `Rute pengiriman ${item.logistics.duration} dengan armada pengangkut`
         ],
         shippingInfo: {
-          distance: destInfo.dist,
-          cost: `Rp ${destInfo.cost.toLocaleString('id-ID')}`,
-          duration: destInfo.time
+          distance: item.logistics.distance,
+          cost: `Rp ${item.logistics.cost.toLocaleString('id-ID')}`,
+          duration: item.logistics.duration
         }
       };
     });
 
-    res.json({ success: true, origin: originProv, originCity, data: recommendations });
+    res.json({
+      success: true,
+      origin: originProv,
+      originCity,
+      originPrice: Math.round(originPrice),
+      targetDate,
+      count: recommendations.length,
+      data: recommendations
+    });
   } catch (err) {
     console.error('Error calculating recommendations:', err);
     res.status(500).json({ success: false, error: err.message });

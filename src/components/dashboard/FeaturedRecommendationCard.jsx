@@ -8,20 +8,28 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
   const [data, setData] = useState(RECOMMENDATION_FEATURED);
   const [showModal, setShowModal] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    let isMounted = true;
     async function loadData() {
+      setLoading(true);
       const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
-      if (liveRecs && liveRecs.length > 0) {
-        setData(liveRecs[0]);
+      if (isMounted) {
+        if (liveRecs && liveRecs.length > 0) {
+          setData(liveRecs[0]);
+        }
+        setLoading(false);
       }
     }
     loadData();
+    return () => { isMounted = false; };
   }, [originLocation, selectedDate]);
 
   const displayOriginCity = data.originCity || originLocation.split(',')[0];
 
   return (
-    <div className="tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/40 via-white to-white mb-4 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className={`tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/40 via-white to-white mb-4 relative overflow-hidden shadow-sm hover:shadow-md transition-all ${loading ? 'opacity-70' : 'opacity-100'}`}>
       {/* Header Badge */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-3">
@@ -34,7 +42,7 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
               <span>Rekomendasi Terbaik AI Arbitrase</span>
             </div>
             <h3 className="font-heading text-xl font-extrabold text-slate-900">
-              Kirim ke {data.city} ({data.province || "Kalimantan Selatan"})
+              Kirim ke {data.city} {data.province ? `(${data.province})` : ''}
             </h3>
           </div>
         </div>

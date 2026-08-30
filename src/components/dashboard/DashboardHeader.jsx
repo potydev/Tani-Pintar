@@ -47,11 +47,16 @@ export function DashboardHeader({
   }, []);
 
   const locations = [
-    { name: "Cilacap, Jateng", desc: "Wilayah Asal Utama (Jateng)" },
-    { name: "Brebes, Jateng", desc: "Sentra Bawang & Cabai (Jateng)" },
-    { name: "Bandung, Jabar", desc: "Pasar Induk Cariu (Jabar)" },
-    { name: "Surabaya, Jatim", desc: "Osowilangun (Jatim)" },
-    { name: "Medan, Sumut", desc: "Pasar Induk Lau Cih (Sumut)" }
+    { name: "Cilacap, Jateng", desc: "Sentra Cabai & Padi (Jawa Tengah)" },
+    { name: "Brebes, Jateng", desc: "Sentra Bawang Merah & Cabai (Jawa Tengah)" },
+    { name: "Bandung, Jabar", desc: "Sentra Hortikultura Lembang (Jawa Barat)" },
+    { name: "Garut, Jabar", desc: "Sentra Cabai & Sayuran (Jawa Barat)" },
+    { name: "Surabaya, Jatim", desc: "Pasar Induk Osowilangun (Jawa Timur)" },
+    { name: "Malang, Jatim", desc: "Sentra Sayuran Batu/Pujon (Jawa Timur)" },
+    { name: "Medan, Sumut", desc: "Sentra Berastagi & Lau Cih (Sumatera Utara)" },
+    { name: "Bandar Lampung, Lampung", desc: "Sentra Pangan Sumatera Bagian Selatan" },
+    { name: "Makassar, Sulsel", desc: "Sentra Distribusi Indonesia Timur" },
+    { name: "Denpasar, Bali", desc: "Pusat Pasar Badung & Tabanan (Bali)" }
   ];
 
   // Close dropdowns on outside click

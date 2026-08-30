@@ -13,20 +13,26 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
         const baseUrl = import.meta.env.VITE_API_BASE_URL ||
           (typeof window !== 'undefined' && window.location.port === '3000' ? 'http://localhost:5000/api' : '/api');
         
-        const [datesRes, latestRes, demandRes] = await Promise.all([
+        const [datesRes, latestRes, demandRes, recsRes] = await Promise.all([
           fetch(`${baseUrl}/dates`),
           fetch(`${baseUrl}/prices/latest`),
-          fetch(`${baseUrl}/demand/regional?commodity=Cabai+Merah`)
+          fetch(`${baseUrl}/demand/regional?commodity=Cabai+Merah`),
+          fetch(`${baseUrl}/recommendations?origin=${encodeURIComponent(originLocation)}&commodity=Cabai+Merah`)
         ]);
 
         const datesData = datesRes.ok ? await datesRes.json() : null;
         const latestData = latestRes.ok ? await latestRes.json() : null;
         const demandData = demandRes.ok ? await demandRes.json() : null;
+        const recsData = recsRes.ok ? await recsRes.json() : null;
 
         const latestDate = datesData?.data?.[0]?.label || "Hari Ini";
         const cabaiItem = latestData?.data?.find(c => c.commodity_name?.includes('Cabai Merah')) || {};
         const topDemand = demandData?.data?.[0];
+        const topRec = recsData?.data?.[0];
         const nationalAvg = cabaiItem.national_avg ? Math.round(cabaiItem.national_avg) : 49300;
+
+        const profitDisplay = topRec ? topRec.netProfit : "Rp 14.850.000";
+        const profitCity = topRec ? `Ke ${topRec.city} (500kg)` : `Rute dari ${originLocation.split(',')[0]} (500kg)`;
 
         setMetrics([
           {
@@ -48,19 +54,19 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
             iconColor: "#7C3AED"
           },
           {
-            title: "Permintaan Tertinggi",
-            value: topDemand?.city || "Kalimantan Selatan",
+            title: "Peluang Terbaik Arbitrase",
+            value: topRec ? topRec.city : (topDemand?.city || "Maluku"),
             unit: "",
-            change: topDemand ? `${topDemand.percent} vs kemarin` : "Permintaan Pasar Tinggi",
+            change: topRec ? `${topRec.diffPercent} margin` : "Permintaan Pasar Tinggi",
             iconName: "Globe",
             iconBg: "#FFEDD5",
             iconColor: "#EA580C"
           },
           {
             title: "Estimasi Keuntungan",
-            value: "Rp 14.850.000",
+            value: profitDisplay,
             unit: "",
-            change: `Rute dari ${originLocation.split(',')[0]} (500kg)`,
+            change: profitCity,
             iconName: "Wallet",
             iconBg: "#DBEAFE",
             iconColor: "#2563EB"
