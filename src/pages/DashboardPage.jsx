@@ -120,21 +120,7 @@ export function DashboardPage({ name, onLogout }) {
         return <OrdersManagementPage user={user} />;
       case "marketplace_view":
         return (
-          <div className="space-y-4">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
-              <div>
-                <h3 className="font-extrabold text-slate-900 text-sm">Katalog Belanja Marketplace</h3>
-                <p className="text-xs text-slate-500">Jelajahi komoditas panen langsung dari petani binaan TaniPintar.</p>
-              </div>
-              <button
-                onClick={() => navigate('/marketplace')}
-                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition-all shadow-sm"
-              >
-                Buka Tampilan Penuh Marketplace &rarr;
-              </button>
-            </div>
-            <MarketplacePage isLoggedIn={true} userName={displayName} />
-          </div>
+          <MarketplacePage isLoggedIn={true} userName={displayName} isEmbedded={true} />
         );
       case "dashboard":
       default:
