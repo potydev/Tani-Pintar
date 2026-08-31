@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { CheckCircle2, MapPin, Truck, Clock, ArrowRight, Sparkles } from "lucide-react";
+import { CheckCircle2, MapPin, Truck, Clock, ArrowRight, Sparkles, Tag } from "lucide-react";
 import { RECOMMENDATION_FEATURED } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
-export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng", selectedDate }) {
+export function FeaturedRecommendationCard({
+  originLocation = "Cilacap, Jateng",
+  selectedDate,
+  commodity = "Cabai Merah"
+}) {
   const [data, setData] = useState(RECOMMENDATION_FEATURED);
   const [showModal, setShowModal] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
       setLoading(true);
-      const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
+      const liveRecs = await fetchAIRecommendations(originLocation, commodity, selectedDate);
       if (isMounted) {
         if (liveRecs && liveRecs.length > 0) {
           setData(liveRecs[0]);
@@ -24,9 +27,10 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
     }
     loadData();
     return () => { isMounted = false; };
-  }, [originLocation, selectedDate]);
+  }, [originLocation, selectedDate, commodity]);
 
   const displayOriginCity = data.originCity || originLocation.split(',')[0];
+  const displayCommodity = data.commodity || commodity;
 
   return (
     <div className={`tp-card p-6 border-emerald-200 bg-gradient-to-r from-emerald-50/40 via-white to-white mb-4 relative overflow-hidden shadow-sm hover:shadow-md transition-all ${loading ? 'opacity-70' : 'opacity-100'}`}>
@@ -34,14 +38,17 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white font-extrabold text-sm flex items-center justify-center shadow-sm">
-            {data.rank}
+            {data.rank || 1}
           </div>
           <div>
-            <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1">
+            <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles size={12} className="text-emerald-600" />
               <span>Rekomendasi Terbaik AI Arbitrase</span>
+              <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200/60">
+                {displayCommodity}
+              </span>
             </div>
-            <h3 className="font-heading text-xl font-extrabold text-slate-900">
+            <h3 className="font-heading text-xl font-extrabold text-slate-900 mt-0.5">
               Kirim ke {data.city} {data.province ? `(${data.province})` : ''}
             </h3>
           </div>
@@ -59,7 +66,7 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
             <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
               Alasan Rekomendasi AI:
             </div>
-            {data.aiReasons.map((reason, idx) => (
+            {(data.aiReasons || []).map((reason, idx) => (
               <div key={idx} className="flex items-start gap-2 text-xs font-medium text-slate-700">
                 <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
                 <span>{reason}</span>
@@ -100,55 +107,59 @@ export function FeaturedRecommendationCard({ originLocation = "Cilacap, Jateng",
               </div>
               <div className="flex justify-between">
                 <span>Estimasi Biaya Kirim:</span>
-                <span className="font-semibold text-slate-700">{data.shippingCost}</span>
-              </div>
-              <div className="flex justify-between font-bold text-emerald-800 pt-1 border-t border-slate-100">
-                <span>Laba Bersih Est:</span>
-                <span>{data.netProfit}</span>
+                <span className="font-semibold text-rose-600">-{data.shippingCost}</span>
               </div>
             </div>
           </div>
 
-          {/* Shipping info & CTA */}
-          <div className="md:col-span-2 flex flex-col justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 text-xs">
-            <div className="font-bold text-slate-800 border-b border-slate-100 pb-1.5">
-              Informasi Pengiriman
-            </div>
-            <div className="space-y-1 text-slate-600">
-              <div className="flex items-center gap-1.5">
-                <MapPin size={13} className="text-slate-400" />
-                <span>Jarak: <strong>{data.shippingInfo?.distance || "312 km"}</strong></span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Truck size={13} className="text-slate-400" />
-                <span>Biaya: <strong>{data.shippingCost}</strong></span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock size={13} className="text-slate-400" />
-                <span>Waktu: <strong>{data.shippingInfo?.duration || "8-10 jam"}</strong></span>
-              </div>
-            </div>
+          {/* Action Button */}
+          <div className="md:col-span-2 flex flex-col justify-center">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition-colors shadow-sm mt-1"
+              className="tp-btn-primary w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 cursor-pointer"
             >
-              <span>Simulasi Kirim</span>
-              <ArrowRight size={12} />
+              <span>Atur Pengiriman</span>
+              <ArrowRight size={14} />
             </button>
+            <div className="text-[10px] text-center text-slate-400 mt-2 flex items-center justify-center gap-1">
+              <Truck size={12} />
+              <span>Mitra Logistik Siap</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Logistics Information Bar */}
+        <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <MapPin size={13} className="text-emerald-700" />
+              <span>Jarak: <strong>{data.shippingInfo?.distance || "312 km"}</strong></span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock size={13} className="text-emerald-700" />
+              <span>Estimasi Waktu: <strong>{data.shippingInfo?.duration || "8-10 jam"}</strong></span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Truck size={13} className="text-emerald-700" />
+              <span>Biaya Armada: <strong>{data.shippingInfo?.cost || data.shippingCost}</strong></span>
+            </div>
+          </div>
+          <div className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Harga live pasar berdasarkan data harian BI PIHPS
           </div>
         </div>
       </div>
 
-      {showModal && (
-        <ShippingModal
-          destination={data.city}
-          netProfit={data.netProfit}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {/* Shipping Arrangement Modal */}
+      <ShippingModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        destination={data.city}
+        estimatedProfit={data.netProfit}
+        origin={displayOriginCity}
+        commodity={displayCommodity}
+      />
     </div>
   );
 }
-
-
-

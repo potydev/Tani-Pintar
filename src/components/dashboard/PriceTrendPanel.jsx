@@ -3,12 +3,20 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { PRICE_TREND_DATA } from "../../data/mockData";
 import { fetchPriceHistory } from "../../utils/apiData";
 
-export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDate }) {
-  const [commodity, setCommodity] = useState("Cabai Merah");
+export function PriceTrendPanel({
+  originLocation = "Cilacap, Jateng",
+  selectedDate,
+  commodity: propCommodity = "Cabai Merah"
+}) {
+  const [commodity, setCommodity] = useState(propCommodity);
   const [chartData, setChartData] = useState(PRICE_TREND_DATA);
   const [loading, setLoading] = useState(false);
 
   const originCity = originLocation ? originLocation.split(',')[0] : "Cilacap";
+
+  useEffect(() => {
+    if (propCommodity) setCommodity(propCommodity);
+  }, [propCommodity]);
 
   useEffect(() => {
     let isMounted = true;
@@ -47,8 +55,12 @@ export function PriceTrendPanel({ originLocation = "Cilacap, Jateng", selectedDa
             className="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer"
           >
             <option value="Cabai Merah">Cabai Merah</option>
-            <option value="Beras">Beras Medium I</option>
-            <option value="Bawang">Bawang Merah</option>
+            <option value="Cabai Rawit">Cabai Rawit</option>
+            <option value="Bawang Merah">Bawang Merah</option>
+            <option value="Beras">Beras Medium</option>
+            <option value="Daging Ayam">Daging Ayam</option>
+            <option value="Daging Sapi">Daging Sapi</option>
+            <option value="Telur Ayam">Telur Ayam</option>
             <option value="Minyak">Minyak Goreng</option>
           </select>
           <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-1 rounded">

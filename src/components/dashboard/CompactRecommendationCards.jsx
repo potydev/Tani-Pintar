@@ -3,17 +3,20 @@ import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
 
-export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng", selectedDate }) {
+export function CompactRecommendationCards({
+  originLocation = "Cilacap, Jateng",
+  selectedDate,
+  commodity = "Cabai Merah"
+}) {
   const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
       setLoading(true);
-      const liveRecs = await fetchAIRecommendations(originLocation, 'Cabai Merah', selectedDate);
+      const liveRecs = await fetchAIRecommendations(originLocation, commodity, selectedDate);
       if (isMounted) {
         if (liveRecs && liveRecs.length > 1) {
           setItems(liveRecs.slice(1, 3));
@@ -23,7 +26,9 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
     }
     loadData();
     return () => { isMounted = false; };
-  }, [originLocation, selectedDate]);
+  }, [originLocation, selectedDate, commodity]);
+
+  const displayOriginCity = originLocation ? originLocation.split(',')[0] : "Cilacap";
 
   return (
     <div className={`space-y-3 mb-6 relative transition-opacity ${loading ? 'opacity-70' : 'opacity-100'}`}>
@@ -46,7 +51,7 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
               </div>
             </div>
 
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-6 text-sm flex-wrap sm:flex-nowrap">
               <div>
                 <span className="text-xs text-slate-400 block">Harga Jual</span>
                 <span className="font-bold text-slate-700">{item.originPrice}</span> &rarr; <span className="font-extrabold text-emerald-700">{item.destPrice}</span>
@@ -58,9 +63,9 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
               </div>
               <button
                 onClick={() => setSelectedItem(item)}
-                className="tp-btn-outline px-4 py-2 rounded-lg text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 transition-colors"
+                className="tp-btn-outline px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer"
               >
-                Lihat Detail
+                Detail
               </button>
             </div>
           </div>
@@ -69,14 +74,14 @@ export function CompactRecommendationCards({ originLocation = "Cilacap, Jateng",
 
       {selectedItem && (
         <ShippingModal
-          destination={selectedItem.city}
-          netProfit={selectedItem.netProfit}
+          isOpen={true}
           onClose={() => setSelectedItem(null)}
+          destination={selectedItem.city}
+          estimatedProfit={selectedItem.netProfit}
+          origin={displayOriginCity}
+          commodity={selectedItem.commodity || commodity}
         />
       )}
     </div>
   );
 }
-
-
-

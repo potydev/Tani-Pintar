@@ -41,6 +41,7 @@ export function DashboardPage({ name, onLogout }) {
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("Surabaya, Jatim");
+  const [selectedCommodity, setSelectedCommodity] = useState("Cabai Merah");
 
   useEffect(() => {
     const savedUser = localStorage.getItem("tanipintar_user");
@@ -133,27 +134,76 @@ export function DashboardPage({ name, onLogout }) {
             <div className="grid lg:grid-cols-12 gap-6">
               {/* Left Column (8 Cols): Recommendations, Charts & Orders */}
               <div className="lg:col-span-8">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-heading font-bold text-slate-900 text-base">
-                    Peluang Penjualan Terbaik untuk Anda ({selectedLocation})
-                  </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div>
+                    <h3 className="font-heading font-bold text-slate-900 text-base">
+                      Peluang Penjualan Terbaik untuk Anda ({selectedLocation})
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Rekomendasi arbitrase harga live pasar komoditas {selectedCommodity}
+                    </p>
+                  </div>
                   <button
                     onClick={() => setActiveTab("peluang")}
-                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 shrink-0"
                   >
                     Lihat Semua Peluang &rarr;
                   </button>
                 </div>
 
+                {/* Commodity Filter Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 text-xs tp-scrollbar">
+                  {[
+                    "Cabai Merah",
+                    "Cabai Rawit",
+                    "Bawang Merah",
+                    "Beras",
+                    "Daging Ayam",
+                    "Daging Sapi",
+                    "Telur Ayam"
+                  ].map((comm) => (
+                    <button
+                      key={comm}
+                      type="button"
+                      onClick={() => setSelectedCommodity(comm)}
+                      className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer text-xs ${
+                        selectedCommodity === comm
+                          ? "bg-emerald-700 text-white shadow-sm shadow-emerald-700/20"
+                          : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+                      }`}
+                    >
+                      {comm}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Featured AI Recommendation */}
-                <FeaturedRecommendationCard originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                <FeaturedRecommendationCard
+                  originLocation={selectedLocation}
+                  selectedDate={selectedDate}
+                  commodity={selectedCommodity}
+                  isVerifiedFarmer={true}
+                  onOpenUpgrade={() => setIsUpgradeOpen(true)}
+                />
 
                 {/* Compact AI Recommendations */}
-                <CompactRecommendationCards originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                <CompactRecommendationCards
+                  originLocation={selectedLocation}
+                  selectedDate={selectedDate}
+                  commodity={selectedCommodity}
+                  isVerifiedFarmer={true}
+                  onOpenUpgrade={() => setIsUpgradeOpen(true)}
+                />
 
                 {/* 3 Panels Analytics Row */}
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <PriceTrendPanel originLocation={selectedLocation} selectedDate={selectedDate} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
+                  <PriceTrendPanel
+                    originLocation={selectedLocation}
+                    selectedDate={selectedDate}
+                    commodity={selectedCommodity}
+                    isVerifiedFarmer={true}
+                    onOpenUpgrade={() => setIsUpgradeOpen(true)}
+                  />
                   <DemandRegionPanel isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
                 </div>
 

@@ -601,22 +601,37 @@ const PROVINCE_MAPPING = {
   'solo': 'Jawa Tengah',
   'surakarta': 'Jawa Tengah',
   'banyumas': 'Jawa Tengah',
-  'kudus': 'Jawa Tengah',
+  'wonosobo': 'Jawa Tengah',
   'magelang': 'Jawa Tengah',
+  'temanggung': 'Jawa Tengah',
+  'boyolali': 'Jawa Tengah',
+  'demak': 'Jawa Tengah',
+  'grobogan': 'Jawa Tengah',
+  'kebumen': 'Jawa Tengah',
+  'karanganyar': 'Jawa Tengah',
+  'pati': 'Jawa Tengah',
+  'sukoharjo': 'Jawa Tengah',
+  'kudus': 'Jawa Tengah',
   'pekalongan': 'Jawa Tengah',
+  'tegal': 'Jawa Tengah',
   'jateng': 'Jawa Tengah',
   'jawa tengah': 'Jawa Tengah',
 
   // Jawa Barat
   'bandung': 'Jawa Barat',
   'garut': 'Jawa Barat',
+  'cianjur': 'Jawa Barat',
+  'tasikmalaya': 'Jawa Barat',
+  'cirebon': 'Jawa Barat',
+  'majalengka': 'Jawa Barat',
+  'kuningan': 'Jawa Barat',
+  'sukabumi': 'Jawa Barat',
+  'sumedang': 'Jawa Barat',
+  'karawang': 'Jawa Barat',
+  'indramayu': 'Jawa Barat',
   'bogor': 'Jawa Barat',
   'bekasi': 'Jawa Barat',
-  'cirebon': 'Jawa Barat',
-  'cianjur': 'Jawa Barat',
-  'sukabumi': 'Jawa Barat',
-  'tasikmalaya': 'Jawa Barat',
-  'karawang': 'Jawa Barat',
+  'depok': 'Jawa Barat',
   'jabar': 'Jawa Barat',
   'jawa barat': 'Jawa Barat',
 
@@ -629,10 +644,16 @@ const PROVINCE_MAPPING = {
   'surabaya': 'Jawa Timur',
   'malang': 'Jawa Timur',
   'kediri': 'Jawa Timur',
+  'blitar': 'Jawa Timur',
   'banyuwangi': 'Jawa Timur',
-  'jember': 'Jawa Timur',
-  'madiun': 'Jawa Timur',
   'probolinggo': 'Jawa Timur',
+  'nganjuk': 'Jawa Timur',
+  'jember': 'Jawa Timur',
+  'lumajang': 'Jawa Timur',
+  'bojonegoro': 'Jawa Timur',
+  'tuban': 'Jawa Timur',
+  'pasuruan': 'Jawa Timur',
+  'madiun': 'Jawa Timur',
   'jatim': 'Jawa Timur',
   'jawa timur': 'Jawa Timur',
 
@@ -640,66 +661,172 @@ const PROVINCE_MAPPING = {
   'yogyakarta': 'DI Yogyakarta',
   'jogja': 'DI Yogyakarta',
   'sleman': 'DI Yogyakarta',
+  'kulon progo': 'DI Yogyakarta',
   'bantul': 'DI Yogyakarta',
+  'gunungkidul': 'DI Yogyakarta',
   'diy': 'DI Yogyakarta',
 
   // Banten
   'serang': 'Banten',
+  'lebak': 'Banten',
   'tangerang': 'Banten',
   'cilegon': 'Banten',
-  'lebak': 'Banten',
+  'pandeglang': 'Banten',
   'banten': 'Banten',
 
   // Sumatera Utara
   'medan': 'Sumatera Utara',
   'karo': 'Sumatera Utara',
   'berastagi': 'Sumatera Utara',
+  'simalungun': 'Sumatera Utara',
+  'toba': 'Sumatera Utara',
   'pematang siantar': 'Sumatera Utara',
   'sumut': 'Sumatera Utara',
   'sumatera utara': 'Sumatera Utara',
 
-  // Lampung
-  'lampung': 'Lampung',
-  'bandar lampung': 'Lampung',
-
   // Sumatera Barat
   'padang': 'Sumatera Barat',
+  'solok': 'Sumatera Barat',
+  'tanah datar': 'Sumatera Barat',
+  'agam': 'Sumatera Barat',
   'bukittinggi': 'Sumatera Barat',
   'sumbar': 'Sumatera Barat',
+  'sumatera barat': 'Sumatera Barat',
 
   // Riau & Kepri
   'pekanbaru': 'Riau',
   'riau': 'Riau',
   'batam': 'Kepulauan Riau',
+  'tanjungpinang': 'Kepulauan Riau',
+  'kepri': 'Kepulauan Riau',
 
-  // Kalimantan
-  'banjarmasin': 'Kalimantan Selatan',
-  'kalsel': 'Kalimantan Selatan',
-  'pontianak': 'Kalimantan Barat',
-  'kalbar': 'Kalimantan Barat',
-  'samarinda': 'Kalimantan Timur',
-  'balikpapan': 'Kalimantan Timur',
-  'kaltim': 'Kalimantan Timur',
+  // Jambi
+  'kerinci': 'Jambi',
+  'jambi': 'Jambi',
 
-  // Sulawesi
-  'makassar': 'Sulawesi Selatan',
-  'sulsel': 'Sulawesi Selatan',
-  'manado': 'Sulawesi Utara',
-  'sulut': 'Sulawesi Utara',
+  // Sumatera Selatan
+  'palembang': 'Sumatera Selatan',
+  'banyuasin': 'Sumatera Selatan',
+  'ogan komering': 'Sumatera Selatan',
+  'sumsel': 'Sumatera Selatan',
+  'sumatera selatan': 'Sumatera Selatan',
 
-  // Bali & Nusa Tenggara
+  // Bengkulu
+  'curup': 'Bengkulu',
+  'rejang lebong': 'Bengkulu',
+  'bengkulu': 'Bengkulu',
+
+  // Lampung
+  'lampung': 'Lampung',
+  'bandar lampung': 'Lampung',
+
+  // Aceh
+  'pidie': 'Aceh',
+  'takengon': 'Aceh',
+  'gayo': 'Aceh',
+  'banda aceh': 'Aceh',
+  'aceh': 'Aceh',
+
+  // Bangka Belitung
+  'pangkalpinang': 'Kepulauan Bangka Belitung',
+  'bangka': 'Kepulauan Bangka Belitung',
+  'belitung': 'Kepulauan Bangka Belitung',
+
+  // Bali
   'denpasar': 'Bali',
+  'tabanan': 'Bali',
+  'bangli': 'Bali',
+  'buleleng': 'Bali',
   'bali': 'Bali',
+
+  // Nusa Tenggara Barat
   'mataram': 'Nusa Tenggara Barat',
   'lombok': 'Nusa Tenggara Barat',
+  'bima': 'Nusa Tenggara Barat',
+  'sumbawa': 'Nusa Tenggara Barat',
   'ntb': 'Nusa Tenggara Barat',
+
+  // Nusa Tenggara Timur
   'kupang': 'Nusa Tenggara Timur',
+  'manggarai': 'Nusa Tenggara Timur',
+  'flores': 'Nusa Tenggara Timur',
   'ntt': 'Nusa Tenggara Timur',
 
-  // Maluku & Papua
+  // Sulawesi Selatan
+  'makassar': 'Sulawesi Selatan',
+  'enrekang': 'Sulawesi Selatan',
+  'bantaeng': 'Sulawesi Selatan',
+  'gowa': 'Sulawesi Selatan',
+  'sidrap': 'Sulawesi Selatan',
+  'bone': 'Sulawesi Selatan',
+  'wajo': 'Sulawesi Selatan',
+  'sulsel': 'Sulawesi Selatan',
+  'sulawesi selatan': 'Sulawesi Selatan',
+
+  // Sulawesi Utara
+  'manado': 'Sulawesi Utara',
+  'minahasa': 'Sulawesi Utara',
+  'modoinding': 'Sulawesi Utara',
+  'sulut': 'Sulawesi Utara',
+  'sulawesi utara': 'Sulawesi Utara',
+
+  // Gorontalo
+  'gorontalo': 'Gorontalo',
+
+  // Sulawesi Tengah
+  'palu': 'Sulawesi Tengah',
+  'parigi': 'Sulawesi Tengah',
+  'sulteng': 'Sulawesi Tengah',
+  'sulawesi tengah': 'Sulawesi Tengah',
+
+  // Sulawesi Tenggara
+  'kendari': 'Sulawesi Tenggara',
+  'konawe': 'Sulawesi Tenggara',
+  'sultra': 'Sulawesi Tenggara',
+  'sulawesi tenggara': 'Sulawesi Tenggara',
+
+  // Sulawesi Barat
+  'mamuju': 'Sulawesi Barat',
+  'sulbar': 'Sulawesi Barat',
+
+  // Kalimantan Selatan
+  'banjarmasin': 'Kalimantan Selatan',
+  'barito kuala': 'Kalimantan Selatan',
+  'tanah laut': 'Kalimantan Selatan',
+  'kalsel': 'Kalimantan Selatan',
+
+  // Kalimantan Barat
+  'pontianak': 'Kalimantan Barat',
+  'sambas': 'Kalimantan Barat',
+  'kalbar': 'Kalimantan Barat',
+
+  // Kalimantan Timur
+  'samarinda': 'Kalimantan Timur',
+  'balikpapan': 'Kalimantan Timur',
+  'kutai': 'Kalimantan Timur',
+  'kaltim': 'Kalimantan Timur',
+
+  // Kalimantan Tengah & Utara
+  'palangkaraya': 'Kalimantan Tengah',
+  'kalteng': 'Kalimantan Tengah',
+  'tarakan': 'Kalimantan Utara',
+  'kaltara': 'Kalimantan Utara',
+
+  // Maluku & Maluku Utara
   'ambon': 'Maluku',
+  'seram': 'Maluku',
+  'maluku': 'Maluku',
+  'ternate': 'Maluku Utara',
+  'malut': 'Maluku Utara',
+
+  // Papua
   'jayapura': 'Papua',
-  'sorong': 'Papua Barat'
+  'merauke': 'Papua',
+  'wamena': 'Papua',
+  'jayawijaya': 'Papua',
+  'sorong': 'Papua Barat',
+  'manokwari': 'Papua Barat',
+  'papua': 'Papua'
 };
 
 function resolveProvince(rawInput) {
@@ -724,15 +851,26 @@ const PROVINCE_HUBS = {
   'Sumatera Barat': { city: 'Padang', island: 'Sumatera', lat: -0.9, lon: 100.3 },
   'Riau': { city: 'Pekanbaru', island: 'Sumatera', lat: 0.5, lon: 101.4 },
   'Kepulauan Riau': { city: 'Batam', island: 'Sumatera', lat: 1.1, lon: 104.0 },
+  'Jambi': { city: 'Jambi', island: 'Sumatera', lat: -1.6, lon: 103.6 },
+  'Bengkulu': { city: 'Bengkulu', island: 'Sumatera', lat: -3.8, lon: 102.3 },
+  'Aceh': { city: 'Banda Aceh', island: 'Sumatera', lat: 5.5, lon: 95.3 },
+  'Kepulauan Bangka Belitung': { city: 'Pangkalpinang', island: 'Sumatera', lat: -2.1, lon: 106.1 },
   'Kalimantan Selatan': { city: 'Banjarmasin', island: 'Kalimantan', lat: -3.3, lon: 114.5 },
   'Kalimantan Timur': { city: 'Balikpapan', island: 'Kalimantan', lat: -1.2, lon: 116.8 },
   'Kalimantan Barat': { city: 'Pontianak', island: 'Kalimantan', lat: -0.0, lon: 109.3 },
+  'Kalimantan Tengah': { city: 'Palangkaraya', island: 'Kalimantan', lat: -2.2, lon: 113.9 },
+  'Kalimantan Utara': { city: 'Tarakan', island: 'Kalimantan', lat: 3.3, lon: 117.6 },
   'Sulawesi Selatan': { city: 'Makassar', island: 'Sulawesi', lat: -5.1, lon: 119.4 },
   'Sulawesi Utara': { city: 'Manado', island: 'Sulawesi', lat: 1.4, lon: 124.8 },
+  'Gorontalo': { city: 'Gorontalo', island: 'Sulawesi', lat: 0.5, lon: 123.0 },
+  'Sulawesi Tengah': { city: 'Palu', island: 'Sulawesi', lat: -0.9, lon: 119.8 },
+  'Sulawesi Tenggara': { city: 'Kendari', island: 'Sulawesi', lat: -3.9, lon: 122.5 },
+  'Sulawesi Barat': { city: 'Mamuju', island: 'Sulawesi', lat: -2.6, lon: 118.8 },
   'Bali': { city: 'Denpasar', island: 'Bali', lat: -8.6, lon: 115.2 },
   'Nusa Tenggara Barat': { city: 'Mataram (Lombok)', island: 'Nusa Tenggara', lat: -8.5, lon: 116.1 },
   'Nusa Tenggara Timur': { city: 'Kupang', island: 'Nusa Tenggara', lat: -10.1, lon: 123.5 },
   'Maluku': { city: 'Ambon', island: 'Maluku', lat: -3.6, lon: 128.1 },
+  'Maluku Utara': { city: 'Ternate', island: 'Maluku', lat: 0.7, lon: 127.3 },
   'Papua': { city: 'Jayapura', island: 'Papua', lat: -2.5, lon: 140.7 },
   'Papua Barat': { city: 'Sorong', island: 'Papua', lat: -0.8, lon: 131.2 }
 };
@@ -770,10 +908,11 @@ function calculateLogistics(originProv, destProv) {
 // GET /api/prices/history - Get historical price trends for chart matching the origin location
 app.get('/api/prices/history', async (req, res) => {
   try {
-    const commodity = req.query.commodity || 'Cabai Merah';
+    const rawCommodity = req.query.commodity || 'Cabai Merah';
     const rawOrigin = req.query.origin || 'Cilacap, Jateng';
     const originProv = resolveProvince(rawOrigin);
     const originCity = rawOrigin.split(',')[0].trim();
+    const cleanComm = getCommodityFilter(rawCommodity);
 
     // Select origin province + benchmark destination provinces
     const targetProvinces = [originProv, 'DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Sumatera Utara'].filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
@@ -781,7 +920,7 @@ app.get('/api/prices/history', async (req, res) => {
     const { data: rows, error } = await supabase
       .from('harga_pangan')
       .select('tanggal_bi, province_name, price, national_avg, commodity_name')
-      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+      .ilike('commodity_name', `%${cleanComm}%`)
       .in('province_name', targetProvinces)
       .order('tanggal_bi', { ascending: true });
 
@@ -803,20 +942,40 @@ app.get('/api/prices/history', async (req, res) => {
     });
 
     const chartData = Object.values(dateMap);
-    res.json({ success: true, commodity, origin: originProv, originCity, count: chartData.length, data: chartData });
+    res.json({ success: true, commodity: rawCommodity, origin: originProv, originCity, count: chartData.length, data: chartData });
   } catch (err) {
     console.error('Error fetching price history:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
+// Helper to sanitize and normalize commodity queries
+function getCommodityFilter(comm) {
+  if (!comm) return 'Cabai Merah';
+  const c = comm.trim().toLowerCase();
+  if (c.includes('ayam')) return 'Daging Ayam';
+  if (c.includes('sapi')) return 'Daging Sapi';
+  if (c.includes('telur')) return 'Telur Ayam';
+  if (c.includes('bawang merah')) return 'Bawang Merah';
+  if (c.includes('bawang putih')) return 'Bawang Putih';
+  if (c.includes('cabai rawit') || c.includes('rawit')) return 'Cabai Rawit';
+  if (c.includes('cabai merah') || c.includes('keriting') || c.includes('merah besar')) return 'Cabai Merah';
+  if (c.includes('beras')) return 'Beras';
+  if (c.includes('minyak')) return 'Minyak Goreng';
+  if (c.includes('gula')) return 'Gula Pasir';
+  return comm.trim();
+}
+
 // GET /api/demand/regional - Get regional demand comparison
 app.get('/api/demand/regional', async (req, res) => {
   try {
-    const commodity = req.query.commodity || 'Cabai Merah';
+    const rawCommodity = req.query.commodity || 'Cabai Merah';
+    const cleanComm = getCommodityFilter(rawCommodity);
+
     const { data: maxDateData } = await supabase
       .from('harga_pangan')
       .select('tanggal_bi')
+      .ilike('commodity_name', `%${cleanComm}%`)
       .order('tanggal_bi', { ascending: false })
       .limit(1);
 
@@ -825,7 +984,7 @@ app.get('/api/demand/regional', async (req, res) => {
     let queryBuilder = supabase
       .from('harga_pangan')
       .select('province_name, price, percentage_change, price_diff, commodity_name')
-      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`);
+      .ilike('commodity_name', `%${cleanComm}%`);
 
     if (latestDate) {
       queryBuilder = queryBuilder.eq('tanggal_bi', latestDate);
@@ -893,7 +1052,8 @@ app.get('/api/dates', async (req, res) => {
 app.get('/api/recommendations', async (req, res) => {
   try {
     const rawOrigin = req.query.origin || 'Cilacap, Jateng';
-    const commodity = req.query.commodity || 'Cabai Merah';
+    const rawCommodity = req.query.commodity || 'Cabai Merah';
+    const cleanComm = getCommodityFilter(rawCommodity);
     let dateParam = req.query.date;
 
     const originProv = resolveProvince(rawOrigin);
@@ -920,16 +1080,17 @@ app.get('/api/recommendations', async (req, res) => {
       const { data: latestDateData } = await supabase
         .from('harga_pangan')
         .select('tanggal_bi')
+        .ilike('commodity_name', `%${cleanComm}%`)
         .order('tanggal_bi', { ascending: false })
         .limit(1);
-      targetDate = latestDateData && latestDateData[0] ? latestDateData[0].tanggal_bi : '2026-08-28';
+      targetDate = latestDateData && latestDateData[0] ? latestDateData[0].tanggal_bi : '2026-08-31';
     }
 
-    // Fetch prices for all provinces on targetDate for the chosen commodity
+    // Fetch prices for all provinces on targetDate for the chosen commodity ONLY
     let { data: allProvRows, error } = await supabase
       .from('harga_pangan')
       .select('province_name, price, percentage_change, tanggal_bi, commodity_name')
-      .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+      .ilike('commodity_name', `%${cleanComm}%`)
       .eq('tanggal_bi', targetDate);
 
     // Fallback if targetDate has no rows for this commodity
@@ -937,13 +1098,14 @@ app.get('/api/recommendations', async (req, res) => {
       const { data: fallbackRows } = await supabase
         .from('harga_pangan')
         .select('province_name, price, percentage_change, tanggal_bi, commodity_name')
-        .or(`commodity_name.ilike.%${commodity}%,commodity_name.ilike.%Cabai%`)
+        .ilike('commodity_name', `%${cleanComm}%`)
         .order('tanggal_bi', { ascending: false })
         .limit(150);
       
       if (fallbackRows && fallbackRows.length > 0) {
         const fallbackDate = fallbackRows[0].tanggal_bi;
         allProvRows = fallbackRows.filter(r => r.tanggal_bi === fallbackDate);
+        targetDate = fallbackDate;
       }
     }
 
@@ -958,8 +1120,25 @@ app.get('/api/recommendations', async (req, res) => {
       provAvg[p] = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
     }
 
-    // Fallback realistic origin price if not found
-    const originPrice = provAvg[originProv] || 38000;
+    // Determine realistic origin price
+    let originPrice = provAvg[originProv];
+    if (!originPrice) {
+      // Query historical origin price for this province and commodity
+      const { data: originData } = await supabase
+        .from('harga_pangan')
+        .select('price')
+        .ilike('commodity_name', `%${cleanComm}%`)
+        .eq('province_name', originProv)
+        .order('tanggal_bi', { ascending: false })
+        .limit(1);
+
+      if (originData && originData[0] && originData[0].price) {
+        originPrice = Number(originData[0].price);
+      } else {
+        const allVals = Object.values(provAvg);
+        originPrice = allVals.length > 0 ? Math.round(allVals.reduce((a, b) => a + b, 0) / allVals.length) : 35000;
+      }
+    }
 
     // Calculate arbitrage profit across all other provinces
     const destinations = [];
@@ -988,7 +1167,7 @@ app.get('/api/recommendations', async (req, res) => {
     // Sort by net profit descending
     destinations.sort((a, b) => b.netProfitVal - a.netProfitVal);
 
-    // If all destinations are lower (origin has highest price), fall back to top consumption hubs
+    // If all destinations are lower (origin has highest price), fall back to top benchmark hubs
     let finalDestinations = destinations.filter(d => d.netProfitVal > 0);
     if (finalDestinations.length === 0) {
       finalDestinations = destinations.slice(0, 3);
@@ -1006,6 +1185,7 @@ app.get('/api/recommendations', async (req, res) => {
         province: item.destProv,
         originCity: originCity,
         originLocation: rawOrigin,
+        commodity: cleanComm,
         badge: idx === 0 ? "Sangat Direkomendasikan" : "Direkomendasikan",
         originPrice: `Rp ${Math.round(originPrice).toLocaleString('id-ID')}`,
         destPrice: `Rp ${Math.round(item.destPrice).toLocaleString('id-ID')}`,
@@ -1015,7 +1195,7 @@ app.get('/api/recommendations', async (req, res) => {
         netProfit: netProfitDisplay,
         netProfitQty: `per ${qty} kg muatan`,
         aiReasons: [
-          `Harga jual ${diffStr} dibanding lokasi panen Anda (${originCity})`,
+          `Harga ${cleanComm} ${diffStr} dibanding sentra panen Anda (${originCity})`,
           `Tujuan pasar utama di ${item.city} (${item.destProv})`,
           `Rute pengiriman ${item.logistics.duration} dengan armada pengangkut`
         ],
@@ -1029,6 +1209,7 @@ app.get('/api/recommendations', async (req, res) => {
 
     res.json({
       success: true,
+      commodity: cleanComm,
       origin: originProv,
       originCity,
       originPrice: Math.round(originPrice),
@@ -1041,6 +1222,7 @@ app.get('/api/recommendations', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
 
 // ============================================================
 // MARKETPLACE API ENDPOINTS
