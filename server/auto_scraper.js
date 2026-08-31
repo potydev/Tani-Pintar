@@ -162,24 +162,46 @@ export async function scrapeRecentDays(daysCount = 3) {
   return totalInserted;
 }
 
-// Function to start the 08:00 AM Cron Schedule
+// Function to start the Automated Cron Scheduler & Initial Startup Sync
 export function initAutoScraperCron() {
-  console.log('⏰ [Cron Scheduler] Initializing Daily 08:00 AM WIB Price Scraper Cron Job...');
+  console.log('⏰ [Cron Scheduler] Initializing BI PIHPS Price Scraper (Multi-schedule: 08:30, 12:30, 18:00 WIB)...');
   
-  // '0 8 * * *' = Every day at 08:00 AM Asia/Jakarta time
-  cron.schedule('0 8 * * *', async () => {
-    console.log('⏰ [CRON TRIGGER] Executing daily 08:00 AM BI PIHPS Scraper...');
+  // 1. Initial background sync on server startup (delayed 10s so server boot is unaffected)
+  setTimeout(async () => {
+    console.log('🔄 [Startup Sync] Checking & fetching latest BI PIHPS price data (last 4 days)...');
     try {
-      await scrapeRecentDays(1);
+      await scrapeRecentDays(4);
     } catch (err) {
-      console.error('❌ [CRON ERROR] Failed daily scraper execution:', err);
+      console.error('⚠️ [Startup Sync Error]:', err.message);
     }
-  }, {
-    timezone: "Asia/Jakarta"
+  }, 10000);
+
+  // 2. Schedule 3x daily in Asia/Jakarta timezone:
+  // - 08:30 WIB: Morning market opening data
+  // - 12:30 WIB: Midday consolidated data
+  // - 18:00 WIB: Evening final daily closing data
+  const cronSchedules = [
+    { cron: '30 8 * * *', label: '08:30 AM WIB (Pagi)' },
+    { cron: '30 12 * * *', label: '12:30 PM WIB (Siang)' },
+    { cron: '0 18 * * *', label: '18:00 PM WIB (Sore)' }
+  ];
+
+  cronSchedules.forEach(({ cron: scheduleExpr, label }) => {
+    cron.schedule(scheduleExpr, async () => {
+      console.log(`⏰ [CRON TRIGGER] Executing scheduled BI PIHPS Scraper for ${label}...`);
+      try {
+        await scrapeRecentDays(4);
+      } catch (err) {
+        console.error(`❌ [CRON ERROR - ${label}] Failed scraper execution:`, err);
+      }
+    }, {
+      timezone: "Asia/Jakarta"
+    });
   });
 }
 
 // Execute standalone if called directly
 if (process.argv[1] && process.argv[1].includes('auto_scraper.js')) {
-  scrapeRecentDays(3);
+  scrapeRecentDays(4);
 }
+
