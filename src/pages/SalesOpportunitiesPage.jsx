@@ -59,12 +59,16 @@ export function SalesOpportunitiesPage({ originLocation = "Jawa Tengah" }) {
   }, [selectedCommodity, originLocation]);
 
   const commodities = [
-    "Cabai Merah Besar",
-    "Cabai Rawit Merah",
+    "Cabai Merah",
+    "Cabai Rawit",
     "Bawang Merah",
-    "Beras Kualitas Medium",
-    "Daging Ayam Ras",
-    "Minyak Goreng Kemasan"
+    "Bawang Putih",
+    "Beras",
+    "Daging Ayam",
+    "Daging Sapi",
+    "Telur Ayam",
+    "Minyak Goreng",
+    "Gula Pasir"
   ];
 
   return (

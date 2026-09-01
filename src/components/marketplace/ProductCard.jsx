@@ -34,7 +34,7 @@ export function ProductCard({ product, onView, onBuy }) {
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {product.grade && (
               <span className="bg-emerald-700 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md">
-                Grade {product.grade}
+                {product.grade.startsWith("Grade") ? product.grade : `Grade ${product.grade}`}
               </span>
             )}
             {product.organic && (

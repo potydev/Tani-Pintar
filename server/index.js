@@ -68,22 +68,25 @@ if (databaseUrl) {
   };
 }
 
-// Auto-create users table if not exists
-try {
-  queryDB(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      password VARCHAR(255) NOT NULL,
-      full_name VARCHAR(100) NOT NULL,
-      farm_location VARCHAR(100) DEFAULT 'Cilacap, Jawa Tengah',
-      primary_commodity VARCHAR(100) DEFAULT 'Cabai Merah Besar',
-      land_size VARCHAR(50) DEFAULT '1.5 Hektar',
-      avatar_url TEXT DEFAULT '/assets/farmer_avatar.png',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `).catch(err => console.log('[Database Notice] Users table check:', err.message));
-} catch (e) {}
+// Supabase Data Store is primary. DDL migration runner if direct DB pool is available
+if (databaseUrl) {
+  try {
+    queryDB(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        full_name VARCHAR(100) NOT NULL,
+        farm_location VARCHAR(100) DEFAULT 'Cilacap, Jawa Tengah',
+        primary_commodity VARCHAR(100) DEFAULT 'Cabai Merah Besar',
+        land_size VARCHAR(50) DEFAULT '1.5 Hektar',
+        avatar_url TEXT DEFAULT '/assets/farmer_avatar.png',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `).catch(err => console.log('[Database Notice] Users table check:', err.message));
+  } catch (e) {}
+}
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -1228,53 +1231,56 @@ app.get('/api/recommendations', async (req, res) => {
 // MARKETPLACE API ENDPOINTS
 // ============================================================
 
-// Auto-create marketplace tables
-try {
-  queryDB(`
-    CREATE TABLE IF NOT EXISTS marketplace_products (
-      id SERIAL PRIMARY KEY,
-      seller_id INT REFERENCES users(id) ON DELETE SET NULL,
-      name VARCHAR(150) NOT NULL,
-      category VARCHAR(50) NOT NULL,
-      price NUMERIC(12,2) NOT NULL,
-      unit VARCHAR(20) DEFAULT 'kg',
-      min_order INT DEFAULT 50,
-      stock INT NOT NULL DEFAULT 0,
-      farmer_name VARCHAR(100) NOT NULL,
-      location VARCHAR(100) NOT NULL,
-      rating NUMERIC(2,1) DEFAULT 5.0,
-      reviews_count INT DEFAULT 0,
-      total_sold INT DEFAULT 0,
-      harvest_date DATE,
-      grade VARCHAR(30) DEFAULT 'Grade A',
-      freshness VARCHAR(30) DEFAULT 'Segar',
-      organic BOOLEAN DEFAULT FALSE,
-      verified_seller BOOLEAN DEFAULT TRUE,
-      image_url TEXT,
-      description TEXT,
-      tags TEXT DEFAULT '[]',
-      price_change NUMERIC(5,2) DEFAULT 0,
-      trending BOOLEAN DEFAULT FALSE,
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    )
-  `).catch(err => console.log('[Database Notice] marketplace_products table check:', err.message));
+// Auto-create marketplace tables if direct DB pool is configured
+if (databaseUrl) {
+  try {
+    queryDB(`
+      CREATE TABLE IF NOT EXISTS marketplace_products (
+        id SERIAL PRIMARY KEY,
+        seller_id INT REFERENCES users(id) ON DELETE SET NULL,
+        name VARCHAR(150) NOT NULL,
+        category VARCHAR(50) NOT NULL,
+        price NUMERIC(12,2) NOT NULL,
+        unit VARCHAR(20) DEFAULT 'kg',
+        min_order INT DEFAULT 50,
+        stock INT NOT NULL DEFAULT 0,
+        farmer_name VARCHAR(100) NOT NULL,
+        location VARCHAR(100) NOT NULL,
+        rating NUMERIC(2,1) DEFAULT 5.0,
+        reviews_count INT DEFAULT 0,
+        total_sold INT DEFAULT 0,
+        harvest_date DATE,
+        grade VARCHAR(30) DEFAULT 'Grade A',
+        freshness VARCHAR(30) DEFAULT 'Segar',
+        organic BOOLEAN DEFAULT FALSE,
+        verified_seller BOOLEAN DEFAULT TRUE,
+        image_url TEXT,
+        description TEXT,
+        tags TEXT DEFAULT '[]',
+        price_change NUMERIC(5,2) DEFAULT 0,
+        trending BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `).catch(err => console.log('[Database Notice] marketplace_products table check:', err.message));
 
-  queryDB(`
-    CREATE TABLE IF NOT EXISTS marketplace_orders (
-      id SERIAL PRIMARY KEY,
-      buyer_id INT REFERENCES users(id) ON DELETE CASCADE,
-      product_id INT REFERENCES marketplace_products(id) ON DELETE SET NULL,
-      seller_id INT REFERENCES users(id) ON DELETE SET NULL,
-      quantity INT NOT NULL,
-      total_price NUMERIC(14,2) NOT NULL,
-      shipping_address TEXT NOT NULL,
-      buyer_phone VARCHAR(20),
-      notes TEXT,
-      status VARCHAR(30) DEFAULT 'Menunggu Konfirmasi',
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    )
-  `).catch(err => console.log('[Database Notice] marketplace_orders table check:', err.message));
-} catch (e) {}
+    queryDB(`
+      CREATE TABLE IF NOT EXISTS marketplace_orders (
+        id SERIAL PRIMARY KEY,
+        buyer_id INT REFERENCES users(id) ON DELETE CASCADE,
+        product_id INT REFERENCES marketplace_products(id) ON DELETE SET NULL,
+        seller_id INT REFERENCES users(id) ON DELETE SET NULL,
+        quantity INT NOT NULL,
+        total_price NUMERIC(14,2) NOT NULL,
+        shipping_address TEXT NOT NULL,
+        buyer_phone VARCHAR(20),
+        notes TEXT,
+        status VARCHAR(30) DEFAULT 'Menunggu Konfirmasi',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `).catch(err => console.log('[Database Notice] marketplace_orders table check:', err.message));
+  } catch (e) {}
+}
+
 
 // Marketplace Backend API powered by Supabase PostgreSQL
 

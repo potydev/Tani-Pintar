@@ -42,10 +42,16 @@ export function PriceRecommendationPage() {
                 onChange={(e) => setCommodity(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-2.5 font-medium focus:ring-2 focus:ring-emerald-500"
               >
-                <option value="Cabai Merah Besar">Cabai Merah Besar</option>
-                <option value="Cabai Rawit Merah">Cabai Rawit Merah</option>
+                <option value="Cabai Merah">Cabai Merah</option>
+                <option value="Cabai Rawit">Cabai Rawit</option>
                 <option value="Bawang Merah">Bawang Merah</option>
-                <option value="Beras Kualitas Medium">Beras Kualitas Medium</option>
+                <option value="Bawang Putih">Bawang Putih</option>
+                <option value="Beras">Beras</option>
+                <option value="Daging Ayam">Daging Ayam</option>
+                <option value="Daging Sapi">Daging Sapi</option>
+                <option value="Telur Ayam">Telur Ayam</option>
+                <option value="Minyak Goreng">Minyak Goreng</option>
+                <option value="Gula Pasir">Gula Pasir</option>
               </select>
             </div>
 

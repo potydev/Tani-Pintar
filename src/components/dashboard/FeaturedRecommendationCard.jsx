@@ -156,9 +156,14 @@ export function FeaturedRecommendationCard({
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         destination={data.city}
+        province={data.province}
         estimatedProfit={data.netProfit}
         origin={displayOriginCity}
         commodity={displayCommodity}
+        originPrice={data.originPrice}
+        destPrice={data.destPrice}
+        diffPercent={data.diffPercent}
+        shippingInfo={data.shippingInfo}
       />
     </div>
   );

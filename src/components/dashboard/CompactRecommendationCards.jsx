@@ -77,9 +77,14 @@ export function CompactRecommendationCards({
           isOpen={true}
           onClose={() => setSelectedItem(null)}
           destination={selectedItem.city}
+          province={selectedItem.province}
           estimatedProfit={selectedItem.netProfit}
           origin={displayOriginCity}
           commodity={selectedItem.commodity || commodity}
+          originPrice={selectedItem.originPrice}
+          destPrice={selectedItem.destPrice}
+          diffPercent={selectedItem.diffPercent}
+          shippingInfo={selectedItem.shippingInfo}
         />
       )}
     </div>

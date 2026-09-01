@@ -136,7 +136,7 @@ export function ProductDetailPage({ isLoggedIn }) {
               <div className="absolute top-4 left-4 flex flex-wrap gap-2">
                 {product.grade && (
                   <span className="px-3 py-1 bg-emerald-600 text-white font-extrabold text-xs rounded-full shadow-md">
-                    Grade {product.grade}
+                    {product.grade.startsWith("Grade") ? product.grade : `Grade ${product.grade}`}
                   </span>
                 )}
                 {product.organic && (

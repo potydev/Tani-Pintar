@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { GlobalStyles } from "./src/styles/GlobalStyles";
 import { LandingPage } from "./src/pages/LandingPage";
 import { DashboardPage } from "./src/pages/DashboardPage";
@@ -24,6 +24,18 @@ function AdminRouteGuard({ onBack }) {
   }
 
   return <AdminDashboardPage onBackToUserApp={onBack} />;
+}
+
+function LandingPageWrapper({ isLoggedIn, userName }) {
+  const navigate = useNavigate();
+  return (
+    <LandingPage
+      isLoggedIn={isLoggedIn}
+      userName={userName}
+      onLoginClick={() => navigate(isLoggedIn ? "/dashboard" : "/login")}
+      onNavigate={(path) => navigate(path)}
+    />
+  );
 }
 
 export default function TaniPintarApp() {
@@ -64,7 +76,7 @@ export default function TaniPintarApp() {
           <Route
             path="/"
             element={
-              <LandingPage
+              <LandingPageWrapper
                 isLoggedIn={isLoggedIn}
                 userName={userName}
               />
