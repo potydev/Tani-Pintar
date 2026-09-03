@@ -1704,11 +1704,28 @@ app.use((err, req, res, _next) => {
 
 import { initAutoScraperCron } from './auto_scraper.js';
 
-app.listen(PORT, '0.0.0.0', () => {
+const primaryPort = parseInt(process.env.PORT || '5000', 10);
+
+const mainServer = app.listen(primaryPort, '0.0.0.0', () => {
   console.log(`=================================================`);
-  console.log(`  TaniPintar Application Server Running on Port ${PORT} (0.0.0.0:${PORT})`);
+  console.log(`  TaniPintar Application Server Running on Port ${primaryPort} (0.0.0.0:${primaryPort})`);
   console.log(`=================================================`);
   initAutoScraperCron();
 });
+
+// Dual listener support for Dokploy / Traefik / Docker hosting:
+// If primaryPort is not 3000, also listen on port 3000 (Dokploy's default app port) inside container
+if (primaryPort !== 3000) {
+  try {
+    const aliasServer = app.listen(3000, '0.0.0.0', () => {
+      console.log(`[Hosting Multi-Port] Also listening on port 3000 (0.0.0.0:3000) for Dokploy/Traefik reverse proxy`);
+    });
+    aliasServer.on('error', (err) => {
+      // Port 3000 is in use (e.g. in local Vite dev mode), which is normal and safe to ignore
+      console.log(`[Hosting Multi-Port Notice] Port 3000 alias listener: ${err.message}`);
+    });
+  } catch (e) {}
+}
+
 
 

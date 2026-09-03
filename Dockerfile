@@ -26,7 +26,7 @@ ENV PORT=5000
 
 # Copy package files and install only production dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy built frontend assets from builder stage
 COPY --from=builder /app/dist ./dist
@@ -34,15 +34,18 @@ COPY --from=builder /app/dist ./dist
 # Copy backend server code
 COPY server/ ./server/
 
-# Copy scraped fallback data
+# Copy scraped fallback data and assets
 COPY src/data/ ./src/data/
+COPY public/ ./public/
 
-# Expose server port
+# Expose server ports (both 5000 and 3000 for Dokploy/Traefik compatibility)
 EXPOSE 5000
+EXPOSE 3000
 
-# Health check endpoint for Dokploy
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:5000/api/health || exit 1
+# Resilient health check endpoint for Dokploy / Traefik
+HEALTHCHECK --interval=20s --timeout=5s --start-period=30s --retries=5 \
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:5000/api/health || wget --quiet --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 # Start Application Server
 CMD ["node", "server/index.js"]
+
