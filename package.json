@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:client": "vite",
+    "dev:server": "node server/index.js",
+    "start": "node server/index.js",
     "server": "node server/index.js",
     "db:migrate:supabase": "node server/migrate_to_supabase.js",
     "db:seed:supabase": "node server/seed_supabase.js",

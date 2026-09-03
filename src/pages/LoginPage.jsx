@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Leaf, Zap, KeyRound, X } from "lucide-react";
+import { apiPost } from "../utils/apiClient.js";
 
 export function LoginPage({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -59,29 +60,24 @@ export function LoginPage({ onLoginSuccess }) {
         ? { email, password, full_name: fullName, farm_location: farmLocation, primary_commodity: primaryCommodity, land_size: "1.5 Hektar" }
         : { email, password };
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
+      const res = await apiPost(endpoint, payload);
       setLoading(false);
 
-      if (res.ok && data.success && data.user) {
-        localStorage.setItem("tanipintar_user", JSON.stringify(data.user));
-        if (onLoginSuccess) onLoginSuccess(data.user);
-        if (data.user.role === "admin" || data.user.role === "super_admin") {
+      if (res.ok && res.data && res.data.success && res.data.user) {
+        localStorage.setItem("tanipintar_user", JSON.stringify(res.data.user));
+        if (onLoginSuccess) onLoginSuccess(res.data.user);
+        if (res.data.user.role === "admin" || res.data.user.role === "super_admin") {
           navigate("/admin");
         } else {
           navigate(redirectUrl);
         }
       } else {
-        setError(data.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
+        const errorMsg = res.data?.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.";
+        setError(errorMsg);
       }
     } catch (err) {
       setLoading(false);
-      setError("Terjadi kesalahan koneksi server. Silakan coba beberapa saat lagi.");
+      setError("Terjadi kendala saat menghubungi server. Silakan coba beberapa saat lagi.");
     }
   };
 

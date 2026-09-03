@@ -12,6 +12,7 @@ import {
   Search,
   Leaf
 } from "lucide-react";
+import { apiPost } from "../../utils/apiClient.js";
 
 export const INDONESIAN_CITIES = [
   { id: "Surabaya, Jatim", label: "Surabaya, Jawa Timur", province: "Jawa Timur", badge: "Hub Jatim" },
@@ -65,12 +66,8 @@ export function OnboardingWizardModal({ isOpen, user, onComplete, redirectUrl })
         land_size: roleIntent === "buyer" ? "Konsumen / Mitra Pembeli" : "1.5 Hektar"
       };
 
-      const res = await fetch("/api/auth/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
+      const res = await apiPost("/api/auth/onboarding", payload);
+      const data = (res.ok && res.data) ? res.data : {};
 
       const updatedUser = data.user || {
         ...user,

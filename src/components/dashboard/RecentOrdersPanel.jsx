@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, MapPin, Bell, Loader2 } from "lucide-react";
+import { apiGet } from "../../utils/apiClient.js";
 
 export function RecentOrdersPanel() {
   const [alerts, setAlerts] = useState([]);
@@ -8,13 +9,9 @@ export function RecentOrdersPanel() {
   useEffect(() => {
     async function fetchAlerts() {
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL ||
-          (typeof window !== 'undefined' && window.location.port === '3000' ? 'http://localhost:5000/api' : '/api');
-        const res = await fetch(`${baseUrl}/demand/regional?commodity=Cabai+Merah`);
-        if (!res.ok) throw new Error("API not ok");
-        const json = await res.json();
-        if (json.data && json.data.length > 0) {
-          const mapped = json.data.slice(0, 4).map((item, idx) => ({
+        const res = await apiGet(`/api/demand/regional?commodity=Cabai+Merah`);
+        if (res.ok && res.data && res.data.data && res.data.data.length > 0) {
+          const mapped = res.data.data.slice(0, 4).map((item, idx) => ({
             id: `ALT-0${idx + 1}`,
             commodity: "Cabai Merah",
             location: `${item.city}`,

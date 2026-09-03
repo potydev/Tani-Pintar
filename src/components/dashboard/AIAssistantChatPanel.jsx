@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Sparkles, ArrowRight, Send, Loader2 } from "lucide-react";
 import { QUICK_CHAT_PROMPTS } from "../../data/mockData";
+import { apiPost } from "../../utils/apiClient.js";
 
 export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilacap, Jateng" }) {
   const [messages, setMessages] = useState([
@@ -28,28 +29,20 @@ export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilaca
     setLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL ||
-        (typeof window !== 'undefined' && window.location.port === '3000' ? 'http://localhost:5000/api' : '/api');
-
-      const res = await fetch(`${baseUrl}/ai/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          history: messages.slice(-4),
-          userContext: {
-            userName: name,
-            location: user?.farm_location || location,
-            commodity: user?.primary_commodity || "Cabai Merah"
-          }
-        })
+      const res = await apiPost('/api/ai/chat', {
+        message: text,
+        history: messages.slice(-4),
+        userContext: {
+          userName: name,
+          location: user?.farm_location || location,
+          commodity: user?.primary_commodity || "Cabai Merah"
+        }
       });
 
-      const data = await res.json();
-      if (res.ok && data.success && data.reply) {
-        setMessages([...newHistory, { sender: "bot", text: data.reply }]);
+      if (res.ok && res.data && res.data.success && res.data.reply) {
+        setMessages([...newHistory, { sender: "bot", text: res.data.reply }]);
       } else {
-        throw new Error(data.error || "Gagal mendapatkan respon AI");
+        throw new Error(res.data?.error || "Gagal mendapatkan respon AI");
       }
     } catch (err) {
       // Intelligent fallback

@@ -1,14 +1,7 @@
 import liveData from "../data/harga_pangan_realtime.json";
+import { safeApiFetch, apiGet, API_BASE_URL } from "./apiClient.js";
 
-const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-  if (typeof window !== 'undefined' && window.location.port === '3000') {
-    return 'http://localhost:5000/api';
-  }
-  return '/api';
-};
-
-const API_BASE_URL = getApiBaseUrl();
+export { API_BASE_URL };
 
 export function getLiveCommodityPrices() {
   if (!liveData || !liveData.commodities) {
@@ -58,38 +51,38 @@ export function getRegionalDemandData() {
     }));
 }
 
-// ASYNC BACKEND API FETCHERS (MySQL Integration)
+// ASYNC BACKEND API FETCHERS (Supabase & Backend Integration)
 
 export async function fetchPriceHistory(commodity = 'Cabai Merah', origin = 'Cilacap, Jateng') {
   try {
-    const res = await fetch(`${API_BASE_URL}/prices/history?commodity=${encodeURIComponent(commodity)}&origin=${encodeURIComponent(origin)}`);
-    if (!res.ok) throw new Error("API Network response was not ok");
-    const json = await res.json();
-    return json.data;
+    const res = await apiGet(`/api/prices/history?commodity=${encodeURIComponent(commodity)}&origin=${encodeURIComponent(origin)}`);
+    if (res.ok && res.data && res.data.success && res.data.data) {
+      return res.data.data;
+    }
   } catch (err) {
     console.warn("Backend API not reachable, using local fallback history.", err);
-    return null;
   }
+  return null;
 }
 
 export async function fetchRegionalDemand(commodity = 'Cabai Merah') {
   try {
-    const res = await fetch(`${API_BASE_URL}/demand/regional?commodity=${encodeURIComponent(commodity)}`);
-    if (!res.ok) throw new Error("API Network response was not ok");
-    const json = await res.json();
-    return json.data;
+    const res = await apiGet(`/api/demand/regional?commodity=${encodeURIComponent(commodity)}`);
+    if (res.ok && res.data && res.data.success && res.data.data) {
+      return res.data.data;
+    }
   } catch (err) {
     console.warn("Backend API not reachable, using local fallback demand.", err);
-    return getRegionalDemandData();
   }
+  return getRegionalDemandData();
 }
 
 export async function fetchAvailableDates() {
   try {
-    const res = await fetch(`${API_BASE_URL}/dates`);
-    if (!res.ok) throw new Error("API response not ok");
-    const json = await res.json();
-    if (json.data && json.data.length > 0) return json.data;
+    const res = await apiGet(`/api/dates`);
+    if (res.ok && res.data && res.data.success && res.data.data && res.data.data.length > 0) {
+      return res.data.data;
+    }
   } catch (err) {
     console.warn("Backend API not reachable for dates, using dynamic generator.", err);
   }
@@ -114,15 +107,16 @@ export async function fetchAvailableDates() {
 
 export async function fetchAIRecommendations(origin = 'Cilacap, Jateng', commodity = 'Cabai Merah', date = null) {
   try {
-    let url = `${API_BASE_URL}/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`;
+    let url = `/api/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`;
     if (date) url += `&date=${encodeURIComponent(date)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("API Network response was not ok");
-    const json = await res.json();
-    return json.data;
+    const res = await apiGet(url);
+    if (res.ok && res.data && res.data.success && res.data.data) {
+      return res.data.data;
+    }
   } catch (err) {
     console.warn("Backend API not reachable, using local fallback recommendations.", err);
-    return null;
   }
+  return null;
 }
+
 

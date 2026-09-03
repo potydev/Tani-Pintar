@@ -3,6 +3,7 @@ import {
   X, Leaf, Lock, Mail, User, MapPin, Sprout, ArrowRight,
   CheckCircle2, AlertCircle, Eye, EyeOff, Loader2, ShieldCheck
 } from "lucide-react";
+import { apiPost } from "../../utils/apiClient.js";
 
 export function LoginModal({ onClose, onLogin }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -49,21 +50,16 @@ export function LoginModal({ onClose, onLogin }) {
       : { email, password };
 
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const json = await res.json();
+      const res = await apiPost(endpoint, payload);
 
-      if (res.ok && json.success && json.user) {
-        localStorage.setItem("tanipintar_user", JSON.stringify(json.user));
-        if (onLogin) onLogin(json.user.full_name || json.user.email);
+      if (res.ok && res.data && res.data.success && res.data.user) {
+        localStorage.setItem("tanipintar_user", JSON.stringify(res.data.user));
+        if (onLogin) onLogin(res.data.user.full_name || res.data.user.email);
       } else {
-        setErrorMsg(json.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
+        setErrorMsg(res.data?.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");
       }
     } catch (err) {
-      setErrorMsg("Terjadi kesalahan koneksi server. Silakan coba beberapa saat lagi.");
+      setErrorMsg("Terjadi kendala saat menghubungi server. Silakan coba beberapa saat lagi.");
     } finally {
       setLoading(false);
     }

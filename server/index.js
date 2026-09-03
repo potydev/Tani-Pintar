@@ -3,6 +3,7 @@ import cors from 'cors';
 import mysql from 'mysql2/promise';
 import pg from 'pg';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 
@@ -17,6 +18,15 @@ const fallbackKeyParts = ['sb_secret_M_0Dl7F4', 'GeCN5VhjjCHKA_L7u7qYHQ'];
 const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY || fallbackKeyParts.join('-');
 const supabase = createClient(supabaseUrl, supabaseKey);
 console.log('[Supabase JS] Initialized Supabase client for harga_pangan queries.');
+
+// Process crash protection & error logging
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL - Uncaught Exception]:', err.message || err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL - Unhandled Rejection]:', reason);
+});
 
 const { Pool: PgPool } = pg;
 const __filename = fileURLToPath(import.meta.url);
@@ -1646,22 +1656,59 @@ app.get('/api/marketplace/stats', async (req, res) => {
 
 // Serve Static Frontend Assets in Production
 const distPath = path.join(__dirname, '../dist');
-app.use(express.static(distPath));
+const distIndex = path.join(distPath, 'index.html');
 
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
+
+// Single Page Application (SPA) Client-side Routing Fallback
 app.use((req, res, next) => {
   if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(distPath, 'index.html'));
-  } else {
-    next();
+    if (fs.existsSync(distIndex)) {
+      return res.sendFile(distIndex);
+    }
+    return res.status(200).send(`
+      <!DOCTYPE html>
+      <html>
+        <head><title>TaniPintar Backend Running</title></head>
+        <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+          <h2>🌾 TaniPintar Backend API Server is Running on Port ${PORT}</h2>
+          <p>Frontend production bundle dist/ is not built yet or running in development mode.</p>
+          <p>Buka <a href="http://localhost:3000">http://localhost:3000</a> untuk mengakses antarmuka Vite frontend.</p>
+        </body>
+      </html>
+    `);
   }
+  next();
+});
+
+// 404 Handler for undefined /api routes
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `Endpoint API '${req.method} ${req.originalUrl}' tidak ditemukan.`
+  });
+});
+
+// Express Global Error Handling Middleware
+app.use((err, req, res, _next) => {
+  console.error('[Server Internal Error]:', err);
+  if (res.headersSent) return;
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || 'Terjadi kesalahan internal pada server.',
+    ...(process.env.NODE_ENV !== 'production' ? { stack: err.stack } : {})
+  });
 });
 
 import { initAutoScraperCron } from './auto_scraper.js';
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`=================================================`);
-  console.log(`  TaniPintar Application Server Running on Port ${PORT}`);
+  console.log(`  TaniPintar Application Server Running on Port ${PORT} (0.0.0.0:${PORT})`);
   console.log(`=================================================`);
   initAutoScraperCron();
 });
+
 

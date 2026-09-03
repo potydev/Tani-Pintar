@@ -18,6 +18,7 @@ import {
   Sparkles,
   ArrowLeft
 } from "lucide-react";
+import { apiGet, apiPost } from "../utils/apiClient.js";
 
 export function AdminDashboardPage({ onBackToUserApp }) {
   const [requests, setRequests] = useState([]);
@@ -30,10 +31,9 @@ export function AdminDashboardPage({ onBackToUserApp }) {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/farmers");
-      const data = await res.json();
-      if (data.success && data.requests) {
-        setRequests(data.requests);
+      const res = await apiGet("/api/admin/farmers");
+      if (res.ok && res.data && res.data.success && res.data.requests) {
+        setRequests(res.data.requests);
       }
     } catch (err) {
       console.error("Error fetching admin requests:", err);
@@ -52,13 +52,8 @@ export function AdminDashboardPage({ onBackToUserApp }) {
 
   const handleApprove = async (reqItem) => {
     try {
-      const res = await fetch("/api/admin/approve-farmer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: reqItem.email, req_id: reqItem.id })
-      });
-      const data = await res.json();
-      if (data.success) {
+      const res = await apiPost("/api/admin/approve-farmer", { email: reqItem.email, req_id: reqItem.id });
+      if (res.ok && res.data && res.data.success) {
         setRequests(prev => prev.map(r => r.id === reqItem.id ? { ...r, verification_status: "approved" } : r));
         setNotification(`✅ Berhasil menyetujui verifikasi petani: ${reqItem.full_name}`);
         setTimeout(() => setNotification(""), 4000);
@@ -72,17 +67,12 @@ export function AdminDashboardPage({ onBackToUserApp }) {
     if (!rejectModalItem) return;
     const finalReason = `${rejectCategory}${rejectDetailReason ? `: ${rejectDetailReason}` : ""}`;
     try {
-      const res = await fetch("/api/admin/reject-farmer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: rejectModalItem.email,
-          req_id: rejectModalItem.id,
-          reason: finalReason
-        })
+      const res = await apiPost("/api/admin/reject-farmer", {
+        email: rejectModalItem.email,
+        req_id: rejectModalItem.id,
+        reason: finalReason
       });
-      const data = await res.json();
-      if (data.success) {
+      if (res.ok && res.data && res.data.success) {
         setRequests(prev => prev.map(r => r.id === rejectModalItem.id ? { ...r, verification_status: "rejected", rejection_reason: finalReason } : r));
         setNotification(`❌ Pengajuan verifikasi ${rejectModalItem.full_name} ditolak.`);
         setTimeout(() => setNotification(""), 5000);

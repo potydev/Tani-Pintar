@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Target, TrendingUp, Globe, Wallet, Building2, Loader2 } from "lucide-react";
+import { apiGet } from "../../utils/apiClient.js";
 
 const ICON_MAP = { Target, TrendingUp, Globe, Wallet, Building2 };
 
@@ -10,20 +11,17 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL ||
-          (typeof window !== 'undefined' && window.location.port === '3000' ? 'http://localhost:5000/api' : '/api');
-        
         const [datesRes, latestRes, demandRes, recsRes] = await Promise.all([
-          fetch(`${baseUrl}/dates`),
-          fetch(`${baseUrl}/prices/latest`),
-          fetch(`${baseUrl}/demand/regional?commodity=Cabai+Merah`),
-          fetch(`${baseUrl}/recommendations?origin=${encodeURIComponent(originLocation)}&commodity=Cabai+Merah`)
+          apiGet(`/api/dates`),
+          apiGet(`/api/prices/latest`),
+          apiGet(`/api/demand/regional?commodity=Cabai+Merah`),
+          apiGet(`/api/recommendations?origin=${encodeURIComponent(originLocation)}&commodity=Cabai+Merah`)
         ]);
 
-        const datesData = datesRes.ok ? await datesRes.json() : null;
-        const latestData = latestRes.ok ? await latestRes.json() : null;
-        const demandData = demandRes.ok ? await demandRes.json() : null;
-        const recsData = recsRes.ok ? await recsRes.json() : null;
+        const datesData = datesRes.ok ? datesRes.data : null;
+        const latestData = latestRes.ok ? latestRes.data : null;
+        const demandData = demandRes.ok ? demandRes.data : null;
+        const recsData = recsRes.ok ? recsRes.data : null;
 
         const latestDate = datesData?.data?.[0]?.label || "Hari Ini";
         const cabaiItem = latestData?.data?.find(c => c.commodity_name?.includes('Cabai Merah')) || {};

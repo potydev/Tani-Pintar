@@ -4,7 +4,7 @@ import {
   ArrowLeft, CheckCircle2, MapPin, Phone, User, Truck, CreditCard,
   ShieldCheck, AlertCircle, ShoppingBag, Leaf, FileText
 } from "lucide-react";
-import { fetchProductDetail, createOrder } from "../data/marketplaceData";
+import { fetchProductDetail, fetchProducts, createOrder } from "../data/marketplaceData";
 
 export function CheckoutPage({ isLoggedIn }) {
   const { id } = useParams();
@@ -23,7 +23,7 @@ export function CheckoutPage({ isLoggedIn }) {
   const [shippingAddress, setShippingAddress] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
   const [notes, setNotes] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethod, setPaymentMethod] = useState("transfer"); // 'transfer' | 'cod' | 'escrow'
 
   useEffect(() => {
     // Check auth
@@ -44,19 +44,23 @@ export function CheckoutPage({ isLoggedIn }) {
 
     async function loadProduct() {
       setLoading(true);
-      const res = await fetchProductDetail(id);
-      if (res.success && res.data) {
-        setProduct(res.data);
-      } else {
-        // Fallback fetch all products
-        const allRes = await fetch("/api/marketplace/products");
-        const json = await allRes.json();
-        if (json.success && json.data) {
-          const found = json.data.find((p) => String(p.id) === String(id));
-          if (found) setProduct(found);
+      try {
+        const res = await fetchProductDetail(id);
+        if (res.success && res.data) {
+          setProduct(res.data);
+        } else {
+          // Fallback fetch all products
+          const allRes = await fetchProducts();
+          if (allRes.success && allRes.data) {
+            const found = allRes.data.find((p) => String(p.id) === String(id));
+            if (found) setProduct(found);
+          }
         }
+      } catch (err) {
+        console.warn("Error loading checkout product:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     loadProduct();

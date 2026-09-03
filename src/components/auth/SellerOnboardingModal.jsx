@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, ArrowRight, ArrowLeft, ArrowDown, Check, ShieldCheck, Leaf, Upload, AlertCircle, Loader2, MapPin } from "lucide-react";
+import { apiPost } from "../../utils/apiClient.js";
 
 export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess }) {
   const [currentStep, setCurrentStep] = useState(1); // 1: Lokasi, 2: Komoditas, 3: Verifikasi
@@ -440,16 +441,10 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
         ktp_image_url: ktpPreview || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80"
       };
 
-      const res = await fetch("/api/auth/upgrade-seller", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
+      const res = await apiPost("/api/auth/upgrade-seller", payload);
       setLoading(false);
 
-      if (res.ok && data.success) {
+      if (res.ok && res.data && res.data.success) {
         const updatedUser = {
           ...user,
           role: "farmer_pending",
@@ -464,7 +459,7 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
         setSubmittedSuccess(true);
         if (onUpgradeSuccess) onUpgradeSuccess(updatedUser);
       } else {
-        setErrorMsg(data.error || "Gagal mengirim pengajuan verifikasi.");
+        setErrorMsg(res.data?.error || "Gagal mengirim pengajuan verifikasi.");
       }
     } catch (err) {
       setLoading(false);

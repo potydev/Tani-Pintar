@@ -15,6 +15,7 @@ import {
   ShoppingBag,
   DollarSign
 } from "lucide-react";
+import { apiGet, apiPatch } from "../utils/apiClient.js";
 
 export function OrdersManagementPage({ user }) {
   const [activeTab, setActiveTab] = useState("buyer"); // 'buyer' | 'seller'
@@ -28,11 +29,10 @@ export function OrdersManagementPage({ user }) {
     setLoading(true);
     try {
       const buyerIdParam = user?.id ? `?buyer_id=${user.id}` : "";
-      const res = await fetch(`/api/marketplace/orders/my-orders${buyerIdParam}`);
-      const json = await res.json();
-      if (json.success && json.data) {
-        setBuyerOrders(json.data.buyerOrders || []);
-        setSellerOrders(json.data.sellerOrders || []);
+      const res = await apiGet(`/api/marketplace/orders/my-orders${buyerIdParam}`);
+      if (res.ok && res.data && res.data.success && res.data.data) {
+        setBuyerOrders(res.data.data.buyerOrders || []);
+        setSellerOrders(res.data.data.sellerOrders || []);
       }
     } catch (e) {
       console.error("Error fetching orders:", e);
@@ -48,13 +48,8 @@ export function OrdersManagementPage({ user }) {
   const handleUpdateStatus = async (orderId, newStatus) => {
     setUpdatingId(orderId);
     try {
-      const res = await fetch(`/api/marketplace/orders/${orderId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus })
-      });
-      const data = await res.json();
-      if (data.success) {
+      const res = await apiPatch(`/api/marketplace/orders/${orderId}/status`, { status: newStatus });
+      if (res.ok && res.data && res.data.success) {
         setToastMsg(`✅ Status pesanan #${orderId} diubah menjadi: ${newStatus}`);
         setTimeout(() => setToastMsg(""), 4000);
         fetchOrders();

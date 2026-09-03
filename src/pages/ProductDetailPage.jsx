@@ -4,7 +4,7 @@ import {
   ArrowLeft, Star, MapPin, Calendar, CheckCircle2, ShieldCheck,
   ShoppingBag, Minus, Plus, ChevronRight, Leaf, Info, Truck
 } from "lucide-react";
-import { fetchProductDetail, CATEGORY_ICON } from "../data/marketplaceData";
+import { fetchProductDetail, fetchProducts, CATEGORY_ICON } from "../data/marketplaceData";
 
 export function ProductDetailPage({ isLoggedIn }) {
   const { id } = useParams();
@@ -18,23 +18,27 @@ export function ProductDetailPage({ isLoggedIn }) {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const res = await fetchProductDetail(id);
-      if (res.success && res.data) {
-        setProduct(res.data);
-        setQty(res.data.min_order || 50);
-      } else {
-        // Fallback fetch all
-        const allRes = await fetch("/api/marketplace/products");
-        const json = await allRes.json();
-        if (json.success && json.data) {
-          const found = json.data.find((p) => String(p.id) === String(id));
-          if (found) {
-            setProduct(found);
-            setQty(found.min_order || 50);
+      try {
+        const res = await fetchProductDetail(id);
+        if (res.success && res.data) {
+          setProduct(res.data);
+          setQty(res.data.min_order || 50);
+        } else {
+          // Fallback fetch all
+          const allRes = await fetchProducts();
+          if (allRes.success && allRes.data) {
+            const found = allRes.data.find((p) => String(p.id) === String(id));
+            if (found) {
+              setProduct(found);
+              setQty(found.min_order || 50);
+            }
           }
         }
+      } catch (err) {
+        console.warn("Error loading product detail:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadData();
   }, [id]);
