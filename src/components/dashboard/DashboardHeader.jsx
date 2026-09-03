@@ -301,8 +301,8 @@ export function DashboardHeader({
                 <div className="mt-3 pt-3 border-t border-slate-100">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                     <span>Data Riwayat Tersedia</span>
-                    <span className="text-[9px] text-emerald-600 font-semibold flex items-center gap-1">
-                      <Sparkles size={10} /> Real-time
+                    <span className="text-[9px] text-emerald-700 font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Terverifikasi
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-0.5">

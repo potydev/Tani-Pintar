@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, MapPin, TrendingUp, Sparkles, ShieldCheck, Truck, Clock } from "lucide-react";
+import { X, MapPin, TrendingUp, Route, ShieldCheck, Truck, Clock } from "lucide-react";
 
 const PROVINCE_MARKETS = {
   "DKI Jakarta": { marketName: "Pasar Induk Kramat Jati / Cipinang", province: "DKI Jakarta", demandStatus: "Sangat Tinggi (~15 Ton/hari)", bestWindow: "Setiap Hari (Konsisten)" },
@@ -84,8 +84,8 @@ export function ShippingModal({
         {/* Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="text-emerald-400" size={20} />
-            <h3 className="font-heading font-bold text-base">Rincian Analisis Pasar AI</h3>
+            <Route className="text-emerald-400" size={20} />
+            <h3 className="font-heading font-bold text-base">Rincian Rute &amp; Margin Arbitrase Pasar</h3>
           </div>
           <button
             type="button"

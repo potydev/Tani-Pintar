@@ -5,13 +5,13 @@ const FEATURES = [
   {
     icon: BarChart2,
     title: "Analitik Harga Real-Time",
-    desc: "Pantau pergerakan harga komoditas dari 34 kota secara langsung. Data diperbarui setiap 15 menit dari pasar induk terpercaya.",
-    highlight: "34 Kota Dipantau",
+    desc: "Pantau pergerakan harga komoditas dari 38 provinsi secara langsung. Data terintegrasi Bank Indonesia PIHPS dan pasar induk nasional.",
+    highlight: "38 Provinsi Terpantau",
   },
   {
     icon: Zap,
-    title: "Rekomendasi AI Instan",
-    desc: "Algoritma AI menganalisis permintaan, logistik, dan margin untuk memberikan rekomendasi pasar tujual terbaik dalam hitungan detik.",
+    title: "Optimasi Rute Arbitrase Pasar",
+    desc: "Algoritma cerdas menganalisis disparitas harga, jarak tempuh kargo, dan toleransi susut muatan untuk menghasilkan rekomendasi pasar berkeuntungan tertinggi.",
     highlight: "+9.2% Rata-rata Profit",
   },
   {

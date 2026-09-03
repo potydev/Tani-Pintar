@@ -127,7 +127,7 @@ export function DashboardPage({ name, onLogout }) {
       default:
         return (
           <>
-            {/* Horizontal Metric Cards (5 Cards) */}
+            {/* Horizontal Metric Cards (4 Executive B2B Cards) */}
             <MetricCardsGrid originLocation={selectedLocation} isVerifiedFarmer={true} onOpenUpgrade={() => setIsUpgradeOpen(true)} />
 
             {/* Main Content Grid: Left Analysis & Right Assistant */}
@@ -137,17 +137,17 @@ export function DashboardPage({ name, onLogout }) {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div>
                     <h3 className="font-heading font-bold text-slate-900 text-base">
-                      Peluang Penjualan Terbaik untuk Anda ({selectedLocation})
+                      Peluang Arbitrase Komoditas Unggulan ({selectedLocation})
                     </h3>
                     <p className="text-[11px] text-slate-500">
-                      Rekomendasi arbitrase harga live pasar komoditas {selectedCommodity}
+                      Perbandingan harga pasar induk nasional terhadap sentra produksi {selectedCommodity}
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab("peluang")}
-                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 shrink-0"
+                    className="text-xs font-bold text-emerald-800 hover:text-emerald-900 flex items-center gap-1 shrink-0 cursor-pointer"
                   >
-                    Lihat Semua Peluang &rarr;
+                    Lihat Semua Rute &rarr;
                   </button>
                 </div>
 
@@ -168,8 +168,8 @@ export function DashboardPage({ name, onLogout }) {
                       onClick={() => setSelectedCommodity(comm)}
                       className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer text-xs ${
                         selectedCommodity === comm
-                          ? "bg-emerald-700 text-white shadow-sm shadow-emerald-700/20"
-                          : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+                          ? "bg-emerald-800 text-white shadow-xs font-extrabold"
+                          : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/90"
                       }`}
                     >
                       {comm}

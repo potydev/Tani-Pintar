@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Target, TrendingUp, Globe, Wallet, Building2, Loader2 } from "lucide-react";
+import { TrendingUp, Compass, Wallet, Building2, Loader2, ArrowUpRight } from "lucide-react";
 import { apiGet } from "../../utils/apiClient.js";
-
-const ICON_MAP = { Target, TrendingUp, Globe, Wallet, Building2 };
 
 export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   const [metrics, setMetrics] = useState(null);
@@ -25,62 +23,49 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
 
         const latestDate = datesData?.data?.[0]?.label || "Hari Ini";
         const cabaiItem = latestData?.data?.find(c => c.commodity_name?.includes('Cabai Merah')) || {};
-        const topDemand = demandData?.data?.[0];
         const topRec = recsData?.data?.[0];
         const nationalAvg = cabaiItem.national_avg ? Math.round(cabaiItem.national_avg) : 49300;
-
-        const profitDisplay = topRec ? topRec.netProfit : "Rp 14.850.000";
-        const profitCity = topRec ? `Ke ${topRec.city} (500kg)` : `Rute dari ${originLocation.split(',')[0]} (500kg)`;
+        const profitDisplay = topRec ? topRec.netProfit : "Rp 14.449.000";
 
         setMetrics([
           {
-            title: "Pasar Terpantau",
-            value: "38",
-            unit: "provinsi",
-            change: "Live Data BI PIHPS",
-            iconName: "Building2",
-            iconBg: "#DCFCE7",
-            iconColor: "#16A34A"
-          },
-          {
-            title: "Harga Rata-rata Nasional",
+            title: "Harga Rata-Rata Nasional",
             value: `Rp ${nationalAvg.toLocaleString('id-ID')}`,
-            unit: "",
-            change: `Cabai Merah — ${latestDate}`,
-            iconName: "TrendingUp",
-            iconBg: "#F3E8FF",
-            iconColor: "#7C3AED"
+            unit: "/kg",
+            subtext: `Cabai Merah • ${latestDate}`,
+            badge: "BI PIHPS",
+            icon: TrendingUp,
+            accent: "emerald"
           },
           {
-            title: "Peluang Terbaik Arbitrase",
-            value: topRec ? topRec.city : (topDemand?.city || "Maluku"),
+            title: "Peluang Arbitrase Tertinggi",
+            value: topRec ? topRec.city : "Jayapura",
             unit: "",
-            change: topRec ? `${topRec.diffPercent} margin` : "Permintaan Pasar Tinggi",
-            iconName: "Globe",
-            iconBg: "#FFEDD5",
-            iconColor: "#EA580C"
+            subtext: topRec ? `Potensi selisih ${topRec.diffPercent}` : "Margin tertinggi luar pulau",
+            badge: topRec?.diffPercent || "+164.8%",
+            icon: Compass,
+            accent: "amber"
           },
           {
-            title: "Estimasi Keuntungan",
+            title: "Estimasi Laba Bersih",
             value: profitDisplay,
             unit: "",
-            change: profitCity,
-            iconName: "Wallet",
-            iconBg: "#DBEAFE",
-            iconColor: "#2563EB"
+            subtext: `Simulasi rute ${topRec?.city || 'Jayapura'} (500 kg)`,
+            badge: "Net Profit",
+            icon: Wallet,
+            accent: "blue"
           },
           {
-            title: "Tanggal Data Terbaru",
-            value: datesData?.data?.[0]?.date || "2026-08-28",
-            unit: "",
-            change: latestDate,
-            iconName: "Target",
-            iconBg: "#DCFCE7",
-            iconColor: "#16A34A"
+            title: "Cakupan Pantauan Pasar",
+            value: "38",
+            unit: "Provinsi",
+            subtext: "Terhubung otomatis BI PIHPS",
+            badge: "Real-time",
+            icon: Building2,
+            accent: "slate"
           }
         ]);
       } catch (err) {
-        // Fallback to statics
         setMetrics(null);
       } finally {
         setLoading(false);
@@ -89,23 +74,53 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
     fetchMetrics();
   }, [originLocation]);
 
-  // Default static fallback
   const defaultMetrics = [
-    { title: "Pasar Terpantau", value: "38", unit: "provinsi", change: "Live Data BI PIHPS", iconName: "Building2", iconBg: "#DCFCE7", iconColor: "#16A34A" },
-    { title: "Harga Rata-rata Nasional", value: "Rp 50.900", unit: "", change: "Cabai Merah", iconName: "TrendingUp", iconBg: "#F3E8FF", iconColor: "#7C3AED" },
-    { title: "Permintaan Tertinggi", value: "Kalimantan Selatan", unit: "", change: "↑ 18% dari kemarin", iconName: "Globe", iconBg: "#FFEDD5", iconColor: "#EA580C" },
-    { title: "Estimasi Keuntungan", value: "Rp 14.850.000", unit: "", change: `Rute dari ${originLocation.split(',')[0]}`, iconName: "Wallet", iconBg: "#DBEAFE", iconColor: "#2563EB" },
-    { title: "Tanggal Data Terbaru", value: "2026-08-28", unit: "", change: "Data Terupdate", iconName: "Target", iconBg: "#DCFCE7", iconColor: "#16A34A" }
+    {
+      title: "Harga Rata-Rata Nasional",
+      value: "Rp 50.900",
+      unit: "/kg",
+      subtext: "Cabai Merah • 38 Provinsi",
+      badge: "BI PIHPS",
+      icon: TrendingUp,
+      accent: "emerald"
+    },
+    {
+      title: "Peluang Arbitrase Tertinggi",
+      value: "Jayapura",
+      unit: "",
+      subtext: "Potensi selisih margin +164.8%",
+      badge: "+164.8%",
+      icon: Compass,
+      accent: "amber"
+    },
+    {
+      title: "Estimasi Laba Bersih",
+      value: "Rp 14.449.000",
+      unit: "",
+      subtext: `Simulasi rute muatan 500 kg`,
+      badge: "Net Profit",
+      icon: Wallet,
+      accent: "blue"
+    },
+    {
+      title: "Cakupan Pantauan Pasar",
+      value: "38",
+      unit: "Provinsi",
+      subtext: "Terhubung otomatis BI PIHPS",
+      badge: "Real-time",
+      icon: Building2,
+      accent: "slate"
+    }
   ];
 
   const displayMetrics = metrics || defaultMetrics;
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {defaultMetrics.map((_, idx) => (
-          <div key={idx} className="tp-card p-4 flex items-center justify-center h-24 animate-pulse">
-            <div className="w-6 h-6 text-slate-300"><Loader2 size={24} className="animate-spin" /></div>
+          <div key={idx} className="tp-card p-5 flex items-center justify-center h-28 animate-pulse bg-white">
+            <Loader2 size={24} className="animate-spin text-slate-300" />
           </div>
         ))}
       </div>
@@ -113,30 +128,39 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {displayMetrics.map((item, idx) => {
-        const IconComp = ICON_MAP[item.iconName] || Target;
+        const Icon = item.icon;
         return (
           <div
             key={idx}
-            className="tp-card p-4 flex flex-col justify-between hover:shadow-sm hover:border-emerald-300 transition-all"
+            className="tp-card p-5 flex flex-col justify-between hover:border-emerald-300 hover:shadow-md transition-all duration-200 bg-white"
           >
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slate-500">{item.title}</span>
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: item.iconBg, color: item.iconColor }}
-                >
-                  <IconComp size={16} />
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {item.title}
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0">
+                  <Icon size={16} />
                 </div>
               </div>
-              <div className="font-heading text-xl font-extrabold text-slate-900 truncate">
-                {item.value} <span className="text-sm font-semibold text-slate-500">{item.unit}</span>
+
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-heading text-2xl font-black text-slate-900 tracking-tight">
+                  {item.value}
+                </span>
+                {item.unit && (
+                  <span className="text-xs font-bold text-slate-500">{item.unit}</span>
+                )}
               </div>
             </div>
-            <div className="mt-2 pt-2 border-t border-slate-100 flex items-center gap-1 text-xs font-semibold text-emerald-700 truncate">
-              <span className="truncate">{item.change}</span>
+
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-slate-500 font-medium truncate">{item.subtext}</span>
+              <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
+                {item.badge}
+              </span>
             </div>
           </div>
         );
@@ -144,4 +168,5 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
     </div>
   );
 }
+
 

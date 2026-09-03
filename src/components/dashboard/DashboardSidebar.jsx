@@ -22,17 +22,17 @@ import {
 export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, onOpenSellProduct, user }) {
   const menuGroups = [
     {
-      title: "Keputusan Penjualan AI",
+      title: "Strategi & Keputusan Pasar",
       items: [
-        { id: "peluang", label: "Peluang Penjualan", icon: Target },
-        { id: "prediksi", label: "Prediksi Harga", icon: LineChartIcon },
-        { id: "pembeli", label: "Pasar Induk", icon: Building2 },
-        { id: "rekomendasi", label: "Rekomendasi Batas Harga", icon: Tag },
-        { id: "hitung", label: "Hitung Keuntungan", icon: Calculator },
+        { id: "peluang", label: "Peluang Arbitrase Pasar", icon: Target },
+        { id: "prediksi", label: "Tren & Prediksi Harga", icon: LineChartIcon },
+        { id: "pembeli", label: "Direktori Pasar Induk", icon: Building2 },
+        { id: "rekomendasi", label: "Batas Harga Tawar Aman", icon: Tag },
+        { id: "hitung", label: "Kalkulator Arbitrase & Laba", icon: Calculator },
       ]
     },
     {
-      title: "Marketplace & Toko",
+      title: "Marketplace & Transaksi",
       items: [
         { id: "marketplace_view", label: "Jelajah Marketplace", icon: ShoppingBag, badge: "Beli" },
         { id: "sell_product", label: "Mulai Menjual (Pasang Panen)", icon: PlusCircle, badge: "Jual" },
@@ -40,9 +40,9 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
       ]
     },
     {
-      title: "Data & Analytics",
+      title: "Analitik Komoditas",
       items: [
-        { id: "analytics", label: "Market Analytics", icon: BarChart3 }
+        { id: "analytics", label: "Market Analytics Nasional", icon: BarChart3 }
       ]
     }
   ];
@@ -53,7 +53,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
         {/* Top Brand */}
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-700 flex items-center justify-center text-white shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-emerald-800 flex items-center justify-center text-white shadow-xs">
               <Leaf size={20} />
             </div>
             <div>
@@ -61,7 +61,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                 TaniPintar
               </div>
               <div className="text-[10px] font-bold text-slate-500 tracking-wider uppercase mt-1">
-                AI Market Intelligence
+                Intelijen Pasar Pangan
               </div>
             </div>
           </div>
@@ -74,24 +74,29 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all ${activeTab === "dashboard"
-                ? "bg-emerald-700 text-white shadow-sm"
+                ? "bg-emerald-800 text-white shadow-xs font-bold"
                 : "text-slate-700 hover:bg-slate-50"
                 }`}
             >
               <LayoutDashboard size={18} />
-              <span>Dashboard</span>
+              <span>Dashboard Ringkasan</span>
             </button>
-            <div className="pl-9 text-[11px] text-slate-400 font-medium mt-1">Ringkasan &amp; Peluang</div>
+            <div className="pl-9 text-[11px] text-slate-400 font-medium mt-1">Peluang &amp; Rute Arbitrase</div>
           </div>
 
-          {/* Active AI Status Card */}
-          <div className="p-3.5 bg-gradient-to-br from-emerald-800 to-teal-900 rounded-2xl text-white space-y-2 shadow-sm border border-emerald-700/50">
-            <div className="flex items-center justify-between text-xs font-bold text-emerald-200">
-              <span className="flex items-center gap-1.5"><Sparkles size={14} className="text-yellow-400" /> AI Engine Aktif</span>
-              <span className="text-[9px] bg-emerald-500/30 border border-emerald-400/40 px-1.5 py-0.5 rounded font-extrabold text-emerald-100">LIVE</span>
+          {/* Market Feed Status Card */}
+          <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-slate-700 space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Data Pasar Terhubung
+              </span>
+              <span className="text-[9px] bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded font-extrabold text-emerald-800">
+                BI PIHPS
+              </span>
             </div>
-            <p className="text-[11px] text-emerald-100/90 leading-snug">
-              Analisis harga real-time &amp; proyeksi panen aktif untuk wilayah Anda.
+            <p className="text-[11px] text-slate-500 leading-snug">
+              Sinkronisasi harga harian 38 provinsi &amp; pasar induk nasional.
             </p>
           </div>
 
@@ -112,8 +117,8 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                        ? "bg-emerald-50 text-emerald-800 font-bold border-r-2 border-emerald-600"
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${isActive
+                        ? "bg-emerald-50 text-emerald-900 font-bold border-r-2 border-emerald-700"
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                     >
@@ -121,6 +126,11 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                         <Icon size={16} className={isActive ? "text-emerald-700" : "text-slate-400"} />
                         <span>{item.label}</span>
                       </div>
+                      {item.badge && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold border border-slate-200">
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

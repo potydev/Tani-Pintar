@@ -46,23 +46,23 @@ export function PriceForecastingPage() {
   return (
     <div className="space-y-6">
       {/* Top Title Banner */}
-      <div className="bg-gradient-to-r from-blue-900 via-indigo-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex justify-between items-center flex-wrap gap-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-white shadow-sm flex justify-between items-center flex-wrap gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold px-3 py-1 rounded-full mb-3">
-            <Sparkles size={14} className="text-yellow-400" /> AI Predictive Price Engine
+          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+            <TrendingUp size={14} className="text-emerald-400" /> Proyeksi Tren Harga Komoditas
           </div>
           <h1 className="font-heading font-extrabold text-2xl md:text-3xl text-white">
-            Prediksi Trend &amp; Forecasting Harga
+            Analisis Tren &amp; Forecasting Harga Pasar
           </h1>
-          <p className="text-blue-100 text-sm mt-1">
-            Visualisasi tren historis (PIHPS) dan proyeksi harga pasar komoditas untuk 7 hari ke depan.
+          <p className="text-slate-300 text-sm mt-1">
+            Visualisasi data historis resmi Bank Indonesia (PIHPS) dan proyeksi tren pergerakan harga 7 hari ke depan.
           </p>
         </div>
 
-        <div className="bg-white/10 backdrop-blur border border-white/20 p-4 rounded-xl text-right">
-          <div className="text-xs text-blue-200 uppercase font-semibold">Rekomendasi Waktu Panen/Jual</div>
-          <div className="text-lg font-bold text-yellow-300 flex items-center gap-1.5 justify-end mt-1">
-            <Calendar size={18} /> 8 - 9 Agustus (Puncak Harga)
+        <div className="bg-slate-800/80 border border-slate-700 p-4 rounded-xl text-right">
+          <div className="text-xs text-slate-400 uppercase font-semibold">Estimasi Waktu Jual Terbaik</div>
+          <div className="text-lg font-bold text-emerald-400 flex items-center gap-1.5 justify-end mt-1">
+            <Calendar size={18} /> Menjelang Akhir Pekan (Puncak Permintaan)
           </div>
         </div>
       </div>

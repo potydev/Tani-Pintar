@@ -1,83 +1,110 @@
 import React from "react";
-import { Leaf, Target, TrendingUp, BarChart3, Sparkles, ArrowRight } from "lucide-react";
+import { PlusCircle, Calculator, FileSpreadsheet, ShieldCheck, ArrowRight, Truck, Scale } from "lucide-react";
 
-export function BottomBannerPanel() {
+export function BottomBannerPanel({ onOpenSellProduct, onOpenCalculator }) {
   return (
     <div className="grid lg:grid-cols-12 gap-5 mt-6">
-      {/* Green Banner Left */}
-      <div className="lg:col-span-8 bg-gradient-to-r from-emerald-900 to-emerald-800 text-white rounded-2xl p-6 shadow-md flex flex-col justify-between">
+      {/* Quick Action Hub Left (8 cols) */}
+      <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Leaf size={20} className="text-emerald-300" />
-            <h3 className="font-heading text-lg font-extrabold text-white">
-              TaniPintar AI Market Intelligence
-            </h3>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-800 text-white flex items-center justify-center">
+                <Scale size={16} />
+              </div>
+              <div>
+                <h3 className="font-heading text-base font-extrabold text-slate-900">
+                  Pusat Operasional &amp; Aksi Penjualan Pangan
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Akses langsung fasilitas transaksi, estimasi biaya logistik, dan laporan komoditas.
+                </p>
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              Layanan Terpadu
+            </span>
           </div>
-          <p className="text-emerald-100 text-xs leading-relaxed mb-6 max-w-xl">
-            Membantu petani menjual hasil panen dengan keputusan cerdas berbasis data pasar yang akurat dan real-time.
-          </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-emerald-700/60 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center shrink-0">
-              <Target size={14} className="text-emerald-300" />
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-100 mt-4">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all flex flex-col justify-between">
             <div>
-              <div className="font-bold text-white">Keputusan Tepat</div>
-              <div className="text-[10px] text-emerald-200">Jual ke tempat terbaik</div>
+              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center mb-2">
+                <PlusCircle size={15} />
+              </div>
+              <div className="font-heading font-bold text-xs text-slate-900">Pasang Komoditas Panen</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Tawarkan hasil panen ke pembeli pasar induk langsung.</div>
             </div>
+            <button
+              onClick={() => {
+                const btn = document.querySelector('[data-testid="sidebar-sell-product"]') || document.querySelector('button:has(.lucide-plus-circle)');
+                if (btn) btn.click();
+              }}
+              className="mt-3 text-xs font-bold text-emerald-800 hover:text-emerald-900 flex items-center gap-1 cursor-pointer"
+            >
+              <span>Mulai Jual</span>
+              <ArrowRight size={12} />
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center shrink-0">
-              <TrendingUp size={14} className="text-emerald-300" />
-            </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all flex flex-col justify-between">
             <div>
-              <div className="font-bold text-white">Keuntungan Maksimal</div>
-              <div className="text-[10px] text-emerald-200">Dapatkan profit tinggi</div>
+              <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center mb-2">
+                <Truck size={15} />
+              </div>
+              <div className="font-heading font-bold text-xs text-slate-900">Tarif Logistik Kargo</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Simulasi ongkos kirim darat &amp; laut antarpulau.</div>
             </div>
+            <a
+              href="#peluang"
+              className="mt-3 text-xs font-bold text-blue-800 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+            >
+              <span>Cek Tarif Kargo</span>
+              <ArrowRight size={12} />
+            </a>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center shrink-0">
-              <BarChart3 size={14} className="text-emerald-300" />
-            </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all flex flex-col justify-between">
             <div>
-              <div className="font-bold text-white">Analisis Real-time</div>
-              <div className="text-[10px] text-emerald-200">Data selalu update</div>
+              <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center mb-2">
+                <FileSpreadsheet size={15} />
+              </div>
+              <div className="font-heading font-bold text-xs text-slate-900">Laporan Harga Harian</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Data historis komparasi harga 38 provinsi format cetak.</div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700/80 flex items-center justify-center shrink-0">
-              <Sparkles size={14} className="text-emerald-300" />
-            </div>
-            <div>
-              <div className="font-bold text-white">Mudah Digunakan</div>
-              <div className="text-[10px] text-emerald-200">AI siap membantu 24/7</div>
-            </div>
+            <button
+              onClick={() => window.print()}
+              className="mt-3 text-xs font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 cursor-pointer"
+            >
+              <span>Cetak / Simpan</span>
+              <ArrowRight size={12} />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Banner Farmer Photo Right */}
-      <div className="lg:col-span-4 relative rounded-2xl overflow-hidden shadow-md group min-h-[160px]">
-        <img
-          src="/assets/farmer_banner.png"
-          alt="Petani TaniPintar"
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/40 to-transparent p-5 flex flex-col justify-end text-white">
-          <div className="font-heading font-extrabold text-base mb-2">
-            Jual lebih pintar, untung lebih besar!
+      {/* Quality Standards Card Right (4 cols) */}
+      <div className="lg:col-span-4 bg-emerald-950 text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between border border-emerald-800">
+        <div>
+          <div className="flex items-center gap-2 mb-2 text-emerald-300">
+            <ShieldCheck size={18} />
+            <span className="text-[10px] font-extrabold uppercase tracking-wider">Standar Mutu Pasar Induk</span>
           </div>
-          <button className="self-start px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all">
-            <span>Pelajari Cara Kerja AI</span>
-            <ArrowRight size={14} />
-          </button>
+          <h4 className="font-heading font-bold text-base text-white leading-snug">
+            Pedoman Sortasi &amp; Pengemasan Kargo
+          </h4>
+          <p className="text-emerald-100/80 text-xs leading-relaxed mt-2">
+            Komoditas kualitas Super (kadar air &lt;14%, sortir tangkai) memperoleh selisih harga hingga +25% di pasar induk Kramat Jati, Caringin, dan Jakabaring.
+          </p>
+        </div>
+
+        <div className="pt-4 border-t border-emerald-800/80 flex items-center justify-between text-xs text-emerald-200">
+          <span>Verifikasi SNI Pangan</span>
+          <span className="font-mono text-emerald-400 font-bold">Grade A &amp; B</span>
         </div>
       </div>
     </div>
   );
 }
+

@@ -69,7 +69,7 @@ export function LandingHero({ onLoginClick }) {
               className="text-white/90 text-xs font-semibold tracking-wide"
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
             >
-              Platform AI Penjualan Hasil Panen #1 di Indonesia
+              Platform Intelijen Pasar &amp; Distribusi Hasil Panen Indonesia
             </span>
           </div>
 
@@ -78,7 +78,7 @@ export function LandingHero({ onLoginClick }) {
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
             Jual Panen di<br />
-            <span className="text-emerald-400">Waktu & Tempat</span><br />
+            <span className="text-emerald-400">Waktu &amp; Tempat</span><br />
             yang Tepat
           </h1>
 
@@ -86,7 +86,7 @@ export function LandingHero({ onLoginClick }) {
             className="text-white/70 text-base leading-relaxed max-w-md"
             style={{ fontFamily: "Inter, sans-serif" }}
           >
-            TaniPintar menganalisis harga, permintaan pasar, dan biaya logistik secara real-time untuk merekomendasikan keputusan penjualan paling menguntungkan bagi petani.
+            TaniPintar memetakan disparitas harga pasar induk, permintaan komoditas antardaerah, dan kalkulasi logistik kargo secara transparan untuk keuntungan maksimal petani.
           </p>
 
           {/* Prominent Search Input & Action */}
@@ -106,7 +106,7 @@ export function LandingHero({ onLoginClick }) {
               {/* Primary Accent CTA */}
               <button
                 type="submit"
-                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-500/25 shrink-0 hover:scale-[1.02]"
+                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-500/25 shrink-0 hover:scale-[1.02] cursor-pointer"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Cek Peluang <ArrowRight size={15} />
@@ -122,7 +122,7 @@ export function LandingHero({ onLoginClick }) {
                 <button
                   key={chip.label}
                   onClick={() => handleChipClick(chip)}
-                  className="text-[11px] font-bold text-white/80 hover:text-white bg-white/10 hover:bg-emerald-500/30 border border-white/15 hover:border-emerald-400/50 px-2.5 py-1 rounded-full backdrop-blur-sm transition-all"
+                  className="text-[11px] font-bold text-white/80 hover:text-white bg-white/10 hover:bg-emerald-500/30 border border-white/15 hover:border-emerald-400/50 px-2.5 py-1 rounded-full backdrop-blur-sm transition-all cursor-pointer"
                   style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
                 >
                   #{chip.label}
@@ -135,7 +135,7 @@ export function LandingHero({ onLoginClick }) {
           <div className="flex flex-wrap gap-8 pt-2">
             {[
               { val: "12.450+", label: "Petani Terhubung" },
-              { val: "34", label: "Kota Dipantau" },
+              { val: "38", label: "Provinsi Dipantau" },
               { val: "+9.2%", label: "Rata-rata Tambahan Margin", accent: true },
             ].map((s) => (
               <div key={s.label}>
@@ -156,24 +156,24 @@ export function LandingHero({ onLoginClick }) {
           </div>
         </div>
 
-        {/* Right Column — AI Recommendation Card (Progressive Disclosure) */}
+        {/* Right Column — Arbitrage Simulation Card */}
         <div className="flex flex-col gap-4">
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-2xl shadow-black/50 border border-slate-100/50 backdrop-blur-sm">
             {/* Header Insight Badge */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
-                  <Sparkles size={16} />
+                <div className="w-7 h-7 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800">
+                  <TrendingUp size={16} />
                 </div>
                 <span
-                  className="text-xs font-bold text-slate-500 uppercase tracking-wider"
+                  className="text-xs font-bold text-slate-600 uppercase tracking-wider"
                   style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
                 >
-                  Rekomendasi Utama AI
+                  Simulasi Arbitrase Harga
                 </span>
               </div>
               <span
-                className="bg-emerald-50 text-emerald-700 text-xs font-extrabold px-3 py-1 rounded-full border border-emerald-200"
+                className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full border border-emerald-200"
                 style={{ fontFamily: "JetBrains Mono, monospace" }}
               >
                 +9.2% Margin
