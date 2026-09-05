@@ -63,6 +63,7 @@ export default function TaniPintarApp() {
 
   const handleLogout = () => {
     localStorage.removeItem("tanipintar_user");
+    localStorage.removeItem("tanipintar_token");
     setIsLoggedIn(false);
     setUserName("Pak Joko Slamet");
   };

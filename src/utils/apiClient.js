@@ -85,11 +85,15 @@ export async function safeApiFetch(endpoint, options = {}) {
   }
 
   try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('tanipintar_token') : null;
+    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
     const res = await fetch(fullUrl, {
       ...options,
       headers: {
         'Accept': 'application/json',
         ...(options.body && typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : {}),
+        ...authHeaders,
         ...options.headers
       }
     });

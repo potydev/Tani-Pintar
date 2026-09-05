@@ -65,6 +65,9 @@ export function LoginPage({ onLoginSuccess }) {
 
       if (res.ok && res.data && res.data.success && res.data.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(res.data.user));
+        if (res.data.token) {
+          localStorage.setItem("tanipintar_token", res.data.token);
+        }
         if (onLoginSuccess) onLoginSuccess(res.data.user);
         if (res.data.user.role === "admin" || res.data.user.role === "super_admin") {
           navigate("/admin");

@@ -17,9 +17,9 @@ export function PriceForecastingPage() {
         const lastPrice = historical[historical.length - 1].Jakarta || 45000;
         
         const forecastDays = [
-          { date: "7 Aug (Est)", Jakarta: Math.round(lastPrice * 1.02), RataNasional: Math.round(lastPrice * 1.01), isForecast: true },
-          { date: "8 Aug (Est)", Jakarta: Math.round(lastPrice * 1.05), RataNasional: Math.round(lastPrice * 1.03), isForecast: true },
-          { date: "9 Aug (Est)", Jakarta: Math.round(lastPrice * 1.04), RataNasional: Math.round(lastPrice * 1.02), isForecast: true }
+          { date: "+1 Hari (Prediksi AI)", Jakarta: Math.round(lastPrice * 1.02), RataNasional: Math.round(lastPrice * 1.01), isForecast: true },
+          { date: "+2 Hari (Prediksi AI)", Jakarta: Math.round(lastPrice * 1.05), RataNasional: Math.round(lastPrice * 1.03), isForecast: true },
+          { date: "+3 Hari (Prediksi AI)", Jakarta: Math.round(lastPrice * 1.04), RataNasional: Math.round(lastPrice * 1.02), isForecast: true }
         ];
 
         setChartData([...historical, ...forecastDays]);

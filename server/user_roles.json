@@ -1,0 +1,12 @@
+{
+  "admin@tanipintar.id": {
+    "role": "admin",
+    "is_seller": true,
+    "verification_status": "approved"
+  },
+  "petani.baru@tanipintar.id": {
+    "role": "verified_farmer",
+    "is_seller": true,
+    "verification_status": "approved"
+  }
+}

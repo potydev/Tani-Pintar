@@ -81,6 +81,7 @@ export function DashboardPage({ name, onLogout }) {
 
   const handleLogoutUser = () => {
     localStorage.removeItem("tanipintar_user");
+    localStorage.removeItem("tanipintar_token");
     setUser(null);
     if (onLogout) onLogout();
   };

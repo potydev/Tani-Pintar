@@ -6,6 +6,20 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
+import {
+  hashPassword,
+  verifyPassword,
+  isPasswordHashed,
+  createToken,
+  verifyToken,
+  getUserRole,
+  getUserMeta,
+  setUserRole,
+  maskNik,
+  maskAccountNumber,
+  maskPhoneNumber
+} from './security.js';
+import { generateSmartConsultantResponse } from './ai_consultant.js';
 
 // Auto-load .env file in Node.js
 if (typeof process.loadEnvFile === 'function') {
@@ -37,6 +51,38 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Global JWT / Bearer Token Authentication Extractor
+app.use((req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    const decoded = verifyToken(token);
+    if (decoded) {
+      req.user = decoded;
+      return next();
+    }
+  }
+  req.user = null;
+  next();
+});
+
+function requireAuth(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ success: false, error: 'Otorisasi diperlukan. Silakan login ke akun Anda.' });
+  }
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ success: false, error: 'Akses ditolak. Token autentikasi Admin diperlukan.' });
+  }
+  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+    return res.status(403).json({ success: false, error: 'Akses ditolak. Endpoint ini hanya untuk Administrator.' });
+  }
+  next();
+}
 
 // Universal Database Query Function (Supports Supabase PostgreSQL & MySQL)
 const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
@@ -104,70 +150,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // Google Gemini AI Assistant Integration
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBo4EfCgLjH5EDbRFkpxOJUm9sqDNDyBZQ';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-async function generateGeminiAIResponse(prompt, systemInstruction = '', history = []) {
-  const models = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
-  
-  const contents = [];
-  
-  // Add conversation history if available
-  if (Array.isArray(history) && history.length > 0) {
-    for (const h of history.slice(-6)) {
-      contents.push({
-        role: h.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: h.text }]
-      });
-    }
-  }
-  
-  // Add current user prompt
-  contents.push({
-    role: 'user',
-    parts: [{ text: prompt }]
-  });
-
-  const payload = {
-    contents,
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95,
-      maxOutputTokens: 1200
-    }
-  };
-
-  if (systemInstruction) {
-    payload.systemInstruction = {
-      parts: [{ text: systemInstruction }]
-    };
-  }
-
-  for (const model of models) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      const data = await response.json();
-      if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-        return {
-          text: data.candidates[0].content.parts[0].text,
-          model: model
-        };
-      }
-      console.log(`[Gemini API Warning] Model ${model} returned:`, data.error?.message || 'Empty response');
-    } catch (err) {
-      console.error(`[Gemini API Error] Model ${model} failed:`, err.message);
-    }
-  }
-
-  throw new Error('Semua model Gemini sedang sibuk. Silakan coba kembali sesaat lagi.');
-}
-
-// AI Chatbot Assistant Endpoint
+// AI Chatbot Assistant Endpoint with Smart Live Market Fallback
 app.post('/api/ai/chat', async (req, res) => {
   try {
     const { message, history = [], userContext = {} } = req.body;
@@ -175,32 +160,17 @@ app.post('/api/ai/chat', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Pesan pertanyaan tidak boleh kosong.' });
     }
 
-    const commodity = userContext.commodity || 'Cabai Merah';
-    const location = userContext.location || 'Cilacap, Jawa Tengah';
-    const userName = userContext.userName || 'Petani Hebat';
+    const aiResult = await generateSmartConsultantResponse({
+      message,
+      history,
+      userContext,
+      supabase,
+      geminiApiKey: GEMINI_API_KEY
+    });
 
-    // System instruction enriched with domain expertise
-    const systemPrompt = `Anda adalah "TaniBot", asisten AI pintar dari platform TaniPintar (AI Market Intelligence untuk Petani & Agribisnis Indonesia).
-Tujuan utama Anda: Membantu petani mengambil keputusan terbaik tentang:
-1. Kapan waktu panen/jual terbaik (prediksi tren harga pasar BI PIHPS).
-2. Ke mana lokasi/kota pasar tujuan pengiriman terbaik dengan selisih margin keuntungan tertinggi (arbitrase pasar antar provinsi).
-3. Berapa estimasi batas harga jual yang wajar dan strategi tawar-menawar dengan pedagang/pasar induk.
-4. Tips logistik, penanganan pasca-panen (grading, packing cabai/bawang/sayur), dan manajemen biaya operasional.
-
-Profil Pengguna saat ini:
-- Nama: ${userName}
-- Lokasi Panen Asal: ${location}
-- Komoditas Utama: ${commodity}
-
-Gaya Komunikasi:
-- Ramah, praktis, empatik, berbahasa Indonesia yang santun dan mudah dipahami petani.
-- Berikan angka estimasi konkret (dalam Rupiah) jika relevan.
-- Gunakan format markdown bersih (bullet points, bold) agar nyaman dibaca.`;
-
-    const aiResult = await generateGeminiAIResponse(message, systemPrompt, history);
     res.json({
       success: true,
-      reply: aiResult.text,
+      reply: aiResult.reply,
       model: aiResult.model
     });
   } catch (err) {
@@ -212,7 +182,7 @@ Gaya Komunikasi:
   }
 });
 
-// Auth API - Register via Supabase PostgreSQL
+// Auth API - Register via Supabase PostgreSQL (Secured with Scrypt & JWT)
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, full_name, role, farm_location, primary_commodity, land_size } = req.body;
@@ -220,11 +190,13 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email, Password, dan Nama Lengkap wajib diisi.' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     // Check existing in Supabase users table
     const { data: existing } = await supabase
       .from('users')
       .select('id')
-      .eq('email', email);
+      .eq('email', cleanEmail);
 
     if (existing && existing.length > 0) {
       return res.status(400).json({ success: false, error: 'Email sudah terdaftar. Silakan masuk ke akun Anda.' });
@@ -233,16 +205,16 @@ app.post('/api/auth/register', async (req, res) => {
     const loc = farm_location || 'Surabaya, Jawa Timur';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
-    const userRole = role || 'farmer';
+    const userRole = role || (cleanEmail === 'admin@tanipintar.id' ? 'admin' : 'farmer');
+    const hashedPassword = hashPassword(password);
 
+    // Insert only columns that exist in the Supabase schema
     const { data: newUser, error } = await supabase
       .from('users')
       .insert([{
-        email,
-        password,
+        email: cleanEmail,
+        password: hashedPassword,
         full_name,
-        role: userRole,
-        is_seller: userRole !== 'buyer',
         farm_location: loc,
         primary_commodity: comm,
         land_size: land,
@@ -256,12 +228,20 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     const created = newUser && newUser[0] ? newUser[0] : {};
+
+    // Persist user role metadata securely
+    setUserRole(cleanEmail, {
+      role: userRole,
+      is_seller: userRole !== 'buyer',
+      verification_status: userRole === 'admin' ? 'approved' : 'pending'
+    });
+
     const user = {
       id: created.id || Date.now(),
-      email: created.email || email,
+      email: cleanEmail,
       full_name: created.full_name || full_name,
-      role: created.role || userRole,
-      is_seller: created.is_seller !== undefined ? created.is_seller : (userRole !== 'buyer'),
+      role: userRole,
+      is_seller: userRole !== 'buyer',
       farm_location: created.farm_location || loc,
       primary_commodity: created.primary_commodity || comm,
       land_size: created.land_size || land,
@@ -269,7 +249,9 @@ app.post('/api/auth/register', async (req, res) => {
       needsOnboarding: true
     };
 
-    res.json({ success: true, message: 'Pendaftaran berhasil! Selamat datang di TaniPintar.', user });
+    const token = createToken(user);
+
+    res.json({ success: true, message: 'Pendaftaran berhasil! Selamat datang di TaniPintar.', token, user });
   } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -284,9 +266,8 @@ app.post('/api/auth/onboarding', async (req, res) => {
       return res.status(400).json({ success: false, error: 'User ID atau Email wajib disertakan.' });
     }
 
+    const cleanEmail = (email || '').toLowerCase().trim();
     const updatePayload = {
-      role: role || 'farmer',
-      is_seller: role !== 'buyer',
       farm_location: farm_location || 'Surabaya, Jawa Timur',
       primary_commodity: primary_commodity || 'Cabai Merah Besar',
       land_size: land_size || '1.5 Hektar'
@@ -296,7 +277,7 @@ app.post('/api/auth/onboarding', async (req, res) => {
     if (id) {
       query = query.eq('id', id);
     } else {
-      query = query.eq('email', email);
+      query = query.eq('email', cleanEmail);
     }
 
     const { data: updated, error } = await query.select();
@@ -305,20 +286,35 @@ app.post('/api/auth/onboarding', async (req, res) => {
       console.warn("Supabase onboarding update warning:", error.message);
     }
 
+    const assignedRole = role || 'farmer';
+    if (cleanEmail) {
+      setUserRole(cleanEmail, {
+        role: assignedRole,
+        is_seller: assignedRole !== 'buyer'
+      });
+    }
+
     const userObj = updated && updated[0] ? updated[0] : {
       id: id || Date.now(),
-      email,
+      email: cleanEmail,
       ...updatePayload
     };
+
+    const finalUser = {
+      ...userObj,
+      role: assignedRole,
+      is_seller: assignedRole !== 'buyer',
+      needsOnboarding: false,
+      onboarded: true
+    };
+
+    const token = createToken(finalUser);
 
     res.json({
       success: true,
       message: 'Preferensi dan wilayah panen berhasil disimpan!',
-      user: {
-        ...userObj,
-        needsOnboarding: false,
-        onboarded: true
-      }
+      token,
+      user: finalUser
     });
   } catch (err) {
     console.error('Error during onboarding:', err);
@@ -389,6 +385,7 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Lokasi panen, komoditas utama, dan NIK KTP wajib diisi.' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
     const loc = farm_location || 'Cilacap, Jawa Tengah';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
@@ -396,7 +393,7 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
     const reqId = 'REQ-' + Date.now().toString().slice(-4);
     const newRequest = {
       id: reqId,
-      email,
+      email: cleanEmail,
       full_name: full_name || email.split('@')[0],
       phone: phone || '08123456789',
       farm_location: loc,
@@ -416,31 +413,36 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
     // Store in memory list
     pendingFarmerRequests.unshift(newRequest);
 
-    // Update Supabase if available
+    // Update user preferences in Supabase safely
     try {
       await supabase
         .from('users')
         .update({
-          role: 'farmer_pending',
-          verification_status: 'pending',
           farm_location: loc,
           primary_commodity: comm,
           land_size: land
         })
-        .eq('email', email);
+        .eq('email', cleanEmail);
     } catch (dbErr) {
       console.log('[Supabase Notice] Offline update fallback active');
     }
 
+    // Persist pending verification in role store
+    setUserRole(cleanEmail, {
+      role: 'farmer_pending',
+      verification_status: 'pending',
+      is_seller: false
+    });
+
     const user = {
-      email,
+      email: cleanEmail,
       role: 'farmer_pending',
       verification_status: 'pending',
       is_seller: false,
       farm_location: loc,
       primary_commodity: comm,
       land_size: land,
-      nik
+      nik: maskNik(nik)
     };
 
     res.json({
@@ -454,18 +456,18 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
   }
 });
 
-// Admin API Security Middleware
-app.use('/api/admin', (req, res, next) => {
-  const userRole = req.headers['x-user-role'] || req.query.role;
-  if (userRole && !['admin', 'super_admin'].includes(userRole)) {
-    return res.status(403).json({ success: false, error: 'Akses ditolak. Endpoint ini hanya untuk Admin.' });
-  }
-  next();
-});
+// Admin API Security Middleware - Strict Token & Role Verification
+app.use('/api/admin', requireAdmin);
 
-// Admin API - Get All Farmer Verification Requests
+// Admin API - Get All Farmer Verification Requests (With Masked PII Protection)
 app.get('/api/admin/farmers', (req, res) => {
-  res.json({ success: true, requests: pendingFarmerRequests });
+  const safeRequests = pendingFarmerRequests.map(r => ({
+    ...r,
+    nik: maskNik(r.nik),
+    account_number: maskAccountNumber(r.account_number),
+    phone: maskPhoneNumber(r.phone)
+  }));
+  res.json({ success: true, requests: safeRequests });
 });
 
 // Admin API - Approve Farmer Verification Request
@@ -476,28 +478,25 @@ app.post('/api/admin/approve-farmer', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
     }
 
-    // Update in memory list
-    const found = pendingFarmerRequests.find(r => r.email === email || r.id === req_id);
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Update in-memory list
+    const found = pendingFarmerRequests.find(r => r.email.toLowerCase() === cleanEmail || r.id === req_id);
     if (found) {
       found.verification_status = 'approved';
     }
 
-    // Update Supabase Database
-    try {
-      await supabase
-        .from('users')
-        .update({
-          role: 'verified_farmer',
-          is_seller: true,
-          verification_status: 'approved'
-        })
-        .eq('email', email);
-    } catch (dbErr) {}
+    // Persist verified role
+    setUserRole(cleanEmail, {
+      role: 'verified_farmer',
+      is_seller: true,
+      verification_status: 'approved'
+    });
 
     res.json({
       success: true,
-      message: `Akun petani (${email}) berhasil DISETUJUI dan di-upgrade menjadi Petani Terverifikasi!`,
-      approved_email: email
+      message: `Akun petani (${cleanEmail}) berhasil DISETUJUI dan di-upgrade menjadi Petani Terverifikasi!`,
+      approved_email: cleanEmail
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -512,34 +511,32 @@ app.post('/api/admin/reject-farmer', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
     }
 
-    const found = pendingFarmerRequests.find(r => r.email === email || r.id === req_id);
+    const cleanEmail = email.toLowerCase().trim();
+
+    const found = pendingFarmerRequests.find(r => r.email.toLowerCase() === cleanEmail || r.id === req_id);
     if (found) {
       found.verification_status = 'rejected';
       found.rejection_reason = reason || 'Dokumen KTP / Data Poktan belum sesuai.';
     }
 
-    try {
-      await supabase
-        .from('users')
-        .update({
-          role: 'buyer',
-          is_seller: false,
-          verification_status: 'rejected'
-        })
-        .eq('email', email);
-    } catch (dbErr) {}
+    // Persist rejected role
+    setUserRole(cleanEmail, {
+      role: 'buyer',
+      is_seller: false,
+      verification_status: 'rejected'
+    });
 
     res.json({
       success: true,
-      message: `Pengajuan verifikasi (${email}) telah DITOLAK.`,
-      rejected_email: email
+      message: `Pengajuan verifikasi (${cleanEmail}) telah DITOLAK.`,
+      rejected_email: cleanEmail
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Auth API - Login via Supabase PostgreSQL
+// Auth API - Login via Supabase PostgreSQL (Secured with Scrypt & Cryptographic JWT)
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -547,30 +544,53 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email dan kata sandi wajib diisi.' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     const { data: users, error } = await supabase
       .from('users')
       .select('*')
-      .eq('email', email)
-      .eq('password', password);
+      .eq('email', cleanEmail);
 
     if (error || !users || users.length === 0) {
       return res.status(401).json({ success: false, error: 'Email atau kata sandi tidak cocok.' });
     }
 
     const u = users[0];
+    const passwordMatch = verifyPassword(password, u.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, error: 'Email atau kata sandi tidak cocok.' });
+    }
+
+    // Transparently upgrade legacy plaintext password to salted scrypt hash
+    if (!isPasswordHashed(u.password)) {
+      try {
+        const upgradedHash = hashPassword(password);
+        await supabase.from('users').update({ password: upgradedHash }).eq('id', u.id);
+        console.log(`[Security] Upgraded user #${u.id} (${cleanEmail}) password to secure scrypt hash.`);
+      } catch (upErr) {
+        console.warn('[Security] Password upgrade warning:', upErr.message);
+      }
+    }
+
+    const meta = getUserMeta(cleanEmail);
+    const userRole = meta.role || (cleanEmail === 'admin@tanipintar.id' ? 'admin' : 'farmer');
+
     const user = {
       id: u.id,
       email: u.email,
       full_name: u.full_name,
-      role: u.role || 'farmer',
-      is_seller: u.is_seller !== undefined ? u.is_seller : true,
+      role: userRole,
+      is_seller: meta.is_seller !== undefined ? meta.is_seller : (userRole !== 'buyer'),
       farm_location: u.farm_location || 'Cilacap, Jawa Tengah',
       primary_commodity: u.primary_commodity || 'Cabai Merah Besar',
       land_size: u.land_size || '1.5 Hektar',
       avatar_url: u.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
     };
 
-    res.json({ success: true, message: 'Login berhasil!', user });
+    const token = createToken(user);
+
+    res.json({ success: true, message: 'Login berhasil!', token, user });
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -1361,7 +1381,7 @@ app.get('/api/marketplace/products/:id', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Produk tidak ditemukan.' });
     }
 
-    data.tags = typeof data.tags === 'string' ? JSON.parse(data.tags || '[]') : (data.tags || []);
+    data.tags = ['Segar', 'Petani Binaan', data.grade || 'Grade A'];
 
     // Get seller info
     if (data.seller_id) {
@@ -1369,21 +1389,21 @@ app.get('/api/marketplace/products/:id', async (req, res) => {
         .from('users')
         .select('id, full_name, farm_location, primary_commodity, avatar_url')
         .eq('id', data.seller_id)
-        .single();
+        .maybeSingle();
       data.seller_info = seller || null;
     }
 
     // Get related products
     const { data: related } = await supabase
       .from('marketplace_products')
-      .select('id, name, price, unit, category, rating, farmer_name, location, image_url, verified_seller, tags, grade, total_sold, price_change')
+      .select('id, name, price, unit, category, rating, farmer_name, location, image_url, verified_seller, grade')
       .eq('category', data.category)
       .neq('id', data.id)
       .limit(4);
 
     data.related_products = (related || []).map(p => ({
       ...p,
-      tags: typeof p.tags === 'string' ? JSON.parse(p.tags || '[]') : (p.tags || [])
+      tags: ['Segar', p.grade || 'Grade A']
     }));
 
     res.json({ success: true, data });
@@ -1402,14 +1422,15 @@ app.post('/api/marketplace/products', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Data produk tidak lengkap.' });
     }
 
+    const effectiveSellerId = seller_id || req.user?.id || null;
     let sellerName = 'Petani Mitra TaniPintar';
     let sellerLocation = location || 'Surabaya, Jawa Timur';
 
-    if (seller_id) {
+    if (effectiveSellerId) {
       const { data: seller } = await supabase
         .from('users')
         .select('full_name, farm_location')
-        .eq('id', seller_id)
+        .eq('id', effectiveSellerId)
         .maybeSingle();
 
       if (seller) {
@@ -1429,10 +1450,11 @@ app.post('/api/marketplace/products', async (req, res) => {
 
     const finalImage = image_url || defaultImages[category] || defaultImages.cabai;
 
+    // Insert only existing columns in marketplace_products schema
     const { data, error } = await supabase
       .from('marketplace_products')
       .insert([{
-        seller_id: seller_id || null,
+        seller_id: effectiveSellerId,
         name,
         category,
         price: parseFloat(price),
@@ -1445,7 +1467,6 @@ app.post('/api/marketplace/products', async (req, res) => {
         description: description || 'Komoditas hasil panen segar langsung dari perkebunan binaan TaniPintar.',
         grade: grade || 'Grade A',
         organic: Boolean(organic),
-        tags: JSON.stringify(tags || []),
         harvest_date: harvest_date || new Date().toISOString().split('T')[0],
         verified_seller: true
       }])
@@ -1714,14 +1735,13 @@ const mainServer = app.listen(primaryPort, '0.0.0.0', () => {
 });
 
 // Dual listener support for Dokploy / Traefik / Docker hosting:
-// If primaryPort is not 3000, also listen on port 3000 (Dokploy's default app port) inside container
-if (primaryPort !== 3000) {
+// In production container mode, also listen on port 3000 if primaryPort is not 3000
+if (primaryPort !== 3000 && process.env.NODE_ENV === 'production') {
   try {
     const aliasServer = app.listen(3000, '0.0.0.0', () => {
       console.log(`[Hosting Multi-Port] Also listening on port 3000 (0.0.0.0:3000) for Dokploy/Traefik reverse proxy`);
     });
     aliasServer.on('error', (err) => {
-      // Port 3000 is in use (e.g. in local Vite dev mode), which is normal and safe to ignore
       console.log(`[Hosting Multi-Port Notice] Port 3000 alias listener: ${err.message}`);
     });
   } catch (e) {}
