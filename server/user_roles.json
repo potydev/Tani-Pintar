@@ -8,5 +8,25 @@
     "role": "verified_farmer",
     "is_seller": true,
     "verification_status": "approved"
+  },
+  "farmer.test.1788684472028@tanipintar.id": {
+    "role": "farmer",
+    "is_seller": true,
+    "verification_status": "pending"
+  },
+  "susuwawa574@gmail.com": {
+    "role": "buyer",
+    "is_seller": false,
+    "verification_status": "pending"
+  },
+  "farmer.test.1788685501022@tanipintar.id": {
+    "role": "farmer",
+    "is_seller": true,
+    "verification_status": "pending"
+  },
+  "budi.baru@tanipintar.id": {
+    "role": "farmer",
+    "is_seller": true,
+    "verification_status": "pending"
   }
 }

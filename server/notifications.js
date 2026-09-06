@@ -48,13 +48,15 @@ function getRelativeTime(timestamp) {
  * Generate real-time notifications for a specific user based on Supabase live data
  */
 export async function getRealNotifications({ user = {}, supabase }) {
-  const userEmail = (user.email || 'petani@tanipintar.id').toLowerCase().trim();
-  const userName = user.full_name || 'Pak Joko Slamet';
+  const userEmail = (user.email || '').toLowerCase().trim();
+  const userName = (user.full_name || '').trim();
+  const userId = user.id || null;
   const location = user.farm_location || 'Cilacap, Jawa Tengah';
   const rawCommodity = user.primary_commodity || 'Cabai Merah';
   const commodity = rawCommodity.includes('Cabai') ? 'Cabai Merah' : rawCommodity;
 
-  const userReadData = readStore[userEmail] || { readIds: [], allMarkedAt: 0 };
+  const storageKey = userEmail || (userId ? `uid_${userId}` : 'guest_session');
+  const userReadData = readStore[storageKey] || (userEmail ? readStore[userEmail] : null) || { readIds: [], allMarkedAt: 0 };
   const readIdsSet = new Set(userReadData.readIds || []);
   const allMarkedAt = userReadData.allMarkedAt || 0;
 
@@ -121,50 +123,114 @@ export async function getRealNotifications({ user = {}, supabase }) {
     console.warn('[Notifications] Error generating market notification:', err.message);
   }
 
-  // 2. Real Marketplace Orders (from Supabase marketplace_orders)
+  // 2. Real Marketplace Orders (strictly isolated per user account)
   try {
-    if (supabase) {
-      const { data: recentOrders } = await supabase
-        .from('marketplace_orders')
-        .select(`
-          id, quantity, total_price, status, created_at,
-          marketplace_products ( name, unit, category )
-        `)
-        .order('created_at', { ascending: false })
-        .limit(4);
+    if (supabase && (userId || (userName && userName.length > 2))) {
+      const userOrders = [];
 
-      if (recentOrders && recentOrders.length > 0) {
-        recentOrders.forEach(o => {
-          const prodName = o.marketplace_products?.name || 'Komoditas Panen';
-          const notifOrderId = `order_${o.id}_${o.status}`;
-          let orderDesc = `Pesanan #${o.id} (${prodName}, ${o.quantity} kg) senilai Rp ${Number(o.total_price).toLocaleString('id-ID')}.`;
-          
-          if (o.status === 'Dalam Pengiriman') {
-            orderDesc += ' Muatan telah diberangkatkan via armada kargo.';
-          } else if (o.status === 'Selesai') {
-            orderDesc += ' Transaksi selesai dan dana diteruskan ke saldo petani.';
-          } else {
-            orderDesc += ' Sedang menunggu konfirmasi jadwal timbang.';
-          }
+      // A. Buyer Orders: Orders placed by THIS user
+      if (userId) {
+        const { data: myPurchases } = await supabase
+          .from('marketplace_orders')
+          .select(`
+            id, quantity, total_price, status, created_at, product_id,
+            marketplace_products ( id, name, unit, category )
+          `)
+          .eq('buyer_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(5);
 
-          notifs.push({
-            id: notifOrderId,
-            type: 'order',
-            category: 'Pesanan',
-            badge: 'Marketplace',
-            badgeColor: 'amber',
-            title: `Pesanan #${o.id}: ${o.status}`,
-            message: orderDesc,
-            actionUrl: '/marketplace',
-            icon: 'package',
-            timestamp: o.created_at || new Date(now - 7200000).toISOString(),
-            time: getRelativeTime(o.created_at || now - 7200000)
+        if (myPurchases && myPurchases.length > 0) {
+          myPurchases.forEach(o => {
+            const prodName = o.marketplace_products?.name || 'Komoditas Panen';
+            let statusDesc = '';
+            if (o.status === 'Dalam Pengiriman' || o.status === 'Siap Kirim / Dikirim') {
+              statusDesc = 'Muatan telah diberangkatkan dan sedang dalam perjalanan armada kargo.';
+            } else if (o.status === 'Selesai') {
+              statusDesc = 'Pesanan telah diterima dengan baik. Transaksi selesai.';
+            } else if (o.status === 'Diproses' || o.status === 'Diproses / Dikemas') {
+              statusDesc = 'Petani sedang memilah dan mengemas komoditas pesanan Anda.';
+            } else {
+              statusDesc = 'Menunggu konfirmasi penjual untuk verifikasi stok dan jadwal muat.';
+            }
+
+            userOrders.push({
+              id: `order_buyer_${o.id}_${o.status}`,
+              type: 'order',
+              category: 'Pesanan',
+              badge: 'Pembelian Anda',
+              badgeColor: 'blue',
+              title: `Pesanan #${o.id}: ${o.status}`,
+              message: `Pembelian ${prodName} (${o.quantity} kg) senilai Rp ${Number(o.total_price).toLocaleString('id-ID')}. ${statusDesc}`,
+              actionUrl: '/dashboard?tab=orders',
+              icon: 'shopping-bag',
+              timestamp: o.created_at || new Date(now - 3600000).toISOString(),
+              time: getRelativeTime(o.created_at || now - 3600000)
+            });
           });
-        });
+        }
+      }
+
+      // B. Seller Orders: Incoming orders for products belonging to THIS user
+      let myProductIds = [];
+      if (userId) {
+        const { data: prodsBySellerId } = await supabase
+          .from('marketplace_products')
+          .select('id')
+          .eq('seller_id', userId);
+        if (prodsBySellerId && prodsBySellerId.length > 0) {
+          myProductIds.push(...prodsBySellerId.map(p => p.id));
+        }
+      }
+
+      // Also support matching by farmer_name if seller_id yielded nothing
+      if (myProductIds.length === 0 && userName && userName.length > 2) {
+        const { data: prodsByFarmerName } = await supabase
+          .from('marketplace_products')
+          .select('id')
+          .ilike('farmer_name', userName);
+        if (prodsByFarmerName && prodsByFarmerName.length > 0) {
+          myProductIds.push(...prodsByFarmerName.map(p => p.id));
+        }
+      }
+
+      if (myProductIds.length > 0) {
+        const { data: incomingSales } = await supabase
+          .from('marketplace_orders')
+          .select(`
+            id, quantity, total_price, status, created_at, product_id,
+            marketplace_products ( id, name, unit, category )
+          `)
+          .in('product_id', myProductIds)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (incomingSales && incomingSales.length > 0) {
+          incomingSales.forEach(o => {
+            const prodName = o.marketplace_products?.name || 'Komoditas Panen';
+            userOrders.push({
+              id: `order_seller_${o.id}_${o.status}`,
+              type: 'order',
+              category: 'Pesanan',
+              badge: 'Pesanan Masuk',
+              badgeColor: 'amber',
+              title: `Pesanan Masuk #${o.id}: ${o.status}`,
+              message: `Ada pesanan masuk untuk ${prodName} (${o.quantity} kg) senilai Rp ${Number(o.total_price).toLocaleString('id-ID')}. Status saat ini: ${o.status}.`,
+              actionUrl: '/dashboard?tab=orders',
+              icon: 'package',
+              timestamp: o.created_at || new Date(now - 7200000).toISOString(),
+              time: getRelativeTime(o.created_at || now - 7200000)
+            });
+          });
+        }
+      }
+
+      // If user has orders, display their own orders. If 0 orders, show onboarding promo (NEVER stranger orders!)
+      if (userOrders.length > 0) {
+        notifs.push(...userOrders);
       } else {
-        // Welcoming marketplace order promo if no orders yet
         notifs.push({
-          id: `order_promo_new`,
+          id: `order_promo_${storageKey}`,
           type: 'order',
           category: 'Pesanan',
           badge: 'Peluang Panen',
@@ -177,48 +243,65 @@ export async function getRealNotifications({ user = {}, supabase }) {
           time: getRelativeTime(now - 14400000)
         });
       }
+    } else {
+      // Guest user or unauthenticated
+      notifs.push({
+        id: `order_promo_guest`,
+        type: 'order',
+        category: 'Pesanan',
+        badge: 'Peluang Panen',
+        badgeColor: 'amber',
+        title: 'Pasang Hasil Panen di Marketplace',
+        message: 'Hubungkan hasil panen Anda langsung ke 1.200+ mitra grosir dan industri kuliner tanpa potongan perantara.',
+        actionUrl: '/marketplace',
+        icon: 'package',
+        timestamp: new Date(now - 14400000).toISOString(),
+        time: getRelativeTime(now - 14400000)
+      });
     }
   } catch (err) {
     console.warn('[Notifications] Error generating order notification:', err.message);
   }
 
-  // 3. Account KYC & Verification Status
-  const userMeta = getUserMeta(userEmail);
-  const isApproved = userMeta.role === 'admin' || userMeta.role === 'verified_farmer' || userMeta.verification_status === 'approved';
+  // 3. Account KYC & Verification Status (Only if user has an account)
+  if (userEmail) {
+    const userMeta = getUserMeta(userEmail);
+    const isApproved = userMeta.role === 'admin' || userMeta.role === 'verified_farmer' || userMeta.verification_status === 'approved';
 
-  if (isApproved) {
-    notifs.push({
-      id: `acc_verified_${userEmail}`,
-      type: 'account',
-      category: 'Akun & Keamanan',
-      badge: 'Terverifikasi',
-      badgeColor: 'emerald',
-      title: 'Akun Petani Binaan Terverifikasi',
-      message: `Selamat ${userName}! Profil kebun Anda di ${location} telah terverifikasi dengan badge Centang Hijau resmi.`,
-      actionUrl: '/dashboard',
-      icon: 'check-circle-2',
-      timestamp: new Date(now - 86400000).toISOString(),
-      time: getRelativeTime(now - 86400000)
-    });
-  } else {
-    notifs.push({
-      id: `acc_pending_${userEmail}`,
-      type: 'account',
-      category: 'Akun & Keamanan',
-      badge: 'Verifikasi',
-      badgeColor: 'indigo',
-      title: 'Verifikasi Lahan Sedang Ditinjau',
-      message: 'Dokumen pengajuan petani binaan Anda sedang dalam proses verifikasi tim lapangan TaniPintar.',
-      actionUrl: '/dashboard',
-      icon: 'shield',
-      timestamp: new Date(now - 43200000).toISOString(),
-      time: getRelativeTime(now - 43200000)
-    });
+    if (isApproved) {
+      notifs.push({
+        id: `acc_verified_${userEmail}`,
+        type: 'account',
+        category: 'Akun & Keamanan',
+        badge: 'Terverifikasi',
+        badgeColor: 'emerald',
+        title: 'Akun Petani Binaan Terverifikasi',
+        message: `Selamat ${userName || 'Mitra Petani'}! Profil kebun Anda di ${location} telah terverifikasi dengan badge Centang Hijau resmi.`,
+        actionUrl: '/dashboard',
+        icon: 'check-circle-2',
+        timestamp: new Date(now - 86400000).toISOString(),
+        time: getRelativeTime(now - 86400000)
+      });
+    } else {
+      notifs.push({
+        id: `acc_pending_${userEmail}`,
+        type: 'account',
+        category: 'Akun & Keamanan',
+        badge: 'Verifikasi',
+        badgeColor: 'indigo',
+        title: 'Verifikasi Lahan Sedang Ditinjau',
+        message: 'Dokumen pengajuan petani binaan Anda sedang dalam proses verifikasi tim lapangan TaniPintar.',
+        actionUrl: '/dashboard',
+        icon: 'shield',
+        timestamp: new Date(now - 43200000).toISOString(),
+        time: getRelativeTime(now - 43200000)
+      });
+    }
   }
 
   // 4. AI TaniBot Agricultural Alert
   notifs.push({
-    id: `ai_tip_${commodity}_weather`,
+    id: `ai_tip_${commodity}_${location.replace(/[^a-zA-Z0-9]/g, '_')}`,
     type: 'ai',
     category: 'Saran TaniBot',
     badge: 'AI Agronomi',
@@ -249,9 +332,9 @@ export async function getRealNotifications({ user = {}, supabase }) {
 /**
  * Mark a single notification as read
  */
-export function markNotificationAsRead(userEmail, notifId) {
-  if (!userEmail || !notifId) return;
-  const key = userEmail.toLowerCase().trim();
+export function markNotificationAsRead(userEmailOrId, notifId) {
+  if (!userEmailOrId || !notifId) return;
+  const key = String(userEmailOrId).toLowerCase().trim();
   if (!readStore[key]) {
     readStore[key] = { readIds: [], allMarkedAt: 0 };
   }
@@ -264,9 +347,9 @@ export function markNotificationAsRead(userEmail, notifId) {
 /**
  * Mark all notifications as read for a user
  */
-export function markAllNotificationsAsRead(userEmail) {
-  if (!userEmail) return;
-  const key = userEmail.toLowerCase().trim();
+export function markAllNotificationsAsRead(userEmailOrId) {
+  if (!userEmailOrId) return;
+  const key = String(userEmailOrId).toLowerCase().trim();
   if (!readStore[key]) {
     readStore[key] = { readIds: [], allMarkedAt: 0 };
   }

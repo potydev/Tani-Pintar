@@ -32,16 +32,39 @@ export function DashboardPage({ name, onLogout }) {
   const [searchParams] = useSearchParams();
   const redirectTarget = searchParams.get("redirect");
 
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [user, setUser] = useState(null);
+  const urlTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(urlTab || "dashboard");
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("tanipintar_user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("Surabaya, Jatim");
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("tanipintar_user");
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (u.farm_location) return u.farm_location;
+      }
+    } catch {}
+    return "Surabaya, Jatim";
+  });
   const [selectedCommodity, setSelectedCommodity] = useState("Cabai Merah");
+
+  useEffect(() => {
+    if (urlTab) {
+      setActiveTab(urlTab);
+    }
+  }, [urlTab]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -120,7 +143,13 @@ export function DashboardPage({ name, onLogout }) {
       case "analytics":
         return <MarketAnalyticsPage />;
       case "orders":
-        return <OrdersManagementPage user={user} />;
+        return (
+          <OrdersManagementPage
+            user={user}
+            onNavigateMarketplace={() => handleTabChange("marketplace_view")}
+            onStartSelling={() => handleTabChange("sell_product")}
+          />
+        );
       case "marketplace_view":
         return (
           <MarketplacePage isLoggedIn={true} userName={displayName} isEmbedded={true} />
@@ -248,6 +277,7 @@ export function DashboardPage({ name, onLogout }) {
           name={displayName}
           user={user}
           onOpenAuth={handleOpenAccount}
+          onSelectTab={handleTabChange}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           selectedLocation={selectedLocation}

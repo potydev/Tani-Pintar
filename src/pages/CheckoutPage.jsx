@@ -145,7 +145,7 @@ export function CheckoutPage({ isLoggedIn }) {
 
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Link
-              to="/dashboard"
+              to="/dashboard?tab=orders"
               className="flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl transition-all shadow-md block text-center"
             >
               📦 Lacak di Pesanan Saya

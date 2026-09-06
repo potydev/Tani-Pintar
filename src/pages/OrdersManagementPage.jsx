@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { apiGet, apiPatch } from "../utils/apiClient.js";
 
-export function OrdersManagementPage({ user }) {
+export function OrdersManagementPage({ user, onNavigateMarketplace, onStartSelling }) {
   const [activeTab, setActiveTab] = useState("buyer"); // 'buyer' | 'seller'
   const [buyerOrders, setBuyerOrders] = useState([]);
   const [sellerOrders, setSellerOrders] = useState([]);
@@ -25,11 +25,30 @@ export function OrdersManagementPage({ user }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [toastMsg, setToastMsg] = useState("");
 
+  const currentUser = user || (() => {
+    try {
+      return JSON.parse(localStorage.getItem("tanipintar_user"));
+    } catch {
+      return null;
+    }
+  })();
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const buyerIdParam = user?.id ? `?buyer_id=${user.id}` : "";
-      const res = await apiGet(`/api/marketplace/orders/my-orders${buyerIdParam}`);
+      const params = new URLSearchParams();
+      if (currentUser?.id) {
+        params.append("buyer_id", currentUser.id);
+        params.append("seller_id", currentUser.id);
+      }
+      if (currentUser?.full_name) {
+        params.append("seller_name", currentUser.full_name);
+      }
+      if (currentUser?.email) {
+        params.append("email", currentUser.email);
+      }
+      const queryStr = params.toString() ? `?${params.toString()}` : "";
+      const res = await apiGet(`/api/marketplace/orders/my-orders${queryStr}`);
       if (res.ok && res.data && res.data.success && res.data.data) {
         setBuyerOrders(res.data.data.buyerOrders || []);
         setSellerOrders(res.data.data.sellerOrders || []);
@@ -43,7 +62,7 @@ export function OrdersManagementPage({ user }) {
 
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [user?.id, user?.email]);
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     setUpdatingId(orderId);
@@ -214,9 +233,18 @@ export function OrdersManagementPage({ user }) {
           <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center">
             <div className="text-4xl mb-3">🛒</div>
             <h3 className="text-base font-extrabold text-slate-900 mb-1">Belum Ada Riwayat Belanja</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
-              Anda belum melakukan pembelian komoditas hasil tani. Jelajahi katalog marketplace kami untuk belanja langsung dari petani.
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mb-5">
+              Anda belum melakukan pembelian komoditas hasil tani. Jelajahi katalog marketplace kami untuk belanja langsung dari petani binaan tanpa perantara.
             </p>
+            {onNavigateMarketplace && (
+              <button
+                onClick={onNavigateMarketplace}
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition-colors inline-flex items-center gap-2"
+              >
+                <ShoppingBag size={15} />
+                <span>Buka Katalog Marketplace</span>
+              </button>
+            )}
           </div>
         )
       ) : (
@@ -297,9 +325,18 @@ export function OrdersManagementPage({ user }) {
           <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center">
             <div className="text-4xl mb-3">📦</div>
             <h3 className="text-base font-extrabold text-slate-900 mb-1">Belum Ada Pesanan Masuk</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mb-5">
               Ketika ada pembeli yang memesan komoditas panen dari etalase Anda, rincian pengiriman dan kontak pembeli akan muncul di sini.
             </p>
+            {onStartSelling && (
+              <button
+                onClick={onStartSelling}
+                className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition-colors inline-flex items-center gap-2"
+              >
+                <Package size={15} />
+                <span>Pasang Komoditas Hasil Panen</span>
+              </button>
+            )}
           </div>
         )
       )}

@@ -42,7 +42,8 @@ export function DashboardHeader({
   selectedDate,
   setSelectedDate,
   selectedLocation,
-  setSelectedLocation
+  setSelectedLocation,
+  onSelectTab
 }) {
   const navigate = useNavigate();
   const [showNotif, setShowNotif] = useState(false);
@@ -60,11 +61,24 @@ export function DashboardHeader({
   const loadNotifications = async () => {
     try {
       setLoadingNotifs(true);
-      const emailParam = user?.email || 'joko.slamet@tanipintar.id';
-      const locParam = user?.farm_location || selectedLocation || 'Cilacap, Jawa Tengah';
-      const commParam = user?.primary_commodity || 'Cabai Merah';
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem("tanipintar_user"));
+        } catch {
+          return null;
+        }
+      })();
 
-      const res = await apiGet(`/api/notifications?email=${encodeURIComponent(emailParam)}&location=${encodeURIComponent(locParam)}&commodity=${encodeURIComponent(commParam)}`);
+      const params = new URLSearchParams();
+      if (currentUser?.email) params.append('email', currentUser.email);
+      if (currentUser?.id) params.append('user_id', currentUser.id);
+      if (currentUser?.full_name) params.append('name', currentUser.full_name);
+      const locParam = currentUser?.farm_location || selectedLocation || 'Cilacap, Jawa Tengah';
+      const commParam = currentUser?.primary_commodity || 'Cabai Merah';
+      params.append('location', locParam);
+      params.append('commodity', commParam);
+
+      const res = await apiGet(`/api/notifications?${params.toString()}`);
       if (res.ok && res.data && res.data.success && Array.isArray(res.data.data)) {
         setNotifications(res.data.data);
       }
@@ -79,7 +93,7 @@ export function DashboardHeader({
     loadNotifications();
     const interval = setInterval(loadNotifications, 60000);
     return () => clearInterval(interval);
-  }, [user?.email, user?.farm_location, selectedLocation]);
+  }, [user?.email, user?.id, user?.farm_location, selectedLocation]);
 
   const notifRef = useRef(null);
   const [availableDates, setAvailableDates] = useState([]);
@@ -145,7 +159,17 @@ export function DashboardHeader({
   const markAllAsRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
     try {
-      await apiPost('/api/notifications/mark-all-read', { email: user?.email || 'joko.slamet@tanipintar.id' });
+      const currentUser = user || (() => {
+        try {
+          return JSON.parse(localStorage.getItem("tanipintar_user"));
+        } catch {
+          return null;
+        }
+      })();
+      await apiPost('/api/notifications/mark-all-read', {
+        email: currentUser?.email,
+        user_id: currentUser?.id
+      });
     } catch (e) {}
   };
 
@@ -153,12 +177,26 @@ export function DashboardHeader({
     if (notif.unread) {
       setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, unread: false } : n));
       try {
-        await apiPatch(`/api/notifications/${encodeURIComponent(notif.id)}/read`, { email: user?.email || 'joko.slamet@tanipintar.id' });
+        const currentUser = user || (() => {
+          try {
+            return JSON.parse(localStorage.getItem("tanipintar_user"));
+          } catch {
+            return null;
+          }
+        })();
+        await apiPatch(`/api/notifications/${encodeURIComponent(notif.id)}/read`, {
+          email: currentUser?.email,
+          user_id: currentUser?.id
+        });
       } catch (e) {}
     }
     setShowNotif(false);
     if (notif.actionUrl) {
-      navigate(notif.actionUrl);
+      if (notif.actionUrl.includes('tab=orders') && onSelectTab) {
+        onSelectTab('orders');
+      } else {
+        navigate(notif.actionUrl);
+      }
     }
   };
 

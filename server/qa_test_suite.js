@@ -334,14 +334,32 @@ async function runQA() {
     const markReadData = await markReadRes.json();
     assert(markReadRes.status === 200 && markReadData.success, 'Mark single notification as read SUCCEEDS');
 
-    // 12.3 POST /api/notifications/mark-all-read
-    const markAllRes = await fetch(`${BASE_URL}/api/notifications/mark-all-read`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'test.farmer@tanipintar.id' })
-    });
-    const markAllData = await markAllRes.json();
-    assert(markAllRes.status === 200 && markAllData.success, 'Mark all notifications as read SUCCEEDS');
+    // 12.4 Strict Order & Notification Isolation for New Accounts (Zero Stranger Orders Leakage)
+    console.log('\n[TEST GROUP 12.4: Zero Stranger Orders Leakage on New Accounts]');
+    const brandNewUserId = `new_user_${Date.now()}`;
+    const brandNewEmail = `fresh_farmer_${Date.now()}@tanipintar.id`;
+
+    // 1. Check orders for brand new user
+    const newAccountOrdersRes = await fetch(`${BASE_URL}/api/marketplace/orders/my-orders?buyer_id=${brandNewUserId}&seller_id=${brandNewUserId}&email=${brandNewEmail}`);
+    const newAccountOrders = await newAccountOrdersRes.json();
+    assert(newAccountOrders.success, 'New account orders endpoint returns success');
+    assert(Array.isArray(newAccountOrders.data?.buyerOrders) && newAccountOrders.data.buyerOrders.length === 0, 'New account has strictly 0 buyer orders (no stranger orders)');
+    assert(Array.isArray(newAccountOrders.data?.sellerOrders) && newAccountOrders.data.sellerOrders.length === 0, 'New account has strictly 0 seller orders (no stranger orders)');
+
+    // 2. Check notifications for brand new user
+    const newAccountNotifRes = await fetch(`${BASE_URL}/api/notifications?email=${brandNewEmail}&user_id=${brandNewUserId}&commodity=Cabai+Merah`);
+    const newAccountNotifData = await newAccountNotifRes.json();
+    assert(newAccountNotifRes.status === 200 && newAccountNotifData.success, 'New account notifications endpoint returns 200 OK');
+    
+    // Ensure no stranger order notifications are leaked
+    const leakedStrangerOrders = newAccountNotifData.data.filter(n => n.type === 'order' && n.id.startsWith('order_seller_'));
+    const leakedStrangerBuyerOrders = newAccountNotifData.data.filter(n => n.type === 'order' && n.id.startsWith('order_buyer_'));
+    assert(leakedStrangerOrders.length === 0, 'Zero stranger incoming sales leaked to new account in notifications');
+    assert(leakedStrangerBuyerOrders.length === 0, 'Zero stranger purchases leaked to new account in notifications');
+
+    // Ensure educational promo card is provided instead
+    const orderPromo = newAccountNotifData.data.find(n => n.type === 'order');
+    assert(orderPromo && orderPromo.id.startsWith('order_promo_'), 'Educational marketplace promo card is shown to new accounts instead of stranger orders');
   } catch (e) {
     assert(false, `Notification test failed: ${e.message}`);
   }

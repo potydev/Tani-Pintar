@@ -202,18 +202,19 @@ app.get('/api/notifications', async (req, res) => {
     }
 
     // Context from query params or authenticated user
-    const userEmail = req.query.email || currentUser?.email || 'joko.slamet@tanipintar.id';
-    const userName = req.query.name || currentUser?.full_name || 'Pak Joko Slamet';
+    const userId = req.query.user_id || req.query.buyer_id || currentUser?.id || null;
+    const userEmail = req.query.email || currentUser?.email || null;
+    const userName = req.query.name || currentUser?.full_name || null;
     const location = req.query.location || currentUser?.farm_location || 'Cilacap, Jawa Tengah';
     const commodity = req.query.commodity || currentUser?.primary_commodity || 'Cabai Merah';
 
     const notifications = await getRealNotifications({
       user: {
+        id: userId,
         email: userEmail,
         full_name: userName,
         farm_location: location,
-        primary_commodity: commodity,
-        id: currentUser?.id
+        primary_commodity: commodity
       },
       supabase
     });
@@ -232,15 +233,16 @@ app.get('/api/notifications', async (req, res) => {
 // PATCH /api/notifications/:id/read - Mark single notification as read
 app.patch('/api/notifications/:id/read', (req, res) => {
   try {
-    let userEmail = 'joko.slamet@tanipintar.id';
+    let userKey = req.body?.email || req.body?.user_id || null;
     const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    if (!userKey && authHeader && authHeader.startsWith('Bearer ')) {
       const decoded = verifyToken(authHeader.split(' ')[1]);
-      if (decoded?.email) userEmail = decoded.email;
+      if (decoded?.email) userKey = decoded.email;
+      else if (decoded?.id) userKey = decoded.id;
     }
-    if (req.body?.email) userEmail = req.body.email;
+    if (!userKey) userKey = 'guest';
 
-    markNotificationAsRead(userEmail, req.params.id);
+    markNotificationAsRead(userKey, req.params.id);
     res.json({ success: true, message: 'Notifikasi ditandai telah dibaca.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -250,15 +252,16 @@ app.patch('/api/notifications/:id/read', (req, res) => {
 // POST /api/notifications/mark-all-read - Mark all notifications as read
 app.post('/api/notifications/mark-all-read', (req, res) => {
   try {
-    let userEmail = 'joko.slamet@tanipintar.id';
+    let userKey = req.body?.email || req.body?.user_id || null;
     const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    if (!userKey && authHeader && authHeader.startsWith('Bearer ')) {
       const decoded = verifyToken(authHeader.split(' ')[1]);
-      if (decoded?.email) userEmail = decoded.email;
+      if (decoded?.email) userKey = decoded.email;
+      else if (decoded?.id) userKey = decoded.id;
     }
-    if (req.body?.email) userEmail = req.body.email;
+    if (!userKey) userKey = 'guest';
 
-    markAllNotificationsAsRead(userEmail);
+    markAllNotificationsAsRead(userKey);
     res.json({ success: true, message: 'Semua notifikasi ditandai telah dibaca.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -1505,9 +1508,16 @@ app.post('/api/marketplace/products', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Data produk tidak lengkap.' });
     }
 
-    const effectiveSellerId = seller_id || req.user?.id || null;
-    let sellerName = 'Petani Mitra TaniPintar';
-    let sellerLocation = location || 'Surabaya, Jawa Timur';
+    let currentUser = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded) currentUser = decoded;
+    }
+
+    const effectiveSellerId = seller_id || currentUser?.id || null;
+    let sellerName = currentUser?.full_name || 'Petani Mitra TaniPintar';
+    let sellerLocation = location || currentUser?.farm_location || 'Surabaya, Jawa Timur';
 
     if (effectiveSellerId) {
       const { data: seller } = await supabase
@@ -1594,10 +1604,27 @@ app.post('/api/marketplace/orders', async (req, res) => {
 
     const total_price = product.price * quantity;
 
+    let currentUser = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded) currentUser = decoded;
+    }
+
+    const rawBuyerId = buyer_id || currentUser?.id || null;
     let validBuyerId = null;
-    if (buyer_id) {
-      const { data: u } = await supabase.from('users').select('id').eq('id', buyer_id).maybeSingle();
-      if (u) validBuyerId = u.id;
+    if (rawBuyerId) {
+      const { data: u } = await supabase.from('users').select('id').eq('id', rawBuyerId).maybeSingle();
+      if (u) {
+        validBuyerId = u.id;
+      } else {
+        validBuyerId = rawBuyerId;
+      }
+    }
+    if (!validBuyerId && (currentUser?.email || req.body.buyer_email)) {
+      const emailLookup = (currentUser?.email || req.body.buyer_email).toLowerCase().trim();
+      const { data: uEmail } = await supabase.from('users').select('id').eq('email', emailLookup).maybeSingle();
+      if (uEmail) validBuyerId = uEmail.id;
     }
 
     const { data: order, error } = await supabase
@@ -1638,22 +1665,38 @@ app.post('/api/marketplace/orders', async (req, res) => {
 // GET /api/marketplace/orders/my-orders - Get orders for current user (both as buyer and seller)
 app.get('/api/marketplace/orders/my-orders', async (req, res) => {
   try {
-    const { buyer_id, seller_name } = req.query;
+    let currentUser = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded) currentUser = decoded;
+    }
 
-    let buyerOrders = [];
-    let sellerOrders = [];
+    const effectiveBuyerId = req.query.buyer_id || currentUser?.id;
+    const effectiveSellerId = req.query.seller_id || currentUser?.id;
+    const effectiveSellerName = (req.query.seller_name || req.query.name || currentUser?.full_name || '').toLowerCase().trim();
+    const effectiveEmail = (req.query.email || currentUser?.email || '').toLowerCase().trim();
 
-    // 1. Fetch all orders with product details
+    // If user is completely unauthenticated / not specified, return empty arrays (never leak other people's orders)
+    if (!effectiveBuyerId && !effectiveSellerId && !effectiveSellerName && !effectiveEmail) {
+      return res.json({
+        success: true,
+        data: { buyerOrders: [], sellerOrders: [] }
+      });
+    }
+
+    // 1. Fetch orders with product details
     const { data: allOrders, error: orderErr } = await supabase
       .from('marketplace_orders')
       .select(`
         *,
         marketplace_products (
-          id, name, price, unit, category, image_url, farmer_name, location
+          id, name, price, unit, category, image_url, farmer_name, location, seller_id
         )
       `)
       .order('created_at', { ascending: false });
 
+    let mapped = [];
     if (orderErr) {
       console.warn("Supabase join warning, fallback to direct query:", orderErr.message);
       const { data: directOrders } = await supabase
@@ -1664,28 +1707,47 @@ app.get('/api/marketplace/orders/my-orders', async (req, res) => {
       const { data: allProds } = await supabase.from('marketplace_products').select('*');
       const prodMap = new Map((allProds || []).map(p => [p.id, p]));
 
-      const mapped = (directOrders || []).map(o => ({
+      mapped = (directOrders || []).map(o => ({
         ...o,
         product: prodMap.get(o.product_id) || { name: 'Komoditas Panen', price: o.total_price / o.quantity, unit: 'kg' }
       }));
-
-      buyerOrders = buyer_id ? mapped.filter(o => String(o.buyer_id) === String(buyer_id)) : mapped;
-      sellerOrders = mapped;
     } else {
-      const mapped = (allOrders || []).map(o => ({
+      mapped = (allOrders || []).map(o => ({
         ...o,
         product: o.marketplace_products || { name: 'Komoditas Panen', price: o.total_price / o.quantity, unit: 'kg' }
       }));
-
-      buyerOrders = buyer_id ? mapped.filter(o => String(o.buyer_id) === String(buyer_id)) : mapped;
-      sellerOrders = mapped;
     }
+
+    // Filter buyerOrders: ONLY orders where buyer_id matches effectiveBuyerId
+    const buyerOrders = mapped.filter(o => {
+      if (effectiveBuyerId && o.buyer_id && String(o.buyer_id) === String(effectiveBuyerId)) {
+        return true;
+      }
+      return false;
+    });
+
+    // Filter sellerOrders: ONLY orders where product belongs to effectiveSellerId or farmer_name matches
+    const sellerOrders = mapped.filter(o => {
+      const prod = o.product || o.marketplace_products;
+      if (!prod) return false;
+
+      const prodSellerId = prod.seller_id;
+      const prodFarmerName = (prod.farmer_name || '').toLowerCase().trim();
+
+      if (effectiveSellerId && prodSellerId && String(prodSellerId) === String(effectiveSellerId)) {
+        return true;
+      }
+      if (effectiveSellerName && prodFarmerName && prodFarmerName === effectiveSellerName) {
+        return true;
+      }
+      return false;
+    });
 
     res.json({
       success: true,
       data: {
-        buyerOrders: buyerOrders || [],
-        sellerOrders: sellerOrders || []
+        buyerOrders,
+        sellerOrders
       }
     });
   } catch (err) {
