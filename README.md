@@ -43,7 +43,7 @@
 | Nama | Peran | GitHub |
 |------|-------|--------|
 | **Dapot Matthew Tampubolon** | Project Lead & Full Stack Developer | [@potydev](https://github.com/potydev) |
-| **Sunu Setyo Jati** | Analisis Data | `-` |
+| **Sunu Setyo Jati** | Analisis Data | https://github.com/nullcurio |
 | **Ahmad Fakhri Abdullah** | UI/UX Designer | [@ahmfakhri](https://github.com/ahmfakhri) |
 
 ---
