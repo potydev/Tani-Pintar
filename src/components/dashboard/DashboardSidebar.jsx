@@ -24,7 +24,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
     {
       title: "Strategi & Keputusan Pasar",
       items: [
-        { id: "peluang", label: "Peluang Arbitrase Pasar", icon: Target, badge: "34 Daerah" },
+        { id: "peluang", label: "Peluang Arbitrase Pasar", icon: Target },
         { id: "prediksi", label: "Tren & Prediksi Harga", icon: LineChartIcon },
         { id: "pembeli", label: "Direktori Pasar Induk", icon: Building2 },
         { id: "rekomendasi", label: "Batas Harga Tawar Aman", icon: Tag },
@@ -34,8 +34,8 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
     {
       title: "Marketplace & Transaksi",
       items: [
-        { id: "marketplace_view", label: "Jelajah Marketplace", icon: ShoppingBag, badge: "Beli" },
-        { id: "sell_product", label: "Mulai Menjual (Pasang Panen)", icon: PlusCircle, badge: "Jual" },
+        { id: "marketplace_view", label: "Jelajah Marketplace", icon: ShoppingBag },
+        { id: "sell_product", label: "Pasang Komoditas Panen", icon: PlusCircle },
         { id: "orders", label: "Kelola Pesanan", icon: Package }
       ]
     },
@@ -122,12 +122,12 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <Icon size={16} className={isActive ? "text-emerald-700" : "text-slate-400"} />
-                        <span>{item.label}</span>
+                      <div className="flex items-center gap-3 min-w-0 text-left">
+                        <Icon size={16} className={`shrink-0 ${isActive ? "text-emerald-700" : "text-slate-400"}`} />
+                        <span className="whitespace-nowrap font-semibold">{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold border border-slate-200">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold border border-slate-200 shrink-0 whitespace-nowrap">
                           {item.badge}
                         </span>
                       )}
