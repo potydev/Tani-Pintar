@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   CheckCircle2,
@@ -10,11 +11,17 @@ import {
   Sparkles,
   RefreshCw,
   Search,
-  Layers
+  Layers,
+  TrendingUp,
+  Package,
+  ShieldCheck,
+  AlertTriangle,
+  ArrowRight
 } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { fetchAvailableDates } from "../../utils/apiData";
+import { apiGet, apiPost, apiPatch } from "../../utils/apiClient.js";
 import { HARVEST_LOCATIONS } from "../../data/harvestLocations";
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
@@ -37,6 +44,7 @@ export function DashboardHeader({
   selectedLocation,
   setSelectedLocation
 }) {
+  const navigate = useNavigate();
   const [showNotif, setShowNotif] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isLocComboboxOpen, setIsLocComboboxOpen] = useState(false);
@@ -44,11 +52,34 @@ export function DashboardHeader({
 
   const displayName = user?.full_name || name || "Pak Joko Slamet";
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: "Pasokan Cabai Merah di pasar pilihan Anda siap dipantau", time: "10 menit lalu", unread: true },
-    { id: 2, text: "Harga Cabai Merah di Semarang naik +5.2%", time: "1 jam lalu", unread: true },
-    { id: 3, text: "Pasokan Cabai Rawit nasional diprediksi stabil minggu ini", time: "3 jam lalu", unread: true },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [activeNotifTab, setActiveNotifTab] = useState("all");
+  const [loadingNotifs, setLoadingNotifs] = useState(false);
+
+  // Load real-time market, order, and verification notifications
+  const loadNotifications = async () => {
+    try {
+      setLoadingNotifs(true);
+      const emailParam = user?.email || 'joko.slamet@tanipintar.id';
+      const locParam = user?.farm_location || selectedLocation || 'Cilacap, Jawa Tengah';
+      const commParam = user?.primary_commodity || 'Cabai Merah';
+
+      const res = await apiGet(`/api/notifications?email=${encodeURIComponent(emailParam)}&location=${encodeURIComponent(locParam)}&commodity=${encodeURIComponent(commParam)}`);
+      if (res.ok && res.data && res.data.success && Array.isArray(res.data.data)) {
+        setNotifications(res.data.data);
+      }
+    } catch (e) {
+      console.warn("Error loading notifications:", e);
+    } finally {
+      setLoadingNotifs(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [user?.email, user?.farm_location, selectedLocation]);
 
   const notifRef = useRef(null);
   const [availableDates, setAvailableDates] = useState([]);
@@ -111,9 +142,33 @@ export function DashboardHeader({
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+  const markAllAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    try {
+      await apiPost('/api/notifications/mark-all-read', { email: user?.email || 'joko.slamet@tanipintar.id' });
+    } catch (e) {}
   };
+
+  const handleNotificationClick = async (notif) => {
+    if (notif.unread) {
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, unread: false } : n));
+      try {
+        await apiPatch(`/api/notifications/${encodeURIComponent(notif.id)}/read`, { email: user?.email || 'joko.slamet@tanipintar.id' });
+      } catch (e) {}
+    }
+    setShowNotif(false);
+    if (notif.actionUrl) {
+      navigate(notif.actionUrl);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+    if (activeNotifTab === "all") return true;
+    if (activeNotifTab === "market") return n.type === "market";
+    if (activeNotifTab === "order") return n.type === "order";
+    if (activeNotifTab === "account") return n.type === "account" || n.type === "ai";
+    return true;
+  });
 
   const handleSelectDate = (date) => {
     if (!date) return;
@@ -220,30 +275,125 @@ export function DashboardHeader({
 
             {/* Notifications Popover */}
             {showNotif && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-                  <h4 className="font-bold text-xs text-slate-800">Notifikasi Terbaru</h4>
+              <div className="absolute right-0 mt-2 w-84 sm:w-[420px] bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-2.5">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-heading font-bold text-sm text-slate-800">Notifikasi Terkini</h4>
+                    {unreadCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">
+                        {unreadCount} Baru
+                      </span>
+                    )}
+                  </div>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
-                      className="text-[11px] font-semibold text-emerald-700 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
                     >
-                      <CheckCircle2 size={12} /> Tandai dibaca
+                      <CheckCircle2 size={13} /> Tandai dibaca
                     </button>
                   )}
                 </div>
-                <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-                  {notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      className={`p-2.5 rounded-xl text-xs transition-colors ${
-                        n.unread ? "bg-emerald-50/70 border border-emerald-100" : "bg-slate-50 border border-slate-100"
+
+                {/* Category Tabs */}
+                <div className="flex items-center gap-1 pb-2 mb-2 border-b border-slate-100 overflow-x-auto tp-scrollbar">
+                  {[
+                    { id: "all", label: "Semua" },
+                    { id: "market", label: "Pasar & Harga" },
+                    { id: "order", label: "Pesanan" },
+                    { id: "account", label: "Akun & AI" }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveNotifTab(tab.id)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                        activeNotifTab === tab.id
+                          ? "bg-emerald-800 text-white shadow-xs"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
-                      <p className="font-medium text-slate-800 leading-snug">{n.text}</p>
-                      <span className="text-[10px] text-slate-400 mt-1 block">{n.time}</span>
-                    </div>
+                      {tab.label}
+                    </button>
                   ))}
+                </div>
+
+                {/* Notification List */}
+                <div className="space-y-2 max-h-72 overflow-y-auto tp-scrollbar pr-1">
+                  {loadingNotifs && notifications.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-slate-400">
+                      Memuat notifikasi pasar & pesanan...
+                    </div>
+                  ) : filteredNotifications.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-slate-400">
+                      Tidak ada notifikasi pada kategori ini.
+                    </div>
+                  ) : (
+                    filteredNotifications.map((n) => {
+                      const getIcon = () => {
+                        if (n.type === "market") return <TrendingUp size={15} className="text-emerald-700" />;
+                        if (n.type === "order") return <Package size={15} className="text-amber-700" />;
+                        if (n.type === "account") return <ShieldCheck size={15} className="text-blue-700" />;
+                        return <Sparkles size={15} className="text-purple-700" />;
+                      };
+
+                      const getBg = () => {
+                        if (n.type === "market") return "bg-emerald-100/70";
+                        if (n.type === "order") return "bg-amber-100/70";
+                        if (n.type === "account") return "bg-blue-100/70";
+                        return "bg-purple-100/70";
+                      };
+
+                      return (
+                        <div
+                          key={n.id}
+                          onClick={() => handleNotificationClick(n)}
+                          className={`p-3 rounded-xl text-xs transition-all cursor-pointer flex items-start gap-3 relative group ${
+                            n.unread
+                              ? "bg-emerald-50/70 border border-emerald-200/80 shadow-xs hover:bg-emerald-100/60"
+                              : "bg-slate-50 border border-slate-200/60 hover:bg-slate-100/80"
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-xl ${getBg()} flex items-center justify-center shrink-0 mt-0.5`}>
+                            {getIcon()}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/80 border border-slate-200 text-slate-600">
+                                {n.badge || n.category}
+                              </span>
+                              <span className="text-[10px] text-slate-400 shrink-0">{n.time}</span>
+                            </div>
+                            <h5 className="font-bold text-slate-900 text-xs leading-tight mb-0.5 group-hover:text-emerald-800 transition-colors">
+                              {n.title}
+                            </h5>
+                            <p className="text-slate-600 text-[11px] leading-relaxed">
+                              {n.message}
+                            </p>
+                          </div>
+
+                          {n.unread && (
+                            <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 mt-2"></span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Footer status */}
+                <div className="pt-2.5 mt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Sinkronisasi Live BI PIHPS & Pasar</span>
+                  </div>
+                  <button
+                    onClick={loadNotifications}
+                    className="text-emerald-700 hover:underline font-semibold cursor-pointer"
+                  >
+                    Segarkan
+                  </button>
                 </div>
               </div>
             )}

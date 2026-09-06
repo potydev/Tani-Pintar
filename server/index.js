@@ -20,6 +20,11 @@ import {
   maskPhoneNumber
 } from './security.js';
 import { generateSmartConsultantResponse } from './ai_consultant.js';
+import {
+  getRealNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead
+} from './notifications.js';
 
 // Auto-load .env file in Node.js
 if (typeof process.loadEnvFile === 'function') {
@@ -179,6 +184,84 @@ app.post('/api/ai/chat', async (req, res) => {
       success: false,
       error: err.message || 'Terjadi kesalahan pada layanan AI TaniBot.'
     });
+  }
+});
+
+// ==========================================
+// REAL-TIME NOTIFICATIONS API
+// ==========================================
+
+// GET /api/notifications - Real-time market alerts, orders, and account verification
+app.get('/api/notifications', async (req, res) => {
+  try {
+    let currentUser = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded) currentUser = decoded;
+    }
+
+    // Context from query params or authenticated user
+    const userEmail = req.query.email || currentUser?.email || 'joko.slamet@tanipintar.id';
+    const userName = req.query.name || currentUser?.full_name || 'Pak Joko Slamet';
+    const location = req.query.location || currentUser?.farm_location || 'Cilacap, Jawa Tengah';
+    const commodity = req.query.commodity || currentUser?.primary_commodity || 'Cabai Merah';
+
+    const notifications = await getRealNotifications({
+      user: {
+        email: userEmail,
+        full_name: userName,
+        farm_location: location,
+        primary_commodity: commodity,
+        id: currentUser?.id
+      },
+      supabase
+    });
+
+    res.json({
+      success: true,
+      unreadCount: notifications.filter(n => n.unread).length,
+      data: notifications
+    });
+  } catch (err) {
+    console.error('Error in /api/notifications:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// PATCH /api/notifications/:id/read - Mark single notification as read
+app.patch('/api/notifications/:id/read', (req, res) => {
+  try {
+    let userEmail = 'joko.slamet@tanipintar.id';
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded?.email) userEmail = decoded.email;
+    }
+    if (req.body?.email) userEmail = req.body.email;
+
+    markNotificationAsRead(userEmail, req.params.id);
+    res.json({ success: true, message: 'Notifikasi ditandai telah dibaca.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/notifications/mark-all-read - Mark all notifications as read
+app.post('/api/notifications/mark-all-read', (req, res) => {
+  try {
+    let userEmail = 'joko.slamet@tanipintar.id';
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = verifyToken(authHeader.split(' ')[1]);
+      if (decoded?.email) userEmail = decoded.email;
+    }
+    if (req.body?.email) userEmail = req.body.email;
+
+    markAllNotificationsAsRead(userEmail);
+    res.json({ success: true, message: 'Semua notifikasi ditandai telah dibaca.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

@@ -6,5 +6,6 @@ prompt-aplikasi-tanipintar.md
 *.sql
 .env
 .env.*
+server/notifications_state.json
 
 

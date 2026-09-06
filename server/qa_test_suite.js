@@ -313,6 +313,39 @@ async function runQA() {
     assert(false, `Market data test failed: ${e.message}`);
   }
 
+  // 12. Real-time Notifications Engine
+  console.log('\n[TEST GROUP 12: Real-time Notifications Engine]');
+  try {
+    // 12.1 GET /api/notifications
+    const notifRes = await fetch(`${BASE_URL}/api/notifications?email=test.farmer@tanipintar.id&commodity=Cabai+Merah`);
+    const notifData = await notifRes.json();
+    assert(notifRes.status === 200 && notifData.success, 'Notifications endpoint responds with 200 OK');
+    assert(Array.isArray(notifData.data) && notifData.data.length > 0, 'Real market and order notifications generated');
+    
+    const sampleNotif = notifData.data[0];
+    assert(sampleNotif.title && sampleNotif.message && sampleNotif.type, 'Notification object contains complete structured payload');
+
+    // 12.2 PATCH /api/notifications/:id/read
+    const markReadRes = await fetch(`${BASE_URL}/api/notifications/${encodeURIComponent(sampleNotif.id)}/read`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'test.farmer@tanipintar.id' })
+    });
+    const markReadData = await markReadRes.json();
+    assert(markReadRes.status === 200 && markReadData.success, 'Mark single notification as read SUCCEEDS');
+
+    // 12.3 POST /api/notifications/mark-all-read
+    const markAllRes = await fetch(`${BASE_URL}/api/notifications/mark-all-read`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'test.farmer@tanipintar.id' })
+    });
+    const markAllData = await markAllRes.json();
+    assert(markAllRes.status === 200 && markAllData.success, 'Mark all notifications as read SUCCEEDS');
+  } catch (e) {
+    assert(false, `Notification test failed: ${e.message}`);
+  }
+
   console.log('\n====================================================');
   console.log(`  QA TEST RUN COMPLETE: ${testsPassed} Passed, ${testsFailed} Failed`);
   console.log('====================================================\n');
