@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { BarChart2, Zap, Truck, Bell, Shield, MapPin, ArrowRight } from "lucide-react";
+import { gsap, ScrollTrigger } from "../../utils/gsapSetup";
 
 const FEATURES = [
   {
@@ -42,10 +43,82 @@ const FEATURES = [
 ];
 
 export function LandingFeatures() {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const cardsRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header entrance
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      // Staggered card entrance
+      if (cardsRef.current?.children) {
+        gsap.fromTo(
+          Array.from(cardsRef.current.children),
+          { y: 35, opacity: 0, scale: 0.98 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            stagger: 0.08,
+            duration: 0.7,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 82%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      // CTA button entrance
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ctaRef.current,
+              start: "top 90%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
   return (
-    <section id="fitur" className="bg-[#f7f6f2] py-24">
+    <section ref={sectionRef} id="fitur" className="bg-[#f7f6f2] py-24">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="mb-14">
+        <div ref={headerRef} className="mb-14">
           <div
             className="text-emerald-600 text-xs font-bold tracking-[0.2em] uppercase mb-3"
             style={{ fontFamily: "JetBrains Mono, monospace" }}
@@ -60,7 +133,7 @@ export function LandingFeatures() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 rounded-2xl overflow-hidden border border-slate-200">
+        <div ref={cardsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 rounded-2xl overflow-hidden border border-slate-200">
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             return (
@@ -99,7 +172,7 @@ export function LandingFeatures() {
           })}
         </div>
 
-        <div className="mt-12 text-center">
+        <div ref={ctaRef} className="mt-12 text-center">
           <Link
             to="/fitur"
             className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer"

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Star, MapPin, BadgeCheck, Quote } from "lucide-react";
+import { gsap } from "../../utils/gsapSetup";
 
 const TESTIMONIALS = [
   {
@@ -35,10 +36,60 @@ const TESTIMONIALS = [
 ];
 
 export function LandingTestimonials() {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const cardsRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (cardsRef.current?.children) {
+        gsap.fromTo(
+          Array.from(cardsRef.current.children),
+          { y: 35, opacity: 0, scale: 0.95 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            stagger: 0.12,
+            duration: 0.75,
+            ease: "back.out(1.2)",
+            scrollTrigger: {
+              trigger: cardsRef.current,
+              start: "top 82%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="bg-[#f7f6f2] py-20 sm:py-24 border-t border-slate-200/60">
+    <section ref={sectionRef} className="bg-[#f7f6f2] py-20 sm:py-24 border-t border-slate-200/60">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-14">
+        <div ref={headerRef} className="text-center max-w-2xl mx-auto mb-14">
           <div
             className="text-emerald-700 text-xs font-extrabold tracking-[0.2em] uppercase mb-2"
             style={{ fontFamily: "JetBrains Mono, monospace" }}
@@ -56,7 +107,7 @@ export function LandingTestimonials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div ref={cardsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
             <div
               key={i}

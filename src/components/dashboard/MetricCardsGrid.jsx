@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TrendingUp, Compass, Wallet, Building2, Loader2, ArrowUpRight } from "lucide-react";
 import { apiGet } from "../../utils/apiClient.js";
+import { gsap } from "../../utils/gsapSetup.js";
 
 export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!loading && containerRef.current?.children) {
+      gsap.from(Array.from(containerRef.current.children), {
+        y: 20,
+        opacity: 0,
+        scale: 0.98,
+        stagger: 0.08,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    }
+  }, [loading, metrics]);
 
   useEffect(() => {
     async function fetchMetrics() {
@@ -128,7 +143,7 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div ref={containerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {displayMetrics.map((item, idx) => {
         const Icon = item.icon;
         return (

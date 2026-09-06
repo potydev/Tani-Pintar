@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, Star, MapPin, Calendar, CheckCircle2, ShieldCheck,
   ShoppingBag, Minus, Plus, ChevronRight, Leaf, Info, Truck
 } from "lucide-react";
 import { fetchProductDetail, fetchProducts, CATEGORY_ICON } from "../data/marketplaceData";
+import { gsap } from "../utils/gsapSetup";
 
 export function ProductDetailPage({ isLoggedIn }) {
   const { id } = useParams();
@@ -14,6 +15,30 @@ export function ProductDetailPage({ isLoggedIn }) {
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(50);
   const [error, setError] = useState("");
+
+  const leftPanelRef = useRef(null);
+  const rightPanelRef = useRef(null);
+
+  useEffect(() => {
+    if (!loading && product) {
+      if (leftPanelRef.current) {
+        gsap.from(leftPanelRef.current, {
+          x: -30,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power3.out",
+        });
+      }
+      if (rightPanelRef.current) {
+        gsap.from(rightPanelRef.current, {
+          x: 30,
+          opacity: 0,
+          duration: 0.7,
+          ease: "power3.out",
+        });
+      }
+    }
+  }, [loading, product]);
 
   useEffect(() => {
     async function loadData() {
@@ -130,7 +155,7 @@ export function ProductDetailPage({ isLoggedIn }) {
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
           
           {/* Left Column: Image Gallery */}
-          <div className="lg:col-span-6 p-8 bg-slate-50 border-r border-slate-100 flex flex-col justify-between">
+          <div ref={leftPanelRef} className="lg:col-span-6 p-8 bg-slate-50 border-r border-slate-100 flex flex-col justify-between">
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-inner bg-slate-200 mb-6">
               <img
                 src={product.image_url || "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=800&q=80"}
@@ -177,7 +202,7 @@ export function ProductDetailPage({ isLoggedIn }) {
           </div>
 
           {/* Right Column: Product Detail & Purchase */}
-          <div className="lg:col-span-6 p-8 flex flex-col justify-between">
+          <div ref={rightPanelRef} className="lg:col-span-6 p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 uppercase tracking-wide">

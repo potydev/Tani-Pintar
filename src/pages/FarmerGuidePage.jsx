@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { gsap } from "../utils/gsapSetup";
 import {
   BookOpen,
   CheckCircle2,
@@ -28,6 +29,126 @@ import { LandingFooter } from "../components/landing/LandingFooter";
 export function FarmerGuidePage({ isLoggedIn, userName }) {
   const [activeChapter, setActiveChapter] = useState(1);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
+  const heroRef = useRef(null);
+  const chaptersNavRef = useRef(null);
+  const chapterContentRef = useRef(null);
+  const checklistSectionRef = useRef(null);
+  const faqSectionRef = useRef(null);
+  const ctaSectionRef = useRef(null);
+
+  // Initial page entrance animation
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const heroEls = heroRef.current?.querySelectorAll(".gsap-hero-item");
+      if (heroEls && heroEls.length > 0) {
+        gsap.fromTo(
+          heroEls,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.08,
+            duration: 0.7,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (chaptersNavRef.current?.children) {
+        gsap.fromTo(
+          Array.from(chaptersNavRef.current.children),
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.06,
+            duration: 0.6,
+            delay: 0.15,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (checklistSectionRef.current) {
+        gsap.fromTo(
+          checklistSectionRef.current,
+          { y: 30, opacity: 0, scale: 0.98 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: checklistSectionRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (faqSectionRef.current) {
+        const faqCards = faqSectionRef.current.querySelectorAll(".gsap-faq-card");
+        if (faqCards.length > 0) {
+          gsap.fromTo(
+            faqCards,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.08,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: faqSectionRef.current,
+                start: "top 85%",
+                once: true,
+              },
+              clearProps: "transform,opacity",
+            }
+          );
+        }
+      }
+
+      if (ctaSectionRef.current) {
+        gsap.fromTo(
+          ctaSectionRef.current,
+          { y: 30, opacity: 0, scale: 0.96 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ctaSectionRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Smooth transition when activeChapter changes
+  useEffect(() => {
+    if (chapterContentRef.current) {
+      gsap.fromTo(
+        chapterContentRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
+      );
+    }
+  }, [activeChapter]);
   const [checklistState, setChecklistState] = useState([
     { id: 1, text: "Cek data harga pasar tujuan di dashboard TaniPintar hari ini", checked: true },
     { id: 2, text: "Pastikan komoditas dipetik pada waktu sejuk (pagi hari sebelum jam 09:00)", checked: true },
@@ -189,9 +310,9 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
 
       <main className="space-y-20 pb-24">
         {/* Hero Section */}
-        <section className="relative pt-12 pb-16 bg-gradient-to-b from-emerald-50/70 via-white to-white border-b border-slate-100">
+        <section ref={heroRef} className="relative pt-12 pb-16 bg-gradient-to-b from-emerald-50/70 via-white to-white border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
+            <div className="gsap-hero-item flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
               <Link to="/" className="hover:text-emerald-800 transition-colors">
                 Beranda
               </Link>
@@ -200,22 +321,22 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
             </div>
 
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-900 border border-emerald-300 px-3.5 py-1 rounded-full text-xs font-bold mb-4">
+              <div className="gsap-hero-item inline-flex items-center gap-2 bg-emerald-100 text-emerald-900 border border-emerald-300 px-3.5 py-1 rounded-full text-xs font-bold mb-4">
                 <BookOpen size={14} className="text-emerald-800" />
                 <span>Pusat Edukasi &amp; Pengetahuan Agribisnis</span>
               </div>
               <h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
+                className="gsap-hero-item text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Panduan Sukses Penjualan Hasil Panen Tanpa Perantara
               </h1>
-              <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed font-medium">
+              <p className="gsap-hero-item text-slate-600 text-base sm:text-lg mt-4 leading-relaxed font-medium">
                 Kumpulan panduan praktis langkah-demi-langkah yang disusun oleh pakar agronomi, praktisi logistik pangan,
                 dan pedagang pasar induk untuk membantu Anda menjual hasil bumi dengan keuntungan maksimal.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mt-8">
+              <div className="gsap-hero-item flex flex-wrap items-center gap-4 mt-8">
                 <a
                   href="#chapters"
                   className="px-6 py-3.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white font-extrabold text-sm rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer"
@@ -235,7 +356,7 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
             </div>
 
             {/* Chapter Navigation Tabs */}
-            <div id="chapters" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-14 pt-8 border-t border-slate-200/80">
+            <div ref={chaptersNavRef} id="chapters" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-14 pt-8 border-t border-slate-200/80">
               {chapters.map((ch) => {
                 const Icon = ch.icon;
                 const isSelected = activeChapter === ch.id;
@@ -271,7 +392,7 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
 
         {/* Active Chapter Reading View */}
         <section className="max-w-7xl mx-auto px-6">
-          <div className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-xs">
+          <div ref={chapterContentRef} className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-xs">
             <div className="max-w-4xl space-y-8">
               {/* Chapter Header */}
               <div className="border-b border-slate-200 pb-6 space-y-2">
@@ -343,7 +464,7 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
         </section>
 
         {/* Interactive Pre-Shipment Checklist */}
-        <section className="max-w-7xl mx-auto px-6">
+        <section ref={checklistSectionRef} className="max-w-7xl mx-auto px-6">
           <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-6 sm:p-10 text-white shadow-lg">
             <div className="grid lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 space-y-3">
@@ -402,13 +523,13 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto space-y-3">
+          <div ref={faqSectionRef} className="max-w-3xl mx-auto space-y-3">
             {faqs.map((faq, fIdx) => {
               const isOpen = openFaqIndex === fIdx;
               return (
                 <div
                   key={fIdx}
-                  className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
+                  className="gsap-faq-card border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
                 >
                   <button
                     onClick={() => setOpenFaqIndex(isOpen ? null : fIdx)}
@@ -435,7 +556,7 @@ export function FarmerGuidePage({ isLoggedIn, userName }) {
         </section>
 
         {/* CTA Banner Bottom */}
-        <section className="max-w-7xl mx-auto px-6">
+        <section ref={ctaSectionRef} className="max-w-7xl mx-auto px-6">
           <div className="bg-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-8 border border-slate-800">
             <div className="max-w-2xl space-y-2">
               <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-white">

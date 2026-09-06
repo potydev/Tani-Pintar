@@ -1,11 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowRight, ChevronDown, ChevronUp, Sparkles, TrendingUp, Tag } from "lucide-react";
+import { gsap } from "../../utils/gsapSetup";
 
 export function LandingHero({ onLoginClick }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+
+  const containerRef = useRef(null);
+  const badgeRef = useRef(null);
+  const headlineRef = useRef(null);
+  const descRef = useRef(null);
+  const searchBoxRef = useRef(null);
+  const chipsRef = useRef(null);
+  const statsRef = useRef(null);
+  const rightCardRef = useRef(null);
+  const floatBadgeRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const leftElements = [
+        badgeRef.current,
+        headlineRef.current,
+        descRef.current,
+        searchBoxRef.current,
+        chipsRef.current,
+        statsRef.current,
+      ].filter(Boolean);
+
+      gsap.fromTo(
+        leftElements,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.08,
+          duration: 0.7,
+          ease: "power3.out",
+          clearProps: "transform,opacity",
+        }
+      );
+
+      if (rightCardRef.current) {
+        gsap.fromTo(
+          rightCardRef.current,
+          { opacity: 0, x: 45 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.8,
+            delay: 0.15,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      // Ambient floating badge
+      if (floatBadgeRef.current) {
+        gsap.to(floatBadgeRef.current, {
+          y: -6,
+          duration: 2.2,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const quickChips = [
     { label: "Cabai Merah", cat: "cabai" },
@@ -30,6 +95,7 @@ export function LandingHero({ onLoginClick }) {
 
   return (
     <section
+      ref={containerRef}
       id="beranda"
       className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden"
       style={{
@@ -63,7 +129,10 @@ export function LandingHero({ onLoginClick }) {
       <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Left Content Column */}
         <div className="flex flex-col gap-6">
-          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.14] rounded-full px-4 py-1.5 w-fit backdrop-blur-md">
+          <div
+            ref={badgeRef}
+            className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.14] rounded-full px-4 py-1.5 w-fit backdrop-blur-md"
+          >
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span
               className="text-white/90 text-xs font-semibold tracking-wide"
@@ -74,6 +143,7 @@ export function LandingHero({ onLoginClick }) {
           </div>
 
           <h1
+            ref={headlineRef}
             className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
@@ -83,6 +153,7 @@ export function LandingHero({ onLoginClick }) {
           </h1>
 
           <p
+            ref={descRef}
             className="text-white/70 text-base leading-relaxed max-w-md"
             style={{ fontFamily: "Inter, sans-serif" }}
           >
@@ -90,7 +161,7 @@ export function LandingHero({ onLoginClick }) {
           </p>
 
           {/* Prominent Search Input & Action */}
-          <div className="flex flex-col gap-2.5 max-w-lg">
+          <div ref={searchBoxRef} className="flex flex-col gap-2.5 max-w-lg">
             <form onSubmit={(e) => { e.preventDefault(); handleSearchSubmit(); }} className="flex gap-2">
               <div className="flex-1 flex items-center gap-3 bg-white/15 backdrop-blur-md border border-white/[0.25] rounded-2xl px-4 py-1 shadow-lg shadow-black/20 focus-within:border-emerald-400 focus-within:bg-white/20 transition-all">
                 <Search size={18} className="text-emerald-400 shrink-0" />
@@ -114,7 +185,7 @@ export function LandingHero({ onLoginClick }) {
             </form>
 
             {/* Quick Commodity Chips */}
-            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            <div ref={chipsRef} className="flex items-center gap-1.5 flex-wrap pt-0.5">
               <span className="text-[11px] text-white/50 font-semibold flex items-center gap-1">
                 <Tag size={11} className="text-emerald-400" /> Populer:
               </span>
@@ -132,7 +203,7 @@ export function LandingHero({ onLoginClick }) {
           </div>
 
           {/* Stats row */}
-          <div className="flex flex-wrap gap-8 pt-2">
+          <div ref={statsRef} className="flex flex-wrap gap-8 pt-2">
             {[
               { val: "12.450+", label: "Petani Terhubung" },
               { val: "38", label: "Provinsi Dipantau" },
@@ -157,7 +228,7 @@ export function LandingHero({ onLoginClick }) {
         </div>
 
         {/* Right Column — Arbitrage Simulation Card */}
-        <div className="flex flex-col gap-4">
+        <div ref={rightCardRef} className="flex flex-col gap-4">
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-2xl shadow-black/50 border border-slate-100/50 backdrop-blur-sm">
             {/* Header Insight Badge */}
             <div className="flex items-center justify-between mb-4">
@@ -173,6 +244,7 @@ export function LandingHero({ onLoginClick }) {
                 </span>
               </div>
               <span
+                ref={floatBadgeRef}
                 className="bg-emerald-50 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full border border-emerald-200"
                 style={{ fontFamily: "JetBrains Mono, monospace" }}
               >

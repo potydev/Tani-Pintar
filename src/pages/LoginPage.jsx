@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Leaf, Zap, KeyRound, X } from "lucide-react";
 import { apiPost } from "../utils/apiClient.js";
+import { gsap } from "../utils/gsapSetup.js";
 
 export function LoginPage({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -23,8 +24,74 @@ export function LoginPage({ onLoginSuccess }) {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSuccess, setForgotSuccess] = useState(false);
 
+  const containerRef = useRef(null);
+  const leftColRef = useRef(null);
+  const formCardRef = useRef(null);
+  const badgeFloatRef = useRef(null);
+
+  // Entrance animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (leftColRef.current) {
+        const leftItems = leftColRef.current.querySelectorAll(".gsap-left-item");
+        if (leftItems.length > 0) {
+          gsap.fromTo(
+            leftItems,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.08,
+              duration: 0.7,
+              ease: "power3.out",
+              clearProps: "transform,opacity",
+            }
+          );
+        }
+      }
+
+      if (badgeFloatRef.current) {
+        gsap.to(badgeFloatRef.current, {
+          y: -6,
+          duration: 2.2,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
+
+      if (formCardRef.current) {
+        gsap.fromTo(
+          formCardRef.current,
+          { y: 30, scale: 0.96, opacity: 0 },
+          {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Form transition on mode change
+  useEffect(() => {
+    if (formCardRef.current) {
+      gsap.fromTo(
+        formCardRef.current.querySelector("form"),
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }
+      );
+    }
+  }, [mode]);
+
   // Auto redirect if already authenticated in local storage
-  React.useEffect(() => {
+  useEffect(() => {
     const savedUser = localStorage.getItem("tanipintar_user");
     if (savedUser) {
       try {
@@ -113,12 +180,12 @@ export function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#121212]" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+    <div ref={containerRef} className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#121212]" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
       
       {/* Left Column — Dark Green Branding & Impact Panel */}
-      <div className="bg-[#081f13] p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
+      <div ref={leftColRef} className="bg-[#081f13] p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
         {/* Brand Logo */}
-        <div className="relative z-10">
+        <div className="gsap-left-item relative z-10">
           <Link to="/" className="inline-flex items-center gap-2.5 group">
             <div className="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/30 group-hover:scale-105 transition-transform">
               <Leaf size={18} className="text-slate-950" />
@@ -129,17 +196,17 @@ export function LoginPage({ onLoginSuccess }) {
 
         {/* Middle Main Headline & Stats */}
         <div className="relative z-10 my-10 max-w-md">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 border border-emerald-500/30">
+          <div ref={badgeFloatRef} className="gsap-left-item inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 border border-emerald-500/30">
             <span>✨ AI Intelligence &amp; Marketplace Tani</span>
           </div>
-          <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4">
+          <h1 className="gsap-left-item text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4">
             Ekosistem Cerdas Jual-Beli Hasil Panen
           </h1>
-          <p className="text-emerald-100/70 text-sm sm:text-base leading-relaxed mb-12">
+          <p className="gsap-left-item text-emerald-100/70 text-sm sm:text-base leading-relaxed mb-12">
             Pantau pergerakan harga komoditas di seluruh Indonesia, prediksi tren panen dengan AI, dan beli komoditas langsung dari petani binaan.
           </p>
 
-          <div className="grid grid-cols-2 gap-8">
+          <div className="gsap-left-item grid grid-cols-2 gap-8">
             <div>
               <div className="text-white font-extrabold text-3xl sm:text-4xl tracking-tight">12.450+</div>
               <div className="text-emerald-200/60 text-xs sm:text-sm mt-1 font-medium">Petani &amp; Pembeli Terhubung</div>
@@ -152,7 +219,7 @@ export function LoginPage({ onLoginSuccess }) {
         </div>
 
         {/* Bottom Social Proof */}
-        <div className="relative z-10 pt-6 border-t border-emerald-800/40">
+        <div className="gsap-left-item relative z-10 pt-6 border-t border-emerald-800/40">
           <p className="text-emerald-100/90 text-sm leading-relaxed mb-2 font-medium">
             &ldquo;Satu akun untuk semua: pantau harga AI, jual panen ke luar kota, atau belanja hasil tani berkualitas.&rdquo;
           </p>
@@ -163,7 +230,7 @@ export function LoginPage({ onLoginSuccess }) {
       </div>
 
       {/* Right Column — Form Panel */}
-      <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center max-w-md mx-auto w-full">
+      <div ref={formCardRef} className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center max-w-md mx-auto w-full">
         
         {/* Header Title */}
         <div className="mb-8">

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, ArrowRight } from "lucide-react";
+import { gsap } from "../../utils/gsapSetup";
 
 const STEPS = [
   { num: "01", title: "Pilih Komoditas", desc: "Masukkan jenis hasil panen dan lokasi kebun Anda." },
@@ -10,10 +11,80 @@ const STEPS = [
 ];
 
 export function LandingHowItWorks() {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const stepsRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (headerRef.current) {
+        gsap.fromTo(
+          headerRef.current,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: headerRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (stepsRef.current?.children) {
+        gsap.fromTo(
+          Array.from(stepsRef.current.children),
+          { y: 35, opacity: 0, scale: 0.95 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            stagger: 0.12,
+            duration: 0.75,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: stepsRef.current,
+              start: "top 82%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ctaRef.current,
+              start: "top 90%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="bg-[#0b1f13] py-24">
+    <section ref={sectionRef} className="bg-[#0b1f13] py-24">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <div ref={headerRef} className="text-center mb-16">
           <div
             className="text-emerald-400 text-xs font-bold tracking-[0.2em] uppercase mb-3"
             style={{ fontFamily: "JetBrains Mono, monospace" }}
@@ -28,7 +99,7 @@ export function LandingHowItWorks() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.08] rounded-2xl overflow-hidden border border-white/[0.08]">
+        <div ref={stepsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/[0.08] rounded-2xl overflow-hidden border border-white/[0.08]">
           {STEPS.map((step, i) => (
             <div
               key={i}
@@ -61,7 +132,7 @@ export function LandingHowItWorks() {
           ))}
         </div>
 
-        <div className="mt-14 text-center">
+        <div ref={ctaRef} className="mt-14 text-center">
           <Link
             to="/panduan"
             className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow-md transition-all cursor-pointer"

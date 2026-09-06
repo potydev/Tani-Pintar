@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { gsap } from "../utils/gsapSetup";
 import {
   Target,
   TrendingUp,
@@ -30,6 +31,105 @@ import { LandingFooter } from "../components/landing/LandingFooter";
 export function FeaturesPage({ isLoggedIn, userName }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("arbitrase");
+
+  const heroRef = useRef(null);
+  const ribbonRef = useRef(null);
+  const previewBoxRef = useRef(null);
+  const tableRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  // Page entrance animation
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const heroEls = heroRef.current?.querySelectorAll(".gsap-hero-el");
+      if (heroEls && heroEls.length > 0) {
+        gsap.fromTo(
+          heroEls,
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.08,
+            duration: 0.7,
+            ease: "power3.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (ribbonRef.current?.children) {
+        gsap.fromTo(
+          Array.from(ribbonRef.current.children),
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.06,
+            duration: 0.5,
+            delay: 0.2,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+
+      if (tableRef.current) {
+        const rows = tableRef.current.querySelectorAll("tbody tr");
+        if (rows.length > 0) {
+          gsap.fromTo(
+            rows,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.08,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: tableRef.current,
+                start: "top 85%",
+                once: true,
+              },
+              clearProps: "transform,opacity",
+            }
+          );
+        }
+      }
+
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current,
+          { y: 30, opacity: 0, scale: 0.96 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ctaRef.current,
+              start: "top 85%",
+              once: true,
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Smooth transition when switching tabs in interactive preview
+  useEffect(() => {
+    if (previewBoxRef.current) {
+      gsap.fromTo(
+        previewBoxRef.current,
+        { opacity: 0, x: 20 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }
+      );
+    }
+  }, [activeTab]);
 
   const featuresList = [
     {
@@ -221,10 +321,10 @@ export function FeaturesPage({ isLoggedIn, userName }) {
 
       <main className="space-y-20 pb-24">
         {/* Hero Section */}
-        <section className="relative pt-12 pb-16 bg-gradient-to-b from-emerald-50/70 via-white to-white overflow-hidden border-b border-slate-100">
+        <section ref={heroRef} className="relative pt-12 pb-16 bg-gradient-to-b from-emerald-50/70 via-white to-white overflow-hidden border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
+            <div className="gsap-hero-el flex items-center gap-2 text-xs font-semibold text-slate-500 mb-6">
               <Link to="/" className="hover:text-emerald-800 transition-colors">
                 Beranda
               </Link>
@@ -233,22 +333,22 @@ export function FeaturesPage({ isLoggedIn, userName }) {
             </div>
 
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 bg-emerald-100/90 text-emerald-900 border border-emerald-200/80 px-3.5 py-1 rounded-full text-xs font-bold mb-4 shadow-2xs">
+              <div className="gsap-hero-el inline-flex items-center gap-2 bg-emerald-100/90 text-emerald-900 border border-emerald-200/80 px-3.5 py-1 rounded-full text-xs font-bold mb-4 shadow-2xs">
                 <Sparkles size={14} className="text-emerald-700" />
                 <span>Ekosistem Lengkap Intelijen Agribisnis 2026</span>
               </div>
               <h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
+                className="gsap-hero-el text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
               >
                 Teknologi Cerdas untuk Petani Indonesia Jual dengan Harga Tertinggi
               </h1>
-              <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed font-medium">
+              <p className="gsap-hero-el text-slate-600 text-base sm:text-lg mt-4 leading-relaxed font-medium">
                 TaniPintar menggabungkan analitik data pasar real-time Bank Indonesia (PIHPS), kecerdasan buatan Google
                 Gemini, dan jaringan logistik terpadu untuk menghilangkan dominasi tengkulak dan melipatgandakan margin petani.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mt-8">
+              <div className="gsap-hero-el flex flex-wrap items-center gap-4 mt-8">
                 <Link
                   to="/login"
                   className="px-6 py-3.5 bg-[#0d5c3a] hover:bg-[#0b4f31] text-white font-extrabold text-sm rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer"
@@ -269,7 +369,7 @@ export function FeaturesPage({ isLoggedIn, userName }) {
             </div>
 
             {/* Quick Feature Pillars Ribbon */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-14 pt-8 border-t border-slate-200/80">
+            <div ref={ribbonRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-14 pt-8 border-t border-slate-200/80">
               {featuresList.map((f) => {
                 const Icon = f.icon;
                 const isCurrent = activeTab === f.id;
@@ -361,7 +461,7 @@ export function FeaturesPage({ isLoggedIn, userName }) {
 
               {/* Right Column: Live Interactive Mock Preview */}
               <div className="lg:col-span-5">
-                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-md space-y-4">
+                <div ref={previewBoxRef} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-md space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100 text-xs">
                     <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
                       Live Visual Demonstrator
@@ -565,7 +665,7 @@ export function FeaturesPage({ isLoggedIn, userName }) {
             </p>
           </div>
 
-          <div className="overflow-x-auto tp-scrollbar">
+          <div ref={tableRef} className="overflow-x-auto tp-scrollbar">
             <table className="w-full text-left text-xs sm:text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-wider">
@@ -618,7 +718,7 @@ export function FeaturesPage({ isLoggedIn, userName }) {
 
         {/* CTA Bottom Banner */}
         <section className="max-w-7xl mx-auto px-6">
-          <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
+          <div ref={ctaRef} className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-8 sm:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-2xl space-y-3">
               <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
                 Siap Melipatgandakan Keuntungan Panen Anda?

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ArrowUpRight, ArrowRight, Route, ShieldCheck, MapPin, Target, Compass } from "lucide-react";
 import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
+import { gsap } from "../../utils/gsapSetup";
 
 export function CompactRecommendationCards({
   originLocation = "Cilacap, Jateng",
@@ -13,6 +14,22 @@ export function CompactRecommendationCards({
   const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const gridRef = useRef(null);
+  const bannerRef = useRef(null);
+
+  useEffect(() => {
+    if (!loading && gridRef.current?.children) {
+      gsap.from(Array.from(gridRef.current.children), {
+        y: 20,
+        opacity: 0,
+        scale: 0.98,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    }
+  }, [loading, items]);
 
   useEffect(() => {
     let isMounted = true;
@@ -46,7 +63,7 @@ export function CompactRecommendationCards({
       </div>
 
       {/* Balanced 2-Column Grid Layout with generous bottom spacing */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {items.map((item) => (
           <div
             key={item.rank}
@@ -114,7 +131,7 @@ export function CompactRecommendationCards({
 
       {/* Spacious, Elegant Action Card: Explore All 34 Regions in Sidebar (No more dempet!) */}
       {onViewAllRegions && (
-        <div className="p-6 bg-gradient-to-r from-emerald-50/70 via-white to-teal-50/40 rounded-2xl border border-emerald-200/90 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all duration-200">
+        <div ref={bannerRef} className="p-6 bg-gradient-to-r from-emerald-50/70 via-white to-teal-50/40 rounded-2xl border border-emerald-200/90 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all duration-200">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-emerald-100/90 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200/80 shadow-2xs mt-0.5 md:mt-0">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Search, Star, MapPin, ShoppingCart, Leaf, Filter, X,
@@ -8,6 +8,7 @@ import {
 import { COMMODITY_CATEGORIES, SORT_OPTIONS, fetchProducts, fetchMarketplaceStats } from "../data/marketplaceData";
 import { ProductCard } from "../components/marketplace/ProductCard";
 import { LandingHeader } from "../components/landing/LandingHeader";
+import { gsap } from "../utils/gsapSetup";
 
 export function MarketplacePage({ isLoggedIn, userName, isEmbedded = false }) {
   const navigate = useNavigate();
@@ -21,6 +22,23 @@ export function MarketplacePage({ isLoggedIn, userName, isEmbedded = false }) {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [stats, setStats] = useState({ totalProducts: 0, totalSellers: 0, totalLocations: 0 });
+
+  const gridRef = useRef(null);
+  const heroRef = useRef(null);
+
+  // Animate product cards on load / update
+  useEffect(() => {
+    if (!loading && gridRef.current?.children) {
+      gsap.from(Array.from(gridRef.current.children), {
+        y: 20,
+        opacity: 0,
+        scale: 0.98,
+        stagger: 0.04,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    }
+  }, [loading, products]);
 
   const [searchTimeout, setSearchTimeout] = useState(null);
 
@@ -189,7 +207,7 @@ export function MarketplacePage({ isLoggedIn, userName, isEmbedded = false }) {
           </div>
         ) : products.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-8">
+            <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-8">
               {products.map(p => (
                 <ProductCard
                   key={p.id}
