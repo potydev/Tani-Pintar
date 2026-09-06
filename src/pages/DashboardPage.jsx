@@ -131,7 +131,14 @@ export function DashboardPage({ name, onLogout }) {
   const renderContent = () => {
     switch (activeTab) {
       case "peluang":
-        return <SalesOpportunitiesPage originLocation={selectedLocation} selectedDate={selectedDate} />;
+        return (
+          <SalesOpportunitiesPage
+            originLocation={selectedLocation}
+            selectedDate={selectedDate}
+            initialCommodity={selectedCommodity}
+            onBackToDashboard={() => setActiveTab("dashboard")}
+          />
+        );
       case "prediksi":
         return <PriceForecastingPage originLocation={selectedLocation} selectedDate={selectedDate} />;
       case "pembeli":
@@ -175,10 +182,12 @@ export function DashboardPage({ name, onLogout }) {
                     </p>
                   </div>
                   <button
-                    onClick={() => setActiveTab("peluang")}
-                    className="text-xs font-bold text-emerald-800 hover:text-emerald-900 flex items-center gap-1 shrink-0 cursor-pointer"
+                    onClick={() => handleTabChange("peluang")}
+                    className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer shadow-2xs hover:shadow-xs"
+                    title="Buka menu Peluang Arbitrase di sidebar untuk melihat seluruh 34 provinsi"
                   >
-                    Lihat Semua Rute &rarr;
+                    <span>Lihat Semua Pilihan Daerah (34 Provinsi)</span>
+                    <span className="text-emerald-700">&rarr;</span>
                   </button>
                 </div>
 
@@ -224,6 +233,7 @@ export function DashboardPage({ name, onLogout }) {
                   commodity={selectedCommodity}
                   isVerifiedFarmer={true}
                   onOpenUpgrade={() => setIsUpgradeOpen(true)}
+                  onViewAllRegions={() => handleTabChange("peluang")}
                 />
 
                 {/* 3 Panels Analytics Row */}

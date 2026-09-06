@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, Route, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Route, ShieldCheck, MapPin, Target } from "lucide-react";
 import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
@@ -7,7 +7,8 @@ import { ShippingModal } from "./ShippingModal";
 export function CompactRecommendationCards({
   originLocation = "Cilacap, Jateng",
   selectedDate,
-  commodity = "Cabai Merah"
+  commodity = "Cabai Merah",
+  onViewAllRegions
 }) {
   const [items, setItems] = useState(RECOMMENDATIONS_COMPACT);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -38,9 +39,22 @@ export function CompactRecommendationCards({
           <Route size={14} className="text-emerald-700" />
           <span>Rute Alternatif Lainnya Berdasarkan Data Pasar Terkini</span>
         </div>
-        <span className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full font-bold">
-          2 Pilihan Teratas
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full font-bold">
+            2 Pilihan Teratas
+          </span>
+          {onViewAllRegions && (
+            <button
+              type="button"
+              onClick={onViewAllRegions}
+              className="text-[11px] text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100 bg-emerald-50/90 border border-emerald-300/80 px-2.5 py-0.5 rounded-full font-extrabold flex items-center gap-1 transition-all cursor-pointer shadow-2xs hover:shadow-xs"
+              title="Buka daftar lengkap seluruh daerah tujuan di menu Peluang Arbitrase sidebar"
+            >
+              <span>Lihat Semua Daerah (34 Provinsi)</span>
+              <ArrowRight size={11} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Balanced 2-Column Grid Layout (Eliminates edge-hugging and central void) */}
@@ -109,6 +123,38 @@ export function CompactRecommendationCards({
           </div>
         ))}
       </div>
+
+      {/* Call To Action Banner: Explore All Regions in Sidebar */}
+      {onViewAllRegions && (
+        <div className="p-4.5 rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-700/60">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-emerald-200 shrink-0 shadow-inner">
+              <MapPin size={20} />
+            </div>
+            <div>
+              <div className="font-heading font-extrabold text-sm text-white flex items-center gap-2">
+                <span>Daftar Lengkap Seluruh Daerah Tujuan (34+ Provinsi)</span>
+                <span className="bg-emerald-500/30 text-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-400/30">
+                  Nasional
+                </span>
+              </div>
+              <p className="text-emerald-100/80 text-xs mt-0.5">
+                Bandingkan peluang harga pangan dan margin laba ke seluruh kota pasar induk di Indonesia.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onViewAllRegions}
+            className="w-full sm:w-auto px-4.5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer group"
+          >
+            <Target size={14} className="text-emerald-700 group-hover:scale-110 transition-transform" />
+            <span>Buka Semua Pilihan Daerah</span>
+            <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform text-emerald-800" />
+          </button>
+        </div>
+      )}
 
       {selectedItem && (
         <ShippingModal

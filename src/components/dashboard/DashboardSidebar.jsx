@@ -24,7 +24,7 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
     {
       title: "Strategi & Keputusan Pasar",
       items: [
-        { id: "peluang", label: "Peluang Arbitrase Pasar", icon: Target },
+        { id: "peluang", label: "Peluang Arbitrase Pasar", icon: Target, badge: "34 Daerah" },
         { id: "prediksi", label: "Tren & Prediksi Harga", icon: LineChartIcon },
         { id: "pembeli", label: "Direktori Pasar Induk", icon: Building2 },
         { id: "rekomendasi", label: "Batas Harga Tawar Aman", icon: Tag },

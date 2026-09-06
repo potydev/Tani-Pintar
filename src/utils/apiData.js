@@ -105,10 +105,11 @@ export async function fetchAvailableDates() {
   return dynamicDates;
 }
 
-export async function fetchAIRecommendations(origin = 'Cilacap, Jateng', commodity = 'Cabai Merah', date = null) {
+export async function fetchAIRecommendations(origin = 'Cilacap, Jateng', commodity = 'Cabai Merah', date = null, all = false) {
   try {
     let url = `/api/recommendations?origin=${encodeURIComponent(origin)}&commodity=${encodeURIComponent(commodity)}`;
     if (date) url += `&date=${encodeURIComponent(date)}`;
+    if (all) url += `&all=true`;
     const res = await apiGet(url);
     if (res.ok && res.data && res.data.success && res.data.data) {
       return res.data.data;

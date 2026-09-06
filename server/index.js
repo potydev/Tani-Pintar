@@ -1286,32 +1286,53 @@ app.get('/api/recommendations', async (req, res) => {
     // Sort by net profit descending
     destinations.sort((a, b) => b.netProfitVal - a.netProfitVal);
 
-    // If all destinations are lower (origin has highest price), fall back to top benchmark hubs
-    let finalDestinations = destinations.filter(d => d.netProfitVal > 0);
-    if (finalDestinations.length === 0) {
-      finalDestinations = destinations.slice(0, 3);
+    const isAll = req.query.all === 'true' || req.query.limit === 'all';
+    const limit = isAll ? destinations.length : (parseInt(req.query.limit) || 3);
+
+    let finalDestinations;
+    if (isAll) {
+      finalDestinations = destinations;
+    } else {
+      finalDestinations = destinations.filter(d => d.netProfitVal > 0);
+      if (finalDestinations.length === 0) {
+        finalDestinations = destinations.slice(0, 3);
+      }
     }
 
     const qty = 500;
-    const recommendations = finalDestinations.slice(0, 3).map((item, idx) => {
+    const recommendations = finalDestinations.slice(0, limit).map((item, idx) => {
       const isPositive = Number(item.diffPct) >= 0;
       const diffStr = isPositive ? `+${item.diffPct}%` : `${item.diffPct}%`;
-      const netProfitDisplay = item.netProfitVal > 0 ? `Rp ${Math.round(item.netProfitVal).toLocaleString('id-ID')}` : `Rp ${Math.round(Math.abs(item.netProfitVal)).toLocaleString('id-ID')}`;
+      const netProfitDisplay = item.netProfitVal > 0
+        ? `Rp ${Math.round(item.netProfitVal).toLocaleString('id-ID')}`
+        : `-Rp ${Math.round(Math.abs(item.netProfitVal)).toLocaleString('id-ID')}`;
+
+      const badge = idx === 0
+        ? "Sangat Direkomendasikan"
+        : item.netProfitVal > 15000000
+          ? "Direkomendasikan"
+          : item.netProfitVal > 0
+            ? "Potensial"
+            : "Margin Ketat";
+
+      const island = PROVINCE_HUBS[item.destProv]?.island || 'Lainnya';
 
       return {
         rank: idx + 1,
         city: item.city,
         province: item.destProv,
+        island: island,
         originCity: originCity,
         originLocation: rawOrigin,
         commodity: cleanComm,
-        badge: idx === 0 ? "Sangat Direkomendasikan" : "Direkomendasikan",
+        badge: badge,
         originPrice: `Rp ${Math.round(originPrice).toLocaleString('id-ID')}`,
         destPrice: `Rp ${Math.round(item.destPrice).toLocaleString('id-ID')}`,
-        diffPercent: `${diffStr} ${isPositive ? 'Lebih tinggi' : 'Tingkat serapan'}`,
+        diffPercent: `${diffStr} ${isPositive ? 'Lebih tinggi' : 'Lebih rendah'}`,
         marginDiff: `Rp ${Math.round(Math.max(0, item.grossMarginTotal)).toLocaleString('id-ID')}`,
         shippingCost: `Rp ${item.logistics.cost.toLocaleString('id-ID')}`,
         netProfit: netProfitDisplay,
+        netProfitVal: item.netProfitVal,
         netProfitQty: `per ${qty} kg muatan`,
         aiReasons: [
           `Harga ${cleanComm} ${diffStr} dibanding sentra panen Anda (${originCity})`,
@@ -1333,6 +1354,7 @@ app.get('/api/recommendations', async (req, res) => {
       originCity,
       originPrice: Math.round(originPrice),
       targetDate,
+      totalDestinations: destinations.length,
       count: recommendations.length,
       data: recommendations
     });
