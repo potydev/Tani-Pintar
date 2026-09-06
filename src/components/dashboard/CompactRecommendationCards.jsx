@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, ArrowRight, Route, ShieldCheck, MapPin, Target } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Route, ShieldCheck, MapPin, Target, Compass } from "lucide-react";
 import { RECOMMENDATIONS_COMPACT } from "../../data/mockData";
 import { fetchAIRecommendations } from "../../utils/apiData";
 import { ShippingModal } from "./ShippingModal";
@@ -33,32 +33,20 @@ export function CompactRecommendationCards({
   const displayOriginCity = originLocation ? originLocation.split(',')[0] : "Cilacap";
 
   return (
-    <div className={`space-y-3 mb-6 relative transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
-      <div className="flex items-center justify-between text-xs text-slate-600 font-bold px-1.5 pb-0.5">
+    <div className={`mb-8 relative transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
+      {/* Header bar */}
+      <div className="flex items-center justify-between text-xs text-slate-600 font-bold px-1.5 pb-3">
         <div className="flex items-center gap-2">
           <Route size={14} className="text-emerald-700" />
           <span>Rute Alternatif Lainnya Berdasarkan Data Pasar Terkini</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full font-bold">
-            2 Pilihan Teratas
-          </span>
-          {onViewAllRegions && (
-            <button
-              type="button"
-              onClick={onViewAllRegions}
-              className="text-[11px] text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100 bg-emerald-50/90 border border-emerald-300/80 px-2.5 py-0.5 rounded-full font-extrabold flex items-center gap-1 transition-all cursor-pointer shadow-2xs hover:shadow-xs"
-              title="Buka daftar lengkap seluruh daerah tujuan di menu Peluang Arbitrase sidebar"
-            >
-              <span>Lihat Semua Daerah (34 Provinsi)</span>
-              <ArrowRight size={11} />
-            </button>
-          )}
-        </div>
+        <span className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full font-bold">
+          2 Pilihan Teratas
+        </span>
       </div>
 
-      {/* Balanced 2-Column Grid Layout (Eliminates edge-hugging and central void) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Balanced 2-Column Grid Layout with generous bottom spacing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {items.map((item) => (
           <div
             key={item.rank}
@@ -124,35 +112,43 @@ export function CompactRecommendationCards({
         ))}
       </div>
 
-      {/* Call To Action Banner: Explore All Regions in Sidebar */}
+      {/* Spacious, Elegant Action Card: Explore All 34 Regions in Sidebar (No more dempet!) */}
       {onViewAllRegions && (
-        <div className="p-4.5 rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-700/60">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-emerald-200 shrink-0 shadow-inner">
-              <MapPin size={20} />
-            </div>
-            <div>
-              <div className="font-heading font-extrabold text-sm text-white flex items-center gap-2">
-                <span>Daftar Lengkap Seluruh Daerah Tujuan (34+ Provinsi)</span>
-                <span className="bg-emerald-500/30 text-emerald-200 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-400/30">
-                  Nasional
-                </span>
+        <div className="p-6 bg-gradient-to-r from-emerald-50/70 via-white to-teal-50/40 rounded-2xl border border-emerald-200/90 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all duration-200">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100/90 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200/80 shadow-2xs mt-0.5 md:mt-0">
+                <Compass size={24} className="text-emerald-800" />
               </div>
-              <p className="text-emerald-100/80 text-xs mt-0.5">
-                Bandingkan peluang harga pangan dan margin laba ke seluruh kota pasar induk di Indonesia.
-              </p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-200/80 tracking-wider">
+                    Peta Pasar Nasional
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    34+ Provinsi Terdata
+                  </span>
+                </div>
+                <h4 className="font-heading font-extrabold text-slate-900 text-sm sm:text-base">
+                  Lihat Seluruh Pilihan Rute &amp; Daerah Tujuan Pasar
+                </h4>
+                <p className="text-xs text-slate-600 font-medium leading-relaxed max-w-xl">
+                  Bandingkan peluang harga pangan, estimasi ongkir kargo, dan margin laba bersih ke seluruh pasar induk di Indonesia dari sentra panen Anda.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={onViewAllRegions}
-            className="w-full sm:w-auto px-4.5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer group"
-          >
-            <Target size={14} className="text-emerald-700 group-hover:scale-110 transition-transform" />
-            <span>Buka Semua Pilihan Daerah</span>
-            <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform text-emerald-800" />
-          </button>
+            <button
+              type="button"
+              onClick={onViewAllRegions}
+              className="w-full md:w-auto px-5 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2.5 shrink-0 cursor-pointer group"
+            >
+              <Target size={16} className="text-emerald-300 group-hover:scale-110 transition-transform" />
+              <span>Buka Semua Pilihan Daerah</span>
+              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform text-white" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -174,4 +170,3 @@ export function CompactRecommendationCards({
     </div>
   );
 }
-
