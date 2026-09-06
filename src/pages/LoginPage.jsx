@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { Leaf, Zap, KeyRound, X } from "lucide-react";
+import { Leaf, KeyRound, X } from "lucide-react";
 import { apiPost } from "../utils/apiClient.js";
 import { gsap } from "../utils/gsapSetup.js";
 
@@ -79,38 +79,18 @@ export function LoginPage({ onLoginSuccess }) {
     }
   }, [mode]);
 
-  // Auto redirect if already authenticated in local storage
+  // If already logged in, redirect away from login page immediately
   useEffect(() => {
     const savedUser = localStorage.getItem("tanipintar_user");
     if (savedUser) {
       try {
-        const u = JSON.parse(savedUser);
-        if (u) {
-          if (u.role === "admin" || u.role === "super_admin") {
-            navigate("/admin", { replace: true });
-          } else {
-            navigate(redirectUrl, { replace: true });
-          }
+        const parsed = JSON.parse(savedUser);
+        if (parsed && (parsed.id || parsed.email)) {
+          navigate(redirectUrl, { replace: true });
         }
       } catch (e) {}
     }
   }, [navigate, redirectUrl]);
-
-  const handleDemoLogin = () => {
-    const demoUser = {
-      id: 1,
-      full_name: "Pak Joko Slamet",
-      email: "joko.slamet@tanipintar.id",
-      role: "farmer",
-      phone: "081234567890",
-      farm_location: "Cilacap, Jawa Tengah",
-      primary_commodity: "Cabai Merah Besar",
-      land_size: "1.5 Hektar"
-    };
-    localStorage.setItem("tanipintar_user", JSON.stringify(demoUser));
-    if (onLoginSuccess) onLoginSuccess(demoUser);
-    navigate(redirectUrl);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -299,20 +279,6 @@ export function LoginPage({ onLoginSuccess }) {
             {loading ? "Memproses..." : mode === "login" ? "Masuk sekarang" : "Daftar Akun Sekarang"}
           </button>
         </form>
-
-        {/* Divider */}
-        <div className="text-center text-xs text-slate-500 font-semibold my-5">
-          atau
-        </div>
-
-        {/* Secondary Demo Button */}
-        <button
-          type="button"
-          onClick={handleDemoLogin}
-          className="w-full bg-transparent border border-slate-700 hover:border-slate-500 text-white font-semibold text-xs sm:text-sm py-3 rounded-xl transition-all flex items-center justify-center gap-2"
-        >
-          <Zap size={14} className="text-amber-400" /> Coba akun demo
-        </button>
 
         {/* Switch Mode Footer Link */}
         <div className="text-center text-xs text-slate-400 mt-8">

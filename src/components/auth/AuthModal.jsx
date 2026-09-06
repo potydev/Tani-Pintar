@@ -45,21 +45,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     }
   };
 
-  const handleDemoLogin = () => {
-    const demoUser = {
-      id: "DEMO-001",
-      email: "joko.slamet@tanipintar.id",
-      full_name: "Pak Joko Slamet",
-      farm_location: "Cilacap, Jawa Tengah",
-      primary_commodity: "Cabai Merah Besar",
-      land_size: "1.5 Hektar",
-      avatar_url: "/assets/farmer_avatar.png"
-    };
-    localStorage.setItem("tanipintar_user", JSON.stringify(demoUser));
-    if (onAuthSuccess) onAuthSuccess(demoUser);
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden">
@@ -177,19 +162,6 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }) {
               </>
             )}
           </button>
-
-          {!isRegister && (
-            <div className="pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5"
-              >
-                <CheckCircle2 size={14} className="text-emerald-600" />
-                <span>Masuk Cepat Demo (Pak Joko Slamet)</span>
-              </button>
-            </div>
-          )}
         </form>
       </div>
     </div>

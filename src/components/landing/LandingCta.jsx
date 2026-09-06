@@ -91,7 +91,7 @@ export function LandingCta({ onLoginClick }) {
             className="flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white font-semibold px-7 py-4 rounded-xl hover:bg-white/15 transition-colors text-sm cursor-pointer"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
-            Lihat Demo
+            Masuk ke Akun
           </button>
         </div>
 

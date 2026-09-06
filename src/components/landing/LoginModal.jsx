@@ -78,20 +78,6 @@ export function LoginModal({ onClose, onLogin }) {
     avatar_url: "/assets/farmer_avatar.png"
   });
 
-  const handleDemoLogin = () => {
-    const demoUser = {
-      id: "DEMO-001",
-      email: "joko.slamet@tanipintar.id",
-      full_name: "Pak Joko Slamet",
-      farm_location: "Cilacap, Jawa Tengah",
-      primary_commodity: "Cabai Merah Besar",
-      land_size: "1.5 Hektar",
-      avatar_url: "/assets/farmer_avatar.png"
-    };
-    localStorage.setItem("tanipintar_user", JSON.stringify(demoUser));
-    if (onLogin) onLogin(demoUser.full_name);
-  };
-
   const handleClose = () => {
     setMounted(false);
     setTimeout(() => onClose(), 200);
@@ -319,21 +305,6 @@ export function LoginModal({ onClose, onLogin }) {
               </>
             )}
           </button>
-
-          {/* Demo Login */}
-          {!isRegister && (
-            <div className="pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-              >
-                <CheckCircle2 size={14} className="text-emerald-600" />
-                <span>Masuk Cepat Demo (Pak Joko Slamet)</span>
-              </button>
-            </div>
-          )}
 
           {/* Security Notice */}
           <div className="flex items-center justify-center gap-1.5 pt-2">
