@@ -27,7 +27,6 @@ export function LoginPage({ onLoginSuccess }) {
   const containerRef = useRef(null);
   const leftColRef = useRef(null);
   const formCardRef = useRef(null);
-  const badgeFloatRef = useRef(null);
 
   // Entrance animations
   useEffect(() => {
@@ -48,16 +47,6 @@ export function LoginPage({ onLoginSuccess }) {
             }
           );
         }
-      }
-
-      if (badgeFloatRef.current) {
-        gsap.to(badgeFloatRef.current, {
-          y: -6,
-          duration: 2.2,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
       }
 
       if (formCardRef.current) {
@@ -196,7 +185,7 @@ export function LoginPage({ onLoginSuccess }) {
 
         {/* Middle Main Headline & Stats */}
         <div className="relative z-10 my-10 max-w-md">
-          <div ref={badgeFloatRef} className="gsap-left-item inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 border border-emerald-500/30">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold mb-4 border border-emerald-500/30">
             <span>✨ AI Intelligence &amp; Marketplace Tani</span>
           </div>
           <h1 className="gsap-left-item text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-tight mb-4">
