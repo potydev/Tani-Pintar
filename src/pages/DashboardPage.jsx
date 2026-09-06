@@ -44,6 +44,7 @@ export function DashboardPage({ name, onLogout }) {
   const [selectedCommodity, setSelectedCommodity] = useState("Cabai Merah");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const savedUser = localStorage.getItem("tanipintar_user");
     if (savedUser) {
       try {

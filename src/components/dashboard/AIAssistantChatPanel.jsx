@@ -12,10 +12,22 @@ export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilaca
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const chatBottomRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const isInitialMount = useRef(true);
 
+  // Confine scrolling strictly to the inner messages container (never scroll window/page)
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }
   }, [messages, loading]);
 
   const handleSend = async (textToSend) => {
@@ -80,7 +92,7 @@ export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilaca
         </div>
 
         {/* Message Stream */}
-        <div className="space-y-3 max-h-72 overflow-y-auto tp-scrollbar pr-1 mb-4">
+        <div ref={messagesContainerRef} className="space-y-3 max-h-72 overflow-y-auto tp-scrollbar pr-1 mb-4">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -106,8 +118,6 @@ export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilaca
               </div>
             </div>
           )}
-
-          <div ref={chatBottomRef} />
         </div>
 
         {/* Quick Prompts */}
