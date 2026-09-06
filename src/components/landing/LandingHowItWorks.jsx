@@ -1,5 +1,6 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronRight, ArrowRight } from "lucide-react";
 
 const STEPS = [
   { num: "01", title: "Pilih Komoditas", desc: "Masukkan jenis hasil panen dan lokasi kebun Anda." },
@@ -58,6 +59,17 @@ export function LandingHowItWorks() {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="mt-14 text-center">
+          <Link
+            to="/panduan"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow-md transition-all cursor-pointer"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            <span>Baca Panduan Petani Lengkap &amp; Praktis</span>
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>

@@ -1,7 +1,38 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Leaf } from "lucide-react";
 
 export function LandingFooter() {
+  const footerGroups = [
+    {
+      title: "Produk & Fitur",
+      links: [
+        { label: "Fitur Utama AI", to: "/fitur" },
+        { label: "Arbitrase Pasar", to: "/fitur" },
+        { label: "Prediksi Harga BI", to: "/fitur" },
+        { label: "Marketplace Hasil Panen", to: "/marketplace" }
+      ],
+    },
+    {
+      title: "Edukasi & Petani",
+      links: [
+        { label: "Panduan Sukses Petani", to: "/panduan" },
+        { label: "Waktu Panen Ideal", to: "/panduan" },
+        { label: "Tips Kargo & Susut", to: "/panduan" },
+        { label: "FAQ Agribisnis", to: "/panduan" }
+      ],
+    },
+    {
+      title: "Akses Akun",
+      links: [
+        { label: "Masuk Akun Petani", to: "/login" },
+        { label: "Daftar Akun Baru", to: "/login" },
+        { label: "Dashboard Ringkasan", to: "/dashboard" },
+        { label: "Katalog Komoditas", to: "/marketplace" }
+      ],
+    },
+  ];
+
   return (
     <footer className="bg-[#0b1f13] py-16 border-t border-white/[0.08]">
       <div className="max-w-7xl mx-auto px-6">
@@ -26,20 +57,7 @@ export function LandingFooter() {
             </p>
           </div>
 
-          {[
-            {
-              title: "Produk",
-              links: ["Analitik Harga", "Rekomendasi AI", "Kalkulator Logistik", "Notifikasi Harga"],
-            },
-            {
-              title: "Perusahaan",
-              links: ["Tentang Kami", "Blog", "Karier", "Hubungi Kami"],
-            },
-            {
-              title: "Dukungan",
-              links: ["Panduan Pengguna", "FAQ", "Kebijakan Privasi", "Syarat & Ketentuan"],
-            },
-          ].map((col) => (
+          {footerGroups.map((col) => (
             <div key={col.title}>
               <div
                 className="text-white font-semibold text-sm mb-4"
@@ -49,14 +67,14 @@ export function LandingFooter() {
               </div>
               <div className="flex flex-col gap-3">
                 {col.links.map((link) => (
-                  <a
-                    key={link}
-                    href="#"
+                  <Link
+                    key={link.label}
+                    to={link.to}
                     className="text-white/45 hover:text-white/80 text-sm transition-colors"
                     style={{ fontFamily: "Inter, sans-serif" }}
                   >
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 ))}
               </div>
             </div>

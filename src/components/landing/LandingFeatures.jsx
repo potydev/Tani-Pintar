@@ -1,5 +1,6 @@
 import React from "react";
-import { BarChart2, Zap, Truck, Bell, Shield, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
+import { BarChart2, Zap, Truck, Bell, Shield, MapPin, ArrowRight } from "lucide-react";
 
 const FEATURES = [
   {
@@ -96,6 +97,17 @@ export function LandingFeatures() {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/fitur"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            <span>Pelajari Seluruh Fitur Utama TaniPintar</span>
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>

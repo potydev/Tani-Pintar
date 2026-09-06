@@ -14,12 +14,15 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
   }, []);
 
   const isMarketplaceActive = location.pathname.startsWith("/marketplace");
+  const isFeaturesActive = location.pathname.startsWith("/fitur");
+  const isGuidanceActive = location.pathname.startsWith("/panduan");
+  const isHomeActive = location.pathname === "/";
 
   return (
     <nav
       id="landing-navbar"
       className={`sticky top-0 z-50 transition-all duration-300 ${
-        bgSolid || scrolled || isMarketplaceActive
+        bgSolid || scrolled || isMarketplaceActive || isFeaturesActive || isGuidanceActive
           ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/60"
           : "bg-transparent"
       }`}
@@ -50,18 +53,26 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
         <div className="hidden md:flex items-center gap-8">
           <Link
             to="/"
-            className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+            className={`text-sm font-medium transition-colors ${
+              isHomeActive
+                ? "text-[#0d5c3a] font-bold"
+                : "text-[#0b1f13]/70 hover:text-[#0d5c3a]"
+            }`}
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
             Beranda
           </Link>
-          <a
-            href="/#features"
-            className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+          <Link
+            to="/fitur"
+            className={`text-sm font-medium transition-colors ${
+              isFeaturesActive
+                ? "text-[#0d5c3a] font-bold"
+                : "text-[#0b1f13]/70 hover:text-[#0d5c3a]"
+            }`}
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
             Fitur Utama
-          </a>
+          </Link>
           <Link
             to="/marketplace"
             className={`text-sm font-medium flex items-center gap-1 transition-colors ${
@@ -74,13 +85,17 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
             <ShoppingBag size={14} className="text-[#0d5c3a]" />
             Marketplace
           </Link>
-          <a
-            href="/#guidance"
-            className="text-sm font-medium text-[#0b1f13]/70 hover:text-[#0d5c3a] transition-colors"
+          <Link
+            to="/panduan"
+            className={`text-sm font-medium transition-colors ${
+              isGuidanceActive
+                ? "text-[#0d5c3a] font-bold"
+                : "text-[#0b1f13]/70 hover:text-[#0d5c3a]"
+            }`}
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
             Panduan Petani
-          </a>
+          </Link>
         </div>
 
         {/* Desktop Right Actions (Secondary / Outline CTA hierarchy to keep Hero Primary) */}
@@ -142,27 +157,33 @@ export function LandingHeader({ isLoggedIn, userName, bgSolid = false }) {
           >
             Beranda
           </Link>
-          <a
-            href="/#features"
+          <Link
+            to="/fitur"
             onClick={() => setMenuOpen(false)}
-            className="block text-sm font-medium text-slate-700 py-1"
+            className={`block text-sm font-medium py-1 ${
+              isFeaturesActive ? "text-[#0d5c3a] font-bold" : "text-slate-700"
+            }`}
           >
             Fitur Utama
-          </a>
+          </Link>
           <Link
             to="/marketplace"
             onClick={() => setMenuOpen(false)}
-            className="block text-sm font-bold text-[#0d5c3a] py-1"
+            className={`block text-sm font-medium py-1 ${
+              isMarketplaceActive ? "text-[#0d5c3a] font-bold" : "text-slate-700"
+            }`}
           >
             Marketplace
           </Link>
-          <a
-            href="/#guidance"
+          <Link
+            to="/panduan"
             onClick={() => setMenuOpen(false)}
-            className="block text-sm font-medium text-slate-700 py-1"
+            className={`block text-sm font-medium py-1 ${
+              isGuidanceActive ? "text-[#0d5c3a] font-bold" : "text-slate-700"
+            }`}
           >
             Panduan Petani
-          </a>
+          </Link>
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
             {isLoggedIn ? (
               <Link

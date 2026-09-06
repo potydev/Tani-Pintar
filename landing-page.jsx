@@ -8,6 +8,8 @@ import { ProductDetailPage } from "./src/pages/ProductDetailPage";
 import { CheckoutPage } from "./src/pages/CheckoutPage";
 import { LoginPage } from "./src/pages/LoginPage";
 import { AdminDashboardPage } from "./src/pages/AdminDashboardPage";
+import { FeaturesPage } from "./src/pages/FeaturesPage";
+import { FarmerGuidePage } from "./src/pages/FarmerGuidePage";
 
 function AdminRouteGuard({ onBack }) {
   const savedUser = localStorage.getItem("tanipintar_user");
@@ -101,6 +103,28 @@ export default function TaniPintarApp() {
             path="/"
             element={
               <LandingPageWrapper
+                isLoggedIn={isLoggedIn}
+                userName={userName}
+              />
+            }
+          />
+
+          {/* Fitur Utama Page */}
+          <Route
+            path="/fitur"
+            element={
+              <FeaturesPage
+                isLoggedIn={isLoggedIn}
+                userName={userName}
+              />
+            }
+          />
+
+          {/* Panduan Petani Page */}
+          <Route
+            path="/panduan"
+            element={
+              <FarmerGuidePage
                 isLoggedIn={isLoggedIn}
                 userName={userName}
               />
