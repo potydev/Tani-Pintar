@@ -155,7 +155,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // Google Gemini AI Assistant Integration
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const DEFAULT_GEMINI_KEY = 'AIzaSyCJLZ6lkRRoMkjEfdymEhU4-LWhjBB48Iw';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
 
 // AI Chatbot Assistant Endpoint with Smart Live Market Fallback
 app.post('/api/ai/chat', async (req, res) => {
@@ -1435,6 +1436,9 @@ app.get('/api/marketplace/products', async (req, res) => {
     if (category && category !== 'all') {
       queryBuilder = queryBuilder.eq('category', category);
     }
+    if (req.query.seller_id) {
+      queryBuilder = queryBuilder.eq('seller_id', req.query.seller_id);
+    }
     if (search) {
       queryBuilder = queryBuilder.or(
         `name.ilike.%${search}%,farmer_name.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%`
@@ -1748,28 +1752,35 @@ app.get('/api/marketplace/orders/my-orders', async (req, res) => {
       return false;
     });
 
-    // Filter sellerOrders: ONLY orders where product belongs to effectiveSellerId or farmer_name matches
+    // Filter sellerOrders: STRICTLY orders where product belongs to effectiveSellerId (never match by farmer_name)
     const sellerOrders = mapped.filter(o => {
       const prod = o.product || o.marketplace_products;
       if (!prod) return false;
 
       const prodSellerId = prod.seller_id;
-      const prodFarmerName = (prod.farmer_name || '').toLowerCase().trim();
-
       if (effectiveSellerId && prodSellerId && String(prodSellerId) === String(effectiveSellerId)) {
-        return true;
-      }
-      if (effectiveSellerName && prodFarmerName && prodFarmerName === effectiveSellerName) {
         return true;
       }
       return false;
     });
 
+    // Check if current user has any uploaded products in the marketplace
+    let hasUploadedProducts = false;
+    if (effectiveSellerId) {
+      const { data: userProds } = await supabase
+        .from('marketplace_products')
+        .select('id')
+        .eq('seller_id', effectiveSellerId)
+        .limit(1);
+      hasUploadedProducts = Boolean(userProds && userProds.length > 0);
+    }
+
     res.json({
       success: true,
       data: {
         buyerOrders,
-        sellerOrders
+        sellerOrders,
+        hasUploadedProducts
       }
     });
   } catch (err) {

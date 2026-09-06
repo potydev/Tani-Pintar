@@ -21,6 +21,7 @@ export function OrdersManagementPage({ user, onNavigateMarketplace, onStartSelli
   const [activeTab, setActiveTab] = useState("buyer"); // 'buyer' | 'seller'
   const [buyerOrders, setBuyerOrders] = useState([]);
   const [sellerOrders, setSellerOrders] = useState([]);
+  const [hasUploadedProducts, setHasUploadedProducts] = useState(false);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [toastMsg, setToastMsg] = useState("");
@@ -41,17 +42,24 @@ export function OrdersManagementPage({ user, onNavigateMarketplace, onStartSelli
         params.append("buyer_id", currentUser.id);
         params.append("seller_id", currentUser.id);
       }
-      if (currentUser?.full_name) {
-        params.append("seller_name", currentUser.full_name);
-      }
       if (currentUser?.email) {
         params.append("email", currentUser.email);
       }
       const queryStr = params.toString() ? `?${params.toString()}` : "";
       const res = await apiGet(`/api/marketplace/orders/my-orders${queryStr}`);
       if (res.ok && res.data && res.data.success && res.data.data) {
-        setBuyerOrders(res.data.data.buyerOrders || []);
-        setSellerOrders(res.data.data.sellerOrders || []);
+        const bOrders = res.data.data.buyerOrders || [];
+        const sOrders = res.data.data.sellerOrders || [];
+        setBuyerOrders(bOrders);
+        setSellerOrders(sOrders);
+
+        const hasSales = Boolean(
+          res.data.data.hasUploadedProducts || sOrders.length > 0
+        );
+        setHasUploadedProducts(hasSales);
+        if (!hasSales) {
+          setActiveTab("buyer");
+        }
       }
     } catch (e) {
       console.error("Error fetching orders:", e);
@@ -110,13 +118,17 @@ export function OrdersManagementPage({ user, onNavigateMarketplace, onStartSelli
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Manajemen Transaksi &amp; Pesanan</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+              {hasUploadedProducts ? "Manajemen Transaksi & Kelola Pesanan" : "Riwayat Belanja & Pesanan Saya"}
+            </h1>
             <span className="bg-emerald-100 text-emerald-800 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
-              Marketplace Hub
+              {hasUploadedProducts ? "Marketplace Hub" : "Pesanan Pembeli"}
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Pantau status pengiriman hasil panen yang Anda beli atau kelola pesanan masuk dari pembeli komoditas Anda.
+            {hasUploadedProducts
+              ? "Pantau status pengiriman hasil panen yang Anda beli atau kelola pesanan masuk dari pembeli komoditas Anda."
+              : "Pantau status pengiriman dan riwayat komoditas hasil panen yang Anda beli di Marketplace."}
           </p>
         </div>
 
@@ -135,37 +147,51 @@ export function OrdersManagementPage({ user, onNavigateMarketplace, onStartSelli
         </div>
       )}
 
-      {/* Tabs Switcher */}
-      <div className="flex bg-slate-200/70 p-1.5 rounded-2xl max-w-md">
-        <button
-          onClick={() => setActiveTab("buyer")}
-          className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-            activeTab === "buyer"
-              ? "bg-white text-emerald-900 shadow-sm"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <ShoppingBag size={14} />
-          <span>Pesanan Saya (Belanjaan)</span>
-          <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] flex items-center justify-center font-extrabold">
-            {buyerOrders.length}
-          </span>
-        </button>
+      {/* Tabs Switcher - Only display seller tab if the user actually has uploaded products for sale */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex bg-slate-200/70 p-1.5 rounded-2xl max-w-md">
+          <button
+            onClick={() => setActiveTab("buyer")}
+            className={`flex-1 py-2.5 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+              activeTab === "buyer"
+                ? "bg-white text-emerald-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <ShoppingBag size={14} />
+            <span>Pesanan Saya (Belanjaan)</span>
+            <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] flex items-center justify-center font-extrabold">
+              {buyerOrders.length}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setActiveTab("seller")}
-          className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-            activeTab === "seller"
-              ? "bg-white text-emerald-900 shadow-sm"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <Package size={14} />
-          <span>Pesanan Masuk (Penjualan)</span>
-          <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] flex items-center justify-center font-extrabold">
-            {sellerOrders.length}
-          </span>
-        </button>
+          {hasUploadedProducts && (
+            <button
+              onClick={() => setActiveTab("seller")}
+              className={`flex-1 py-2.5 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                activeTab === "seller"
+                  ? "bg-white text-emerald-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Package size={14} />
+              <span>Pesanan Masuk (Penjualan)</span>
+              <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] flex items-center justify-center font-extrabold">
+                {sellerOrders.length}
+              </span>
+            </button>
+          )}
+        </div>
+
+        {!hasUploadedProducts && onStartSelling && (
+          <button
+            onClick={onStartSelling}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+          >
+            <Package size={14} className="text-emerald-700" />
+            <span>Ingin Jual Panen? Pasang Komoditas</span>
+          </button>
+        )}
       </div>
 
       {/* Content Area */}

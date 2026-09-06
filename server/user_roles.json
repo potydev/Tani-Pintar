@@ -28,5 +28,10 @@
     "role": "farmer",
     "is_seller": true,
     "verification_status": "pending"
+  },
+  "farmer.test.1788714755730@tanipintar.id": {
+    "role": "farmer",
+    "is_seller": true,
+    "verification_status": "pending"
   }
 }

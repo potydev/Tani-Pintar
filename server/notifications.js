@@ -171,7 +171,7 @@ export async function getRealNotifications({ user = {}, supabase }) {
         }
       }
 
-      // B. Seller Orders: Incoming orders for products belonging to THIS user
+      // B. Seller Orders: Incoming orders for products strictly belonging to THIS user (seller_id)
       let myProductIds = [];
       if (userId) {
         const { data: prodsBySellerId } = await supabase
@@ -180,17 +180,6 @@ export async function getRealNotifications({ user = {}, supabase }) {
           .eq('seller_id', userId);
         if (prodsBySellerId && prodsBySellerId.length > 0) {
           myProductIds.push(...prodsBySellerId.map(p => p.id));
-        }
-      }
-
-      // Also support matching by farmer_name if seller_id yielded nothing
-      if (myProductIds.length === 0 && userName && userName.length > 2) {
-        const { data: prodsByFarmerName } = await supabase
-          .from('marketplace_products')
-          .select('id')
-          .ilike('farmer_name', userName);
-        if (prodsByFarmerName && prodsByFarmerName.length > 0) {
-          myProductIds.push(...prodsByFarmerName.map(p => p.id));
         }
       }
 
