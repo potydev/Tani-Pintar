@@ -19,7 +19,9 @@ import {
   Package
 } from "lucide-react";
 
-export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, onOpenSellProduct, user }) {
+export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setActiveTab, onOpenAuth, onOpenSellProduct, user, hasUploadedProducts }) {
+  const isSeller = Boolean(hasUploadedProducts);
+
   const menuGroups = [
     {
       title: "Strategi & Keputusan Pasar",
@@ -36,7 +38,11 @@ export function DashboardSidebar({ name, onLogout, activeTab = "dashboard", setA
       items: [
         { id: "marketplace_view", label: "Jelajah Marketplace", icon: ShoppingBag },
         { id: "sell_product", label: "Pasang Komoditas Panen", icon: PlusCircle },
-        { id: "orders", label: "Kelola Pesanan", icon: Package }
+        {
+          id: "orders",
+          label: isSeller ? "Kelola Pesanan" : "Pesanan Saya",
+          icon: isSeller ? Package : ShoppingBag
+        }
       ]
     },
     {

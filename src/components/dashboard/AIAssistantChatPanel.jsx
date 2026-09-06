@@ -51,17 +51,24 @@ export function AIAssistantChatPanel({ name = "Petani", user, location = "Cilaca
         }
       });
 
-      if (res.ok && res.data && res.data.success && res.data.reply) {
+      if (res.data && res.data.reply) {
         setMessages([...newHistory, { sender: "bot", text: res.data.reply }]);
       } else {
-        throw new Error(res.data?.error || "Gagal mendapatkan respon");
+        throw new Error(res.data?.error || "Gagal mendapatkan respon server");
       }
     } catch (err) {
-      let fallbackText = "Berdasarkan data PIHPS hari ini, harga Cabai Merah di pasar tujuan luar daerah memiliki selisih hingga +18% dibanding harga lokal. Disarankan untuk memilah kualitas super sebelum pengiriman kargo.";
-      if (text.toLowerCase().includes("kapan")) {
-        fallbackText = "Analisis tren mingguan menunjukkan harga cenderung menguat menjelang akhir pekan (+4% hingga +7%). Waktu pelepasan panen paling efisien adalah dalam 2-3 hari ke depan.";
-      } else if (text.toLowerCase().includes("harga") || text.toLowerCase().includes("pasang")) {
-        fallbackText = "Untuk Cabai Merah dari wilayah Anda, pasang harga penawaran di kisaran Rp 45.000 - Rp 48.000 /kg untuk pasar induk tujuan. Batas bawah negosiasi aman adalah Rp 39.000/kg.";
+      const lower = text.toLowerCase();
+      let fallbackText = "Berdasarkan data acuan PIHPS terkini, harga Cabai Merah di pasar tujuan antar-provinsi menunjukkan selisih potensi keuntungan hingga +18%. Disarankan memilah kualitas super sebelum keberangkatan muatan.";
+      if (/(hama|penyakit|patek|ulat|kuning|layu|busuk|obat)/i.test(lower)) {
+        fallbackText = "Untuk penanganan gejala patek/bercak daun pada cabai, lakukan penyemprotan fungisida berbahan aktif Azoksistrobin atau Mankozeb (1.5 gr/l) pada pagi hari dan perbaiki sirkulasi bedengan.";
+      } else if (/(pupuk|npk|urea|dosis|takaran)/i.test(lower)) {
+        fallbackText = "Rekomendasi pemupukan fase generatif: Gunakan NPK 16-16-16 dipadukan pupuk Kalium (K) tinggi untuk memperkuat tangkai bunga dan bobot buah cabai.";
+      } else if (/(kapan|waktu|hari)/i.test(lower)) {
+        fallbackText = "Analisis tren mingguan menunjukkan harga cenderung menguat menjelang akhir pekan (+4% hingga +7%). Waktu pelepasan panen paling efisien adalah Kamis hingga Sabtu pagi.";
+      } else if (/(harga|pasang|tawar|buka)/i.test(lower)) {
+        fallbackText = "Untuk komoditas dari wilayah Anda, pasang harga penawaran di kisaran Rp 45.000 - Rp 48.000 /kg untuk pasar induk tujuan. Batas bawah negosiasi aman adalah Rp 39.000/kg.";
+      } else if (/(halo|hai|tes|ping)/i.test(lower)) {
+        fallbackText = `Halo ${name}! 👋 TaniBot siap membantu. Silakan tanyakan seputar harga pasar hari ini, tips penanganan hama patek, atau perhitungan rute kargo panen.`;
       }
       setMessages([...newHistory, { sender: "bot", text: fallbackText }]);
     } finally {

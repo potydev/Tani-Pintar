@@ -26,6 +26,7 @@ import { ProfitCalculatorPage } from "./ProfitCalculatorPage";
 import { MarketAnalyticsPage } from "./MarketAnalyticsPage";
 import { OrdersManagementPage } from "./OrdersManagementPage";
 import { MarketplacePage } from "./MarketplacePage";
+import { apiGet } from "../utils/apiClient.js";
 
 export function DashboardPage({ name, onLogout }) {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export function DashboardPage({ name, onLogout }) {
 
   const urlTab = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(urlTab || "dashboard");
+  const [hasUploadedProducts, setHasUploadedProducts] = useState(false);
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem("tanipintar_user");
@@ -59,6 +61,24 @@ export function DashboardPage({ name, onLogout }) {
     return "Surabaya, Jatim";
   });
   const [selectedCommodity, setSelectedCommodity] = useState("Cabai Merah");
+
+  // Check whether current user actually has uploaded products for sale
+  useEffect(() => {
+    async function checkSellerStatus() {
+      if (!user?.id) return;
+      try {
+        const res = await apiGet(`/api/marketplace/orders/my-orders?buyer_id=${user.id}&seller_id=${user.id}`);
+        if (res.ok && res.data && res.data.data) {
+          const hasSales = Boolean(
+            res.data.data.hasUploadedProducts ||
+            (res.data.data.sellerOrders && res.data.data.sellerOrders.length > 0)
+          );
+          setHasUploadedProducts(hasSales);
+        }
+      } catch (e) {}
+    }
+    checkSellerStatus();
+  }, [user?.id]);
 
   useEffect(() => {
     if (urlTab) {
@@ -272,6 +292,7 @@ export function DashboardPage({ name, onLogout }) {
       <DashboardSidebar
         name={displayName}
         user={user}
+        hasUploadedProducts={hasUploadedProducts}
         onLogout={handleLogoutUser}
         onOpenAuth={handleOpenAccount}
         onOpenUpgrade={() => setIsUpgradeOpen(true)}
