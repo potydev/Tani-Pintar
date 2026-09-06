@@ -42,10 +42,9 @@
 
 | Nama | Peran | GitHub |
 |------|-------|--------|
-| **PotyDev** | Project Lead & Full Stack Developer | [@potydev](https://github.com/potydev) |
-| **Magic Chess Team** | Frontend & UI/UX Specialist | [@potydev](https://github.com/potydev) |
-| **Magic Chess Team** | Backend & AI Engineer | [@potydev](https://github.com/potydev) |
-| **Magic Chess Team** | QA & Data Intelligence Specialist | [@potydev](https://github.com/potydev) |
+| **Dapot Matthew Tampubolon** | Project Lead & Full Stack Developer | [@potydev](https://github.com/potydev) |
+| **Sunu Setyo Jati** | Analisis Data | `-` |
+| **Ahmad Fakhri Abdullah** | UI/UX Designer | [@ahmfakhri](https://github.com/ahmfakhri) |
 
 ---
 
