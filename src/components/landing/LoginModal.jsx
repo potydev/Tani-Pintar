@@ -54,6 +54,9 @@ export function LoginModal({ onClose, onLogin }) {
 
       if (res.ok && res.data && res.data.success && res.data.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(res.data.user));
+        if (res.data.token) {
+          localStorage.setItem("tanipintar_token", res.data.token);
+        }
         if (onLogin) onLogin(res.data.user.full_name || res.data.user.email);
       } else {
         setErrorMsg(res.data?.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.");

@@ -26,6 +26,32 @@ function AdminRouteGuard({ onBack }) {
   return <AdminDashboardPage onBackToUserApp={onBack} />;
 }
 
+function getStoredAuthUser() {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem("tanipintar_user");
+    if (!saved) return null;
+    return JSON.parse(saved);
+  } catch (e) {
+    return null;
+  }
+}
+
+function DashboardRouteGuard({ user, onLogout }) {
+  const currentUser = user || getStoredAuthUser();
+
+  if (!currentUser) {
+    return <Navigate to="/login?redirect=/dashboard" replace />;
+  }
+
+  return (
+    <DashboardPage
+      name={currentUser.full_name || currentUser.email || "Pak Joko Slamet"}
+      onLogout={onLogout}
+    />
+  );
+}
+
 function LandingPageWrapper({ isLoggedIn, userName }) {
   const navigate = useNavigate();
   return (
@@ -39,33 +65,30 @@ function LandingPageWrapper({ isLoggedIn, userName }) {
 }
 
 export default function TaniPintarApp() {
-  const [userName, setUserName] = useState("Pak Joko Slamet");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Synchronously initialize user session from localStorage so refresh never redirects to login
+  const [user, setUser] = useState(getStoredAuthUser);
+  const isLoggedIn = !!user;
+  const userName = user?.full_name || user?.email || "Pak Joko Slamet";
 
-  // Check for existing session on mount
+  // Keep state synchronized with localStorage across windows/events
   useEffect(() => {
-    const savedUser = localStorage.getItem("tanipintar_user");
-    if (savedUser) {
-      try {
-        const u = JSON.parse(savedUser);
-        setUserName(u.full_name || u.email || "Pak Joko Slamet");
-        setIsLoggedIn(true);
-      } catch (e) {}
-    }
+    const onStorageChange = () => {
+      setUser(getStoredAuthUser());
+    };
+    window.addEventListener("storage", onStorageChange);
+    return () => window.removeEventListener("storage", onStorageChange);
   }, []);
 
   const handleLoginSuccess = (userObj) => {
     if (userObj) {
-      setUserName(userObj.full_name || userObj.email || "Pak Joko Slamet");
-      setIsLoggedIn(true);
+      setUser(userObj);
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("tanipintar_user");
     localStorage.removeItem("tanipintar_token");
-    setIsLoggedIn(false);
-    setUserName("Pak Joko Slamet");
+    setUser(null);
   };
 
   return (
@@ -113,15 +136,14 @@ export default function TaniPintarApp() {
             element={<CheckoutPage isLoggedIn={isLoggedIn} />}
           />
 
-          {/* Dashboard Page */}
+          {/* Dashboard Page - Protected with persistent session guard */}
           <Route
             path="/dashboard"
             element={
-              isLoggedIn ? (
-                <DashboardPage name={userName} onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/login?redirect=/dashboard" replace />
-              )
+              <DashboardRouteGuard
+                user={user}
+                onLogout={handleLogout}
+              />
             }
           />
 
@@ -138,3 +160,4 @@ export default function TaniPintarApp() {
     </BrowserRouter>
   );
 }
+

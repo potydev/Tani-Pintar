@@ -30,6 +30,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess }) {
 
       if (res.ok && res.data && res.data.success && res.data.user) {
         localStorage.setItem("tanipintar_user", JSON.stringify(res.data.user));
+        if (res.data.token) {
+          localStorage.setItem("tanipintar_token", res.data.token);
+        }
         if (onAuthSuccess) onAuthSuccess(res.data.user);
         onClose();
       } else {

@@ -23,6 +23,23 @@ export function LoginPage({ onLoginSuccess }) {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSuccess, setForgotSuccess] = useState(false);
 
+  // Auto redirect if already authenticated in local storage
+  React.useEffect(() => {
+    const savedUser = localStorage.getItem("tanipintar_user");
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        if (u) {
+          if (u.role === "admin" || u.role === "super_admin") {
+            navigate("/admin", { replace: true });
+          } else {
+            navigate(redirectUrl, { replace: true });
+          }
+        }
+      } catch (e) {}
+    }
+  }, [navigate, redirectUrl]);
+
   const handleDemoLogin = () => {
     const demoUser = {
       id: 1,
