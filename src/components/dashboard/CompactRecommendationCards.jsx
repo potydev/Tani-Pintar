@@ -19,17 +19,28 @@ export function CompactRecommendationCards({
   const bannerRef = useRef(null);
 
   useEffect(() => {
-    if (!loading && gridRef.current?.children) {
-      gsap.from(Array.from(gridRef.current.children), {
-        y: 20,
-        opacity: 0,
-        scale: 0.98,
-        stagger: 0.1,
-        duration: 0.6,
-        ease: "power2.out",
-      });
+    if (!loading && gridRef.current) {
+      const ctx = gsap.context(() => {
+        const children = gridRef.current?.children;
+        if (children && children.length > 0) {
+          gsap.fromTo(
+            Array.from(children),
+            { y: 16, opacity: 0, scale: 0.98 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              stagger: 0.08,
+              duration: 0.45,
+              ease: "power2.out",
+              clearProps: "transform,opacity,scale",
+            }
+          );
+        }
+      }, gridRef);
+      return () => ctx.revert();
     }
-  }, [loading, items]);
+  }, [loading]);
 
   useEffect(() => {
     let isMounted = true;

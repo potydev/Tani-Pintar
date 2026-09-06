@@ -28,15 +28,26 @@ export function MarketplacePage({ isLoggedIn, userName, isEmbedded = false }) {
 
   // Animate product cards on load / update
   useEffect(() => {
-    if (!loading && gridRef.current?.children) {
-      gsap.from(Array.from(gridRef.current.children), {
-        y: 20,
-        opacity: 0,
-        scale: 0.98,
-        stagger: 0.04,
-        duration: 0.5,
-        ease: "power2.out",
-      });
+    if (!loading && gridRef.current) {
+      const ctx = gsap.context(() => {
+        const children = gridRef.current?.children;
+        if (children && children.length > 0) {
+          gsap.fromTo(
+            Array.from(children),
+            { y: 16, opacity: 0, scale: 0.98 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              stagger: 0.04,
+              duration: 0.4,
+              ease: "power2.out",
+              clearProps: "transform,opacity,scale",
+            }
+          );
+        }
+      }, gridRef);
+      return () => ctx.revert();
     }
   }, [loading, products]);
 

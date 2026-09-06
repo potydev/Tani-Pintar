@@ -9,17 +9,28 @@ export function MetricCardsGrid({ originLocation = "Cilacap, Jateng" }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (!loading && containerRef.current?.children) {
-      gsap.from(Array.from(containerRef.current.children), {
-        y: 20,
-        opacity: 0,
-        scale: 0.98,
-        stagger: 0.08,
-        duration: 0.6,
-        ease: "power2.out",
-      });
+    if (!loading && containerRef.current) {
+      const ctx = gsap.context(() => {
+        const cards = containerRef.current?.children;
+        if (cards && cards.length > 0) {
+          gsap.fromTo(
+            Array.from(cards),
+            { y: 16, opacity: 0, scale: 0.98 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              stagger: 0.06,
+              duration: 0.45,
+              ease: "power2.out",
+              clearProps: "transform,opacity,scale",
+            }
+          );
+        }
+      }, containerRef);
+      return () => ctx.revert();
     }
-  }, [loading, metrics]);
+  }, [loading]);
 
   useEffect(() => {
     async function fetchMetrics() {

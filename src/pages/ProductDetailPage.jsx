@@ -21,22 +21,35 @@ export function ProductDetailPage({ isLoggedIn }) {
 
   useEffect(() => {
     if (!loading && product) {
-      if (leftPanelRef.current) {
-        gsap.from(leftPanelRef.current, {
-          x: -30,
-          opacity: 0,
-          duration: 0.7,
-          ease: "power3.out",
-        });
-      }
-      if (rightPanelRef.current) {
-        gsap.from(rightPanelRef.current, {
-          x: 30,
-          opacity: 0,
-          duration: 0.7,
-          ease: "power3.out",
-        });
-      }
+      const ctx = gsap.context(() => {
+        if (leftPanelRef.current) {
+          gsap.fromTo(
+            leftPanelRef.current,
+            { x: -25, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.5,
+              ease: "power3.out",
+              clearProps: "transform,opacity",
+            }
+          );
+        }
+        if (rightPanelRef.current) {
+          gsap.fromTo(
+            rightPanelRef.current,
+            { x: 25, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.5,
+              ease: "power3.out",
+              clearProps: "transform,opacity",
+            }
+          );
+        }
+      });
+      return () => ctx.revert();
     }
   }, [loading, product]);
 
