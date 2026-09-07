@@ -54,8 +54,8 @@ Untuk mempermudah pengujian seluruh fitur aplikasi tanpa perlu registrasi ulang,
 
 | Kategori Akun | Email Login | Kata Sandi | Hak Akses & Fitur yang Dapat Diuji |
 |---|---|---|---|
-| **🌾 Petani Binaan (Verified Farmer)** | `petani.baru@tanipintar.id` | `rahasia123` | **Dashboard Lengkap:** Simulasi Arbitrase Antar-Provinsi (34 Daerah), Konsultan TaniBot AI, Pasang Komoditas Panen ke Marketplace, Kelola Pesanan Masuk, Notifikasi Pasar Real-Time. |
-| **🛡️ Administrator Platform** | `admin@tanipintar.id` | `admin123` | **Portal Khusus Admin (`/admin`):** Role-Based Access Control (RBAC), Verifikasi Kelayakan Berkas Petani, Pengawasan Transaksi Nasional, Sensor Otomatis Data Sensitif (PII Masking NIK & Rekening). |
+| **🌾 Petani Binaan (Verified Farmer)** | `hidayat@tanipintar.id` | `rahasia123` | **Dashboard Lengkap:** Simulasi Arbitrase Antar-Provinsi (34 Daerah), Konsultan TaniBot AI, Pasang Komoditas Panen ke Marketplace, Kelola Pesanan Masuk & Penjualan, Notifikasi Pasar Real-Time. |
+| **🛒 Akun Pembeli / Pengguna Baru** | `budi.baru@tanipintar.id` | `rahasia123` | **Marketplace & Onboarding:** Eksplorasi katalog komoditas nusantara, checkout pesanan grosir, simulasi registrasi petani, dan pengujian isolasi data transaksi multi-akun. |
 
 > 💡 **Catatan:** Penguji juga dapat membuat akun baru melalui halaman [Daftar Baru](https://tanipintar.potydev.cloud/login?mode=register) untuk menguji alur onboarding dan sistem isolasi data akun baru.
 
@@ -94,7 +94,7 @@ Petani di Indonesia sering kali berada pada posisi paling lemah dalam rantai nil
 | **B2B Verified Agribusiness Marketplace** | Katalog komoditas hasil panen langsung dari petani binaan lengkap dengan detail grade (Grade A/B), kuantitas, dan lokasi panen. | Transaksi terisolasi penuh per akun, proteksi stok otomatis (*stock auto-decrement*), dan pelacakan status kargo transparan. |
 | **Panduan Interaktif Petani (`/panduan`)** | 5 bab kurikulum praktis agribisnis: strategi panen, negosiasi tengkulak, standar pengemasan kargo, hingga pemanfaatan data PIHPS. | Dilengkapi *Interactive Pre-Shipment Checklist* reaktif dengan progress bar dinamis dan FAQ accordion agribisnis. |
 | **Fitur Utama & Interactive Demonstrator (`/fitur`)** | Showcase teknologi interaktif 6 pilar inovasi TaniPintar dengan komparasi langsung metode lama vs AI Platform. | Pengunjung dapat mencoba demonstrasi simulasi rute, tren harga, dan kalkulator logistik secara langsung tanpa mendaftar. |
-| **Portal Admin Berstandar Keamanan Tinggi** | Panel pengawasan admin (`/admin`) untuk verifikasi identitas petani binaan dan monitoring komoditas pangan. | Proteksi token kriptografis Bearer JWT, penolakan akses ilegal (RBAC), serta enkripsi dan sensor otomatis data sensitif (*PII Masking*). |
+| **Keamanan Autentikasi & Proteksi Data Multi-Akun** | Sistem proteksi akun dan data transaksi berbasis token kriptografis Bearer JWT dan password hashing Salted Scrypt. | Menjamin isolasi 100% data pesanan antar-pengguna, mencegah pemalsuan token sesi, serta otomatis menyamarkan data identitas sensitif (*PII Masking* NIK & Rekening). |
 
 ### Fitur Tambahan
 - **Real-Time Price Ticker**: Running text harga pangan harian nasional di halaman beranda.
@@ -238,7 +238,6 @@ flowchart TD
         UI_Dash["Dashboard Analisis & Arbitrase"]
         UI_Bot["TaniBot AI Chat Panel"]
         UI_Market["Katalog Marketplace & Checkout"]
-        UI_Admin["Portal Verifikasi Admin (RBAC)"]
     end
 
     subgraph Server["⚙️ Backend Server (Node.js + Express)"]
@@ -247,7 +246,6 @@ flowchart TD
         API_Arb["Arbitrage Calculator (34 Provinsi)"]
         API_Bot["Hybrid AI Agent (Gemini + Local NLP)"]
         API_Market["Marketplace & Order Controller"]
-        API_Admin["Admin Verification (PII Masking)"]
     end
 
     subgraph Data["💾 Data & AI Cloud Services"]
@@ -260,15 +258,14 @@ flowchart TD
     UI_Dash -->|Hitung Margin Kargo| API_Arb
     UI_Bot -->|Konsultasi Real-Time| API_Bot
     UI_Market -->|Order & Inventory| API_Market
-    UI_Admin -->|Bearer Token Admin| MW_Auth
-    MW_Auth --> API_Admin
+    UI_Dash -->|Bearer Token User| MW_Auth
+    MW_Auth --> API_Market
 
     API_Price --> DB_Supa
     API_Arb --> DB_Supa
     API_Bot --> AI_Gemini
     API_Bot --> DB_Supa
     API_Market --> DB_Supa
-    API_Admin --> DB_Supa
     FEED_BI -.->|Sinkronisasi Harian| DB_Supa
 ```
 
@@ -281,7 +278,7 @@ erDiagram
         string email UK
         string password "Salted Scrypt Hash"
         string full_name
-        string role "admin | verified_farmer | farmer | buyer"
+        string role "verified_farmer | farmer | buyer"
         string farm_location
         string primary_commodity
         string land_size
@@ -344,7 +341,6 @@ Tani-Pintar/
 │   │   ├── landing/            # Komponen Landing Page (Hero, Features, How It Works, CTA, Ticker)
 │   │   └── marketplace/        # Komponen Keranjang & Katalog Komoditas
 │   ├── pages/                  # Halaman Aplikasi
-│   │   ├── AdminDashboardPage.jsx  # Portal Admin (Role-Guarded)
 │   │   ├── DashboardPage.jsx       # Dashboard Analitik Petani
 │   │   ├── FarmerGuidePage.jsx     # Panduan Interaktif Petani (/panduan)
 │   │   ├── FeaturesPage.jsx        # Fitur Utama & Interactive Demonstrator (/fitur)
@@ -424,7 +420,7 @@ Aplikasi dapat langsung diakses di:
 ### User Guide (Panduan Alur Pengguna)
 
 #### 1. Untuk Petani / Penjual Komoditas
-1. **Login Akun**: Masuk menggunakan akun `petani.baru@tanipintar.id` / `rahasia123` atau buat akun baru.
+1. **Login Akun**: Masuk menggunakan akun `hidayat@tanipintar.id` / `rahasia123` atau buat akun baru.
 2. **Lihat Peluang Arbitrase**: Pada dashboard, sistem otomatis membaca sentra panen Anda (misal: *Cilacap, Jawa Tengah*) dan merekomendasikan kota tujuan dengan margin laba bersih tertinggi (misal: *Ternate +228.7%*).
 3. **Simulasi Rute & Biaya Kargo**: Klik tombol **"Simulasi Rute & Pengiriman Kargo"** untuk menyesuaikan tonase muatan, pilihan armada (truk/kontainer reefer), toleransi susut panen, dan estimasi laba bersih.
 4. **Jelajah 34 Provinsi**: Klik **"Lihat Semua Pilihan Daerah (34 Provinsi)"** untuk membandingkan harga pangan ke seluruh pulau.
@@ -436,11 +432,6 @@ Aplikasi dapat langsung diakses di:
 2. Telusuri katalog komoditas berdasarkan kategori (*Cabai, Bawang, Beras, Sayur, Buah*).
 3. Pilih produk, tentukan kuantitas kg, dan klik **"Beli Sekarang"**.
 4. Pesanan akan otomatis memotong stok gudang petani dan muncul di halaman **Kelola Pesanan**.
-
-#### 3. Untuk Administrator (`/admin`)
-1. Masuk menggunakan akun `admin@tanipintar.id` / `admin123`.
-2. Buka rute `/admin` untuk memverifikasi pendaftaran petani baru.
-3. Seluruh data identitas sensitif (NIK KTP dan Nomor Rekening) telah disamarkan secara otomatis demi standar privasi data (PII Masking).
 
 ---
 
@@ -457,6 +448,8 @@ Aplikasi dapat langsung diakses di:
 | `GET` | `/api/health` | Status kesehatan server & konektivitas database | Public |
 | `POST` | `/api/auth/login` | Login pengguna & menerbitkan token Bearer JWT | Public |
 | `POST` | `/api/auth/register` | Registrasi akun petani/pembeli dengan password scrypt | Public |
+| `GET` | `/api/auth/me` | Profil pengguna terautentikasi via token Bearer | Authenticated |
+| `POST` | `/api/auth/upgrade-seller` | Pengajuan verifikasi profil & komoditas panen petani | Authenticated |
 | `GET` | `/api/prices/latest` | Rata-rata harga pangan nasional BI PIHPS terkini | Public |
 | `GET` | `/api/recommendations` | Hitung peluang margin arbitrase ke seluruh provinsi (`?all=true`) | Public |
 | `POST` | `/api/ai/chat` | Konsultasi TaniBot AI (Gemini 2.5 Flash + PIHPS Injection) | Public |
@@ -464,7 +457,6 @@ Aplikasi dapat langsung diakses di:
 | `POST` | `/api/marketplace/orders` | Checkout pesanan komoditas & potong stok otomatis | Authenticated |
 | `GET` | `/api/marketplace/orders/my-orders` | Riwayat pesanan belanjaan & penjualan terisolasi per akun | Authenticated |
 | `GET` | `/api/notifications` | Agregasi sinyal pasar real-time & update transaksi | Authenticated |
-| `GET` | `/api/admin/farmers` | Daftar pengajuan verifikasi petani (dengan PII Masking) | **Admin Only** |
 
 ### Contoh Request & Response (Login)
 
@@ -472,7 +464,7 @@ Aplikasi dapat langsung diakses di:
 curl -X POST https://tanipintar.potydev.cloud/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "petani.baru@tanipintar.id",
+    "email": "hidayat@tanipintar.id",
     "password": "rahasia123"
   }'
 ```
@@ -485,7 +477,7 @@ curl -X POST https://tanipintar.potydev.cloud/api/auth/login \
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": 1,
-    "email": "petani.baru@tanipintar.id",
+    "email": "hidayat@tanipintar.id",
     "full_name": "Pak Hidayat Sugiono",
     "role": "verified_farmer",
     "is_seller": true,
@@ -500,7 +492,7 @@ curl -X POST https://tanipintar.potydev.cloud/api/auth/login \
 
 ## 🧪 Testing
 
-Sistem TaniPintar telah melalui pengujian otomatis menyeluruh (*QA Automated Testing Suite*) yang mencakup integritas data, keamanan autentikasi, enkripsi password, isolasi multi-akun, performa AI, hingga ketahanan endpoint admin.
+Sistem TaniPintar telah melalui pengujian otomatis menyeluruh (*QA Automated Testing Suite*) yang mencakup integritas data, keamanan autentikasi, enkripsi password, isolasi multi-akun, performa AI, hingga verifikasi petani terverifikasi.
 
 Jalankan suite pengujian mandiri:
 ```bash
@@ -514,19 +506,19 @@ node server/qa_test_suite.js
   HASIL AUDIT SISTEM & PENGUJIAN OTOMATIS TANIPINTAR
 ======================================================================
 [PASS] GET /api/health merespon HTTP 200 OK
-[PASS] Akses /api/admin/farmers tanpa token ditolak (HTTP 401/403)
-[PASS] Header palsu x-user-role: admin tanpa token kriptografis ditolak
-[PASS] Login Admin (admin@tanipintar.id) sukses & menerbitkan Bearer Token
-[PASS] Token Admin terverifikasi memiliki role 'admin'
-[PASS] Admin berhasil mengakses daftar pengajuan verifikasi petani
-[PASS] Nomor NIK KTP petani disamarkan secara otomatis (330105******0003)
-[PASS] Nomor Rekening Bank petani disamarkan secara otomatis (0123-**-*****-0-2)
-[PASS] Nomor Telepon petani disamarkan secara otomatis (0813****766)
+[PASS] Akses /api/auth/me tanpa token ditolak (HTTP 401 Unauthorized)
+[PASS] Token palsu / tampered token ditolak (HTTP 401 Unauthorized)
+[PASS] Login Petani Binaan (hidayat@tanipintar.id) sukses & menerbitkan Bearer Token
+[PASS] Token Petani terverifikasi memiliki role 'verified_farmer'
+[PASS] Profil Petani terverifikasi menampilkan 'Pak Hidayat Sugiono'
+[PASS] Petani terverifikasi berhasil mengakses /api/auth/me dengan Bearer Token
 [PASS] Registrasi pengguna baru berhasil tanpa kendala skema database
 [PASS] Registrasi email duplikat ditolak (HTTP 400 Bad Request)
 [PASS] Login dengan password salah ditolak (HTTP 401 Unauthorized)
 [PASS] Login dengan password benar sukses dan menerbitkan sesi scrypt
-[PASS] Token petani biasa ditolak saat mencoba membobol portal admin (HTTP 403)
+[PASS] Pengaturan preferensi onboarding lokasi dan komoditas berhasil disimpan
+[PASS] Pengajuan verifikasi petani (/api/auth/upgrade-seller) sukses di-upgrade ke verified_farmer
+[PASS] Nomor NIK KTP petani disamarkan secara otomatis (330105******0003)
 [PASS] Petani dapat memasang komoditas baru ke Marketplace
 [PASS] Katalog produk marketplace merespon data yang valid
 [PASS] Pembelian komoditas (Checkout) berhasil memotong stok secara riil

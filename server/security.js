@@ -11,7 +11,7 @@ const ROLES_FILE = path.join(__dirname, 'user_roles.json');
 
 // --- In-Memory & Persistent Role Store ---
 let roleStore = {
-  'admin@tanipintar.id': { role: 'admin', is_seller: true, verification_status: 'approved' },
+  'hidayat@tanipintar.id': { role: 'verified_farmer', is_seller: true, verification_status: 'approved' },
   'petani.baru@tanipintar.id': { role: 'verified_farmer', is_seller: true, verification_status: 'approved' }
 };
 
@@ -37,16 +37,12 @@ function saveRolesToFile() {
 export function getUserRole(email) {
   if (!email) return 'farmer';
   const normalized = email.toLowerCase().trim();
-  if (normalized === 'admin@tanipintar.id') return 'admin';
   return roleStore[normalized]?.role || 'farmer';
 }
 
 export function getUserMeta(email) {
   if (!email) return { role: 'farmer', is_seller: true, verification_status: 'pending' };
   const normalized = email.toLowerCase().trim();
-  if (normalized === 'admin@tanipintar.id') {
-    return { role: 'admin', is_seller: true, verification_status: 'approved' };
-  }
   return roleStore[normalized] || { role: 'farmer', is_seller: true, verification_status: 'pending' };
 }
 

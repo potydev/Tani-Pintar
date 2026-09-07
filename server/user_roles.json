@@ -1,6 +1,6 @@
 {
-  "admin@tanipintar.id": {
-    "role": "admin",
+  "hidayat@tanipintar.id": {
+    "role": "verified_farmer",
     "is_seller": true,
     "verification_status": "approved"
   },
@@ -38,5 +38,10 @@
     "role": "farmer",
     "is_seller": true,
     "verification_status": "pending"
+  },
+  "farmer.test.1788748603241@tanipintar.id": {
+    "role": "verified_farmer",
+    "is_seller": true,
+    "verification_status": "approved"
   }
 }

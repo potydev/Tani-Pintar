@@ -79,15 +79,10 @@ function requireAuth(req, res, next) {
   next();
 }
 
-function requireAdmin(req, res, next) {
-  if (!req.user) {
-    return res.status(401).json({ success: false, error: 'Akses ditolak. Token autentikasi Admin diperlukan.' });
-  }
-  if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
-    return res.status(403).json({ success: false, error: 'Akses ditolak. Endpoint ini hanya untuk Administrator.' });
-  }
-  next();
-}
+// Protected Profile Endpoint
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({ success: true, user: req.user });
+});
 
 // Universal Database Query Function (Supports Supabase PostgreSQL & MySQL)
 const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
@@ -292,7 +287,7 @@ app.post('/api/auth/register', async (req, res) => {
     const loc = farm_location || 'Surabaya, Jawa Timur';
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
-    const userRole = role || (cleanEmail === 'admin@tanipintar.id' ? 'admin' : 'farmer');
+    const userRole = role || 'farmer';
     const hashedPassword = hashPassword(password);
 
     // Insert only columns that exist in the Supabase schema
@@ -320,7 +315,7 @@ app.post('/api/auth/register', async (req, res) => {
     setUserRole(cleanEmail, {
       role: userRole,
       is_seller: userRole !== 'buyer',
-      verification_status: userRole === 'admin' ? 'approved' : 'pending'
+      verification_status: userRole === 'verified_farmer' ? 'approved' : 'pending'
     });
 
     const user = {
@@ -409,47 +404,7 @@ app.post('/api/auth/onboarding', async (req, res) => {
   }
 });
 
-// In-memory verification requests buffer for instant responsiveness
-let pendingFarmerRequests = [
-  {
-    id: 'REQ-001',
-    email: 'petani.sugiono@gmail.com',
-    full_name: 'Pak Hidayat Sugiono',
-    phone: '081399887766',
-    farm_location: 'Cilacap, Jawa Tengah',
-    primary_commodity: 'Cabai Merah Besar',
-    land_size: '1.5 Hektar',
-    land_type: 'Milik Sendiri',
-    harvest_capacity: '1 - 5 Ton',
-    nik: '3301051204850003',
-    group_name: 'Poktan Tani Makmur Cilacap',
-    bank_name: 'BRI (Bank Rakyat Indonesia)',
-    account_number: '0123-01-045678-50-2',
-    ktp_image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
-    verification_status: 'pending',
-    submitted_at: new Date().toISOString()
-  },
-  {
-    id: 'REQ-002',
-    email: 'bambang.brebes@gmail.com',
-    full_name: 'Pak Bambang Suprianto',
-    phone: '082155443322',
-    farm_location: 'Brebes, Jawa Tengah',
-    primary_commodity: 'Bawang Merah',
-    land_size: '2.5 Hektar',
-    land_type: 'Sewa Lahan',
-    harvest_capacity: '5 - 10 Ton',
-    nik: '3329012209780001',
-    group_name: 'Gapoktan Bawang Unggul Brebes',
-    bank_name: 'Bank Mandiri',
-    account_number: '138-00-1928374-1',
-    ktp_image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
-    verification_status: 'pending',
-    submitted_at: new Date().toISOString()
-  }
-];
-
-// Auth API - Upgrade / Submit Farmer Verification (Pending Admin Review)
+// Auth API - Upgrade / Submit Farmer Verification
 app.post('/api/auth/upgrade-seller', async (req, res) => {
   try {
     const {
@@ -477,29 +432,6 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
     const comm = primary_commodity || 'Cabai Merah Besar';
     const land = land_size || '1.5 Hektar';
 
-    const reqId = 'REQ-' + Date.now().toString().slice(-4);
-    const newRequest = {
-      id: reqId,
-      email: cleanEmail,
-      full_name: full_name || email.split('@')[0],
-      phone: phone || '08123456789',
-      farm_location: loc,
-      primary_commodity: comm,
-      land_size: land,
-      land_type: land_type || 'Milik Sendiri',
-      harvest_capacity: harvest_capacity || '1 - 5 Ton',
-      nik,
-      group_name: group_name || 'Kelompok Tani Mandiri',
-      bank_name: bank_name || 'BRI',
-      account_number: account_number || '1234567890',
-      ktp_image_url: ktp_image_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
-      verification_status: 'pending',
-      submitted_at: new Date().toISOString()
-    };
-
-    // Store in memory list
-    pendingFarmerRequests.unshift(newRequest);
-
     // Update user preferences in Supabase safely
     try {
       await supabase
@@ -514,18 +446,18 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
       console.log('[Supabase Notice] Offline update fallback active');
     }
 
-    // Persist pending verification in role store
+    // Persist verified role in role store
     setUserRole(cleanEmail, {
-      role: 'farmer_pending',
-      verification_status: 'pending',
-      is_seller: false
+      role: 'verified_farmer',
+      verification_status: 'approved',
+      is_seller: true
     });
 
     const user = {
       email: cleanEmail,
-      role: 'farmer_pending',
-      verification_status: 'pending',
-      is_seller: false,
+      role: 'verified_farmer',
+      verification_status: 'approved',
+      is_seller: true,
       farm_location: loc,
       primary_commodity: comm,
       land_size: land,
@@ -534,91 +466,11 @@ app.post('/api/auth/upgrade-seller', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Pengajuan verifikasi berhasil dikirim! Status akun Anda sekarang "Dalam Peninjauan Admin".',
+      message: 'Verifikasi berhasil! Akun Anda kini aktif sebagai Petani Terverifikasi.',
       user
     });
   } catch (err) {
     console.error('Error during seller upgrade submission:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Admin API Security Middleware - Strict Token & Role Verification
-app.use('/api/admin', requireAdmin);
-
-// Admin API - Get All Farmer Verification Requests (With Masked PII Protection)
-app.get('/api/admin/farmers', (req, res) => {
-  const safeRequests = pendingFarmerRequests.map(r => ({
-    ...r,
-    nik: maskNik(r.nik),
-    account_number: maskAccountNumber(r.account_number),
-    phone: maskPhoneNumber(r.phone)
-  }));
-  res.json({ success: true, requests: safeRequests });
-});
-
-// Admin API - Approve Farmer Verification Request
-app.post('/api/admin/approve-farmer', async (req, res) => {
-  try {
-    const { email, req_id } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
-    }
-
-    const cleanEmail = email.toLowerCase().trim();
-
-    // Update in-memory list
-    const found = pendingFarmerRequests.find(r => r.email.toLowerCase() === cleanEmail || r.id === req_id);
-    if (found) {
-      found.verification_status = 'approved';
-    }
-
-    // Persist verified role
-    setUserRole(cleanEmail, {
-      role: 'verified_farmer',
-      is_seller: true,
-      verification_status: 'approved'
-    });
-
-    res.json({
-      success: true,
-      message: `Akun petani (${cleanEmail}) berhasil DISETUJUI dan di-upgrade menjadi Petani Terverifikasi!`,
-      approved_email: cleanEmail
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Admin API - Reject Farmer Verification Request
-app.post('/api/admin/reject-farmer', async (req, res) => {
-  try {
-    const { email, req_id, reason } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email wajib disertakan.' });
-    }
-
-    const cleanEmail = email.toLowerCase().trim();
-
-    const found = pendingFarmerRequests.find(r => r.email.toLowerCase() === cleanEmail || r.id === req_id);
-    if (found) {
-      found.verification_status = 'rejected';
-      found.rejection_reason = reason || 'Dokumen KTP / Data Poktan belum sesuai.';
-    }
-
-    // Persist rejected role
-    setUserRole(cleanEmail, {
-      role: 'buyer',
-      is_seller: false,
-      verification_status: 'rejected'
-    });
-
-    res.json({
-      success: true,
-      message: `Pengajuan verifikasi (${cleanEmail}) telah DITOLAK.`,
-      rejected_email: cleanEmail
-    });
-  } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -661,7 +513,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const meta = getUserMeta(cleanEmail);
-    const userRole = meta.role || (cleanEmail === 'admin@tanipintar.id' ? 'admin' : 'farmer');
+    const userRole = meta.role || 'farmer';
 
     const user = {
       id: u.id,

@@ -246,17 +246,17 @@ export function DashboardHeader({
 
   return (
     <div className="flex flex-col gap-4 mb-6 pb-2">
-      {/* Pending Admin Verification Alert Banner */}
+      {/* Pending Verification Alert Banner */}
       {isPendingFarmer && (
         <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 p-3.5 rounded-2xl text-white shadow-md flex items-center justify-between text-xs sm:text-sm font-bold animate-in fade-in duration-300">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
-            <span>⏳ Status Akun: Pengajuan Verifikasi Petani Dalam Peninjauan Admin (Estimasi 1x24 jam)</span>
+            <span>⏳ Status Akun: Pengajuan Verifikasi Petani Sedang Diproses (Estimasi 1x24 jam)</span>
           </div>
         </div>
       )}
 
-      {/* Rejected Admin Verification Alert Banner */}
+      {/* Rejected Verification Alert Banner */}
       {isRejectedFarmer && (
         <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-red-700 p-4 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm font-bold animate-in fade-in duration-300">
           <div className="flex items-center gap-2">

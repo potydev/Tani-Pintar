@@ -7,26 +7,8 @@ import { MarketplacePage } from "./src/pages/MarketplacePage";
 import { ProductDetailPage } from "./src/pages/ProductDetailPage";
 import { CheckoutPage } from "./src/pages/CheckoutPage";
 import { LoginPage } from "./src/pages/LoginPage";
-import { AdminDashboardPage } from "./src/pages/AdminDashboardPage";
 import { FeaturesPage } from "./src/pages/FeaturesPage";
 import { FarmerGuidePage } from "./src/pages/FarmerGuidePage";
-
-function AdminRouteGuard({ onBack }) {
-  const savedUser = localStorage.getItem("tanipintar_user");
-  let user = null;
-  if (savedUser) {
-    try {
-      user = JSON.parse(savedUser);
-    } catch (e) {}
-  }
-  const isAdmin = user && (user.role === "admin" || user.role === "super_admin");
-
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <AdminDashboardPage onBackToUserApp={onBack} />;
-}
 
 function getStoredAuthUser() {
   if (typeof window === "undefined") return null;
@@ -171,11 +153,6 @@ export default function TaniPintarApp() {
             }
           />
 
-          {/* Admin Verification Portal */}
-          <Route
-            path="/admin"
-            element={<AdminRouteGuard onBack={() => window.location.href = "/dashboard"} />}
-          />
 
           {/* Catch all redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />

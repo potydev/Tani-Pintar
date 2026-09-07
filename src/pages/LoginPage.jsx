@@ -122,11 +122,7 @@ export function LoginPage({ onLoginSuccess }) {
           localStorage.setItem("tanipintar_token", res.data.token);
         }
         if (onLoginSuccess) onLoginSuccess(res.data.user);
-        if (res.data.user.role === "admin" || res.data.user.role === "super_admin") {
-          navigate("/admin");
-        } else {
-          navigate(redirectUrl);
-        }
+        navigate(redirectUrl);
       } else {
         const errorMsg = res.data?.error || "Email atau kata sandi tidak cocok. Silakan periksa kembali.";
         setError(errorMsg);

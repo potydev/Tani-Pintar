@@ -582,24 +582,24 @@ export function SellerOnboardingModal({ isOpen, onClose, user, onUpgradeSuccess 
           )}
 
           {submittedSuccess ? (
-            /* Success / Pending Confirmation Screen */
+            /* Success / Confirmation Screen */
             <div className="p-8 text-center space-y-4 bg-[#1a1a1e] rounded-3xl border border-slate-800">
-              <div className="w-16 h-16 bg-amber-500/20 border border-amber-500/40 text-amber-400 rounded-full flex items-center justify-center mx-auto shadow-lg">
+              <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-lg">
                 <ShieldCheck size={36} />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-black text-white">Pengajuan Verifikasi Terkirim! ⏳</h3>
+                <h3 className="text-xl font-black text-white">Verifikasi Petani Berhasil! 🎉</h3>
                 <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                  Data lokasi panen (<strong className="text-white">Kec. {district}, {regency}, {province}</strong>), komoditas, dan KTP Anda telah diterima. Tim Admin TaniPintar akan meninjau verifikasi Anda dalam estimasi <strong className="text-white">1x24 jam</strong>.
+                  Data lokasi panen (<strong className="text-white">Kec. {district}, {regency}, {province}</strong>), komoditas, dan KTP Anda telah berhasil diverifikasi.
                 </p>
               </div>
 
-              <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl max-w-md mx-auto text-left text-xs text-amber-200 space-y-1">
-                <div className="font-bold flex items-center gap-1.5 text-amber-300">
-                  <AlertCircle size={15} className="text-amber-400" /> Status Akun: "Dalam Peninjauan Admin"
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl max-w-md mx-auto text-left text-xs text-emerald-200 space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-emerald-300">
+                  <Check size={15} className="text-emerald-400" /> Status Akun: "Petani Terverifikasi"
                 </div>
-                <p className="text-[11px] text-amber-200/80 leading-snug">
-                  Anda sudah dapat menjelajahi seluruh tampilan analitik. Akses penuh penjualan akan aktif otomatis begitu dikonfirmasi oleh Admin.
+                <p className="text-[11px] text-emerald-200/80 leading-snug">
+                  Akun Anda telah aktif sebagai Petani Terverifikasi. Anda sekarang memiliki akses penuh untuk memasang hasil panen di Marketplace.
                 </p>
               </div>
 

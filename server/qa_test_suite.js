@@ -34,55 +34,46 @@ async function runQA() {
     assert(false, `Server health check failed: ${e.message}`);
   }
 
-  // 2. Admin Security & Authentication Bypass Prevention
-  console.log('\n[TEST GROUP 2: Security & Role-Based Access Control]');
+  // 2. Authentication Security & Bypass Prevention
+  console.log('\n[TEST GROUP 2: Security & Authentication Enforcement]');
   try {
-    // 2.1 Unauthenticated call to /api/admin/farmers
-    const resNoAuth = await fetch(`${BASE_URL}/api/admin/farmers`);
-    assert(resNoAuth.status === 401 || resNoAuth.status === 403, 'Unauthenticated request to /api/admin/farmers is BLOCKED (401/403)');
+    // 2.1 Unauthenticated call to protected endpoint
+    const resNoAuth = await fetch(`${BASE_URL}/api/auth/me`);
+    assert(resNoAuth.status === 401, 'Unauthenticated request to /api/auth/me is BLOCKED (401 Unauthorized)');
 
-    // 2.2 Spoofed x-user-role header without valid token
-    const resSpoofed = await fetch(`${BASE_URL}/api/admin/farmers`, {
-      headers: { 'x-user-role': 'admin' }
+    // 2.2 Spoofed / fake JWT token
+    const resSpoofed = await fetch(`${BASE_URL}/api/auth/me`, {
+      headers: { 'Authorization': 'Bearer fake_tampered_token_signature_xyz' }
     });
-    assert(resSpoofed.status === 401 || resSpoofed.status === 403, 'Spoofed header "x-user-role: admin" without cryptographic token is BLOCKED');
+    assert(resSpoofed.status === 401, 'Tampered Bearer token without valid cryptographic signature is BLOCKED (401)');
   } catch (e) {
-    assert(false, `Admin security check failed: ${e.message}`);
+    assert(false, `Security check failed: ${e.message}`);
   }
 
-  // 3. Admin Authentication & Token Verification
-  console.log('\n[TEST GROUP 3: Admin Login & Protected Data Masking]');
-  let adminToken = null;
+  // 3. Verified Farmer Authentication & Token Verification (hidayat@tanipintar.id)
+  console.log('\n[TEST GROUP 3: Verified Farmer Login & Data Integrity]');
+  let farmerToken = null;
   try {
-    const adminLoginRes = await fetch(`${BASE_URL}/api/auth/login`, {
+    const farmerLoginRes = await fetch(`${BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'admin@tanipintar.id', password: 'admin123' })
+      body: JSON.stringify({ email: 'hidayat@tanipintar.id', password: 'rahasia123' })
     });
-    const adminLoginData = await adminLoginRes.json();
-    assert(adminLoginRes.status === 200 && adminLoginData.success, 'Admin login succeeds with credentials');
-    assert(adminLoginData.token && typeof adminLoginData.token === 'string', 'Admin login issues a cryptographic session token');
-    assert(adminLoginData.user?.role === 'admin', 'Admin user object has role "admin"');
-    adminToken = adminLoginData.token;
+    const farmerLoginData = await farmerLoginRes.json();
+    assert(farmerLoginRes.status === 200 && farmerLoginData.success, 'Farmer login succeeds with credentials (hidayat@tanipintar.id)');
+    assert(farmerLoginData.token && typeof farmerLoginData.token === 'string', 'Farmer login issues a cryptographic session token');
+    assert(farmerLoginData.user?.role === 'verified_farmer', 'Farmer user object has role "verified_farmer"');
+    assert(farmerLoginData.user?.full_name === 'Pak Hidayat Sugiono', 'Farmer user object has full_name "Pak Hidayat Sugiono"');
+    farmerToken = farmerLoginData.token;
 
-    // Call /api/admin/farmers with valid admin token
-    const adminFetchRes = await fetch(`${BASE_URL}/api/admin/farmers`, {
-      headers: { 'Authorization': `Bearer ${adminToken}` }
+    // Call protected /api/auth/me with valid Bearer token
+    const profileRes = await fetch(`${BASE_URL}/api/auth/me`, {
+      headers: { 'Authorization': `Bearer ${farmerToken}` }
     });
-    const adminFetchData = await adminFetchRes.json();
-    assert(adminFetchRes.status === 200 && adminFetchData.success, 'Admin can access /api/admin/farmers with Bearer token');
-    
-    // Check PII Data Masking
-    const sampleReq = adminFetchData.requests?.[0];
-    if (sampleReq) {
-      assert(sampleReq.nik.includes('***'), `PII Protection: NIK is masked (${sampleReq.nik})`);
-      assert(sampleReq.account_number.includes('***') || sampleReq.account_number.includes('-**-'), `PII Protection: Bank Account is masked (${sampleReq.account_number})`);
-      assert(sampleReq.phone.includes('***'), `PII Protection: Phone is masked (${sampleReq.phone})`);
-    } else {
-      assert(true, 'Admin request list is clean');
-    }
+    const profileData = await profileRes.json();
+    assert(profileRes.status === 200 && profileData.success, 'Verified farmer can access /api/auth/me with Bearer token');
   } catch (e) {
-    assert(false, `Admin flow failed: ${e.message}`);
+    assert(false, `Farmer auth flow failed: ${e.message}`);
   }
 
   // 4. User Registration & Schema Protection
@@ -169,15 +160,33 @@ async function runQA() {
     assert(false, `Onboarding failed: ${e.message}`);
   }
 
-  // 7. Regular User Forbidden from Admin Endpoints
-  console.log('\n[TEST GROUP 7: RBAC Enforcement]');
+  // 7. Farmer Seller Verification & KYC Data Masking
+  console.log('\n[TEST GROUP 7: Farmer Seller Verification & PII Protection]');
   try {
-    const forbiddenRes = await fetch(`${BASE_URL}/api/admin/farmers`, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+    const upgradeRes = await fetch(`${BASE_URL}/api/auth/upgrade-seller`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`
+      },
+      body: JSON.stringify({
+        email: testEmail,
+        full_name: 'Budi Santoso',
+        farm_location: 'Cilacap, Jawa Tengah',
+        primary_commodity: 'Cabai Merah Besar',
+        land_size: '2 Hektar',
+        nik: '3301051204850003',
+        bank_name: 'BRI',
+        account_number: '0123-01-045678-50-2',
+        phone: '081399887766'
+      })
     });
-    assert(forbiddenRes.status === 403, 'Regular farmer token is strictly FORBIDDEN (403) from accessing admin endpoints');
+    const upgradeData = await upgradeRes.json();
+    assert(upgradeRes.status === 200 && upgradeData.success, 'Farmer verification submission succeeds (200 OK)');
+    assert(upgradeData.user?.role === 'verified_farmer', 'Account upgraded to "verified_farmer" role');
+    assert(upgradeData.user?.nik && upgradeData.user.nik.includes('******'), `PII Protection: NIK is masked (${upgradeData.user?.nik})`);
   } catch (e) {
-    assert(false, `RBAC check failed: ${e.message}`);
+    assert(false, `Seller verification check failed: ${e.message}`);
   }
 
   // 8. Marketplace Product Creation & Listing

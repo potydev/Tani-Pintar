@@ -255,7 +255,7 @@ export async function getRealNotifications({ user = {}, supabase }) {
   // 3. Account KYC & Verification Status (Only if user has an account)
   if (userEmail) {
     const userMeta = getUserMeta(userEmail);
-    const isApproved = userMeta.role === 'admin' || userMeta.role === 'verified_farmer' || userMeta.verification_status === 'approved';
+    const isApproved = userMeta.role === 'verified_farmer' || userMeta.verification_status === 'approved';
 
     if (isApproved) {
       notifs.push({
