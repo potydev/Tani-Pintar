@@ -64,8 +64,8 @@ export async function generateSmartConsultantResponse({
 
   // 1. Try Google Gemini with Live Price Context
   if (cleanKey && cleanKey.startsWith('AIzaSy')) {
-    // Verified Google Gemini models (try newest first, fallback to older stable)
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Google Gemini model (per API deprecation notice, use gemini-3.6-flash)
+    const models = ['gemini-3.6-flash'];
     const priceSummary = await getLivePriceSummary(supabase);
 
     const systemInstruction = `Anda adalah "TaniBot", asisten kecerdasan buatan (AI) terpercaya dari platform TaniPintar (Platform Intelijen Pasar & Agribisnis Indonesia).
