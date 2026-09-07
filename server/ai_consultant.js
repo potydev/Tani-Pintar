@@ -48,7 +48,7 @@ async function getLivePriceSummary(supabase) {
   return `- Beras: Rp 16.550/kg\n- Cabai Merah Besar: Rp 52.800/kg\n- Cabai Rawit Merah: Rp 84.000/kg\n- Bawang Merah: Rp 38.100/kg\n- Bawang Putih: Rp 39.300/kg\n- Daging Ayam: Rp 42.700/kg\n- Daging Sapi: Rp 151.900/kg\n- Telur Ayam: Rp 29.650/kg`;
 }
 
-const DEFAULT_GEMINI_KEY = 'AIzaSyCJLZ6lkRRoMkjEfdymEhU4-LWhjBB48Iw';
+// No hardcoded API key — must be provided via .env / process.env.GEMINI_API_KEY
 
 export async function generateSmartConsultantResponse({
   message,
@@ -60,10 +60,10 @@ export async function generateSmartConsultantResponse({
   const userName = userContext.userName || 'Bapak/Ibu Petani';
   const location = userContext.location || 'Cilacap, Jawa Tengah';
   const userCommodity = userContext.commodity || 'Cabai Merah Besar';
-  const cleanKey = (geminiApiKey || process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY).trim();
+  const cleanKey = (geminiApiKey || process.env.GEMINI_API_KEY || '').trim();
 
   // 1. Try Google Gemini with Live Price Context
-  if (cleanKey && cleanKey.startsWith('AIzaSy')) {
+  if (cleanKey && cleanKey.length > 10) {
     // Google Gemini model (per API deprecation notice, use gemini-3.6-flash)
     const models = ['gemini-3.6-flash'];
     const priceSummary = await getLivePriceSummary(supabase);

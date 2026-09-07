@@ -149,9 +149,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'TaniPintar API Server is running', timestamp: new Date() });
 });
 
-// Google Gemini AI Assistant Integration
-const DEFAULT_GEMINI_KEY = 'AIzaSyCJLZ6lkRRoMkjEfdymEhU4-LWhjBB48Iw';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
+// Google Gemini AI Assistant Integration (key from .env only, never hardcode!)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
 // AI Chatbot Assistant Endpoint with Smart Live Market Fallback
 app.post('/api/ai/chat', async (req, res) => {
