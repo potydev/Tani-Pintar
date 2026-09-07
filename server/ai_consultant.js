@@ -64,8 +64,8 @@ export async function generateSmartConsultantResponse({
 
   // 1. Try Google Gemini with Live Price Context
   if (cleanKey && cleanKey.startsWith('AIzaSy')) {
-    // Verified 2026 stable Google Gemini models
-    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest', 'gemini-3.6-flash'];
+    // Verified Google Gemini models (try newest first, fallback to older stable)
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
     const priceSummary = await getLivePriceSummary(supabase);
 
     const systemInstruction = `Anda adalah "TaniBot", asisten kecerdasan buatan (AI) terpercaya dari platform TaniPintar (Platform Intelijen Pasar & Agribisnis Indonesia).
@@ -127,12 +127,13 @@ Petunjuk Respons:
 
         const data = await resp.json();
         if (resp.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          console.log(`[Gemini API] ✅ Success with model: ${model}`);
           return {
             reply: data.candidates[0].content.parts[0].text,
             model: `gemini-${model}`
           };
         }
-        console.warn(`[Gemini API] Model ${model} returned non-ok:`, data.error?.message || 'empty candidate');
+        console.warn(`[Gemini API] Model ${model} HTTP ${resp.status}:`, JSON.stringify(data.error || data).slice(0, 300));
       } catch (err) {
         console.warn(`[Gemini API] Error contacting ${model}:`, err.message);
       }
@@ -140,6 +141,7 @@ Petunjuk Respons:
   }
 
   // 2. High-Grade NLP Offline Fallback Engine (Detects intent, agronomy, commodity, and context)
+  console.warn('[AI Consultant] ⚠️ All Gemini models failed, using NLP fallback for:', message.slice(0, 80));
   return await generateIntelligentFallbackReply({ message, userContext, supabase });
 }
 
@@ -174,8 +176,8 @@ async function generateIntelligentFallbackReply({ message, userContext, supabase
     };
   }
 
-  // Intent 3: Gratitude
-  if (/(terima kasih|makasih|thanks|matur nuwun|nuhun|ok|siap|baik)/i.test(text)) {
+  // Intent 3: Gratitude (use word boundaries to prevent "baik" matching "sebaiknya"/"terbaik")
+  if (/(terima\s*kasih|makasih|thanks|matur nuwun|nuhun|\bok\b|\bsiap\b|\bbaik\b)/i.test(text) && !/sebaiknya|terbaik/i.test(text)) {
     return {
       reply: `Sama-sama, **${userName}**! Senang bisa membantu Anda. Sukses selalu untuk hasil panen dan agribisnis Anda di **${location}**. Jika ada pertanyaan seputar harga atau rute pasar lain, jangan ragu untuk bertanya lagi! 🌾🚜`,
       model: 'tanibot-nlp-engine'
